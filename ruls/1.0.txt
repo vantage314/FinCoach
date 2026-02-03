@@ -1,0 +1,69 @@
+1. 核心通用原则 (General Principles)
+可复用性检查： 在编写新代码前，必须检查现有功能、组件、API 是否可复用。禁止重复创建已有的函数、工具类或常量。
+需求确认逻辑： 若需求存在模糊点，必须通过反问明确计划；若有多种方案，需提供 A/B 选项供用户选择。
+最小改动原则： 禁止未经指示的大范围重构。除非用户明确要求，否则禁止擅自变更 UI/UX（布局、颜色、字体）或技术栈版本。
+AI 友好规范： 代码需遵循“去魔法”、强约定、可检索、可复用的原则。前端优先使用语义化主题写法，禁止硬编码颜色样式。
+2. 技术栈约束 (Tech Stack)
+后端 (Backend)
+核心环境： Java [1.8 ] / Spring Boot [ 3]
+构建工具： [Maven 】
+持久层框架： [ MybatisPlus]
+架构规范： 严格遵循 Controller -> Service -> Repository 调用链路，禁止反向依赖（如 Repository 调用 Service）。
+代码风格： 禁止复杂的注解组合与元注解，调用链需清晰透明，避免逻辑“隐身”在 AOP 或异步事件中。
+前端 (Frontend)
+框架： [ Vue3]
+构建工具： [Webpack ] 
+语言： JavaScript (要求自检率达 90% 以上)
+UI 组件库： [ ElementUI] 
+CSS 规范： 写法需统一标准，降低“骚操作”带来的维护风险。
+技术栈约束的核心逻辑为各条件相匹配，若不匹配请自行修改
+3. 代码质量与重构 (Quality & Refactoring)
+引用深度： 代码引用层级不得超过 2 层。
+模块化隔离： 模块划分需粒度适当，保持物理隔离，严格控制 API 依赖。
+重构触发点： 单文件代码超过 1000 行 必须进行重构拆分。
+设计先行： 复杂需求需先生成设计文档，经评估后再执行代码实现。
+4. 任务交付与验证 (Verification)
+编译检查： * Java 项目交付前必须确保编译不报错。
+Node/TS 项目必须执行 [ ] (如 pnpm tsc) 确保无类型错误。
+数据库变更： 若涉及结构变化，需同步更新 SQL 配置文件（全量及增量脚本）。
+日志验证： 任务完成后需检查日志（路径：[ ]），确保后端无 Exception 或 Error 堆栈。
+反馈机制： 优先通过“日志 + 反馈”定位问题，减少盲目 Debug；必要时尝试回滚或更换模型。
+doc编写：每次完成任务需要写一个md文件，命名为：日期+变更内容
+关于log在在前后端中，重要的功能或容易报错的地方必须加log
+
+目录大致为：
+/my-ai-project
+├── /api                # 接口协议层：定义前后端沟通的契约
+│   ├── /proto          # 如果使用 gRPC/Protobuf
+│   └── /openapi        # Swagger/OpenAPI 定义文件 (YAML/JSON)
+├── /backend            # 后端服务：遵循 Controller -> Service -> Repository
+│   ├── /src/main/[ ]   # 留空：例如 java/com/project/core
+│   │   ├── /controller # 仅负责请求分发
+│   │   ├── /service    # 核心业务逻辑
+│   │   ├── /repository # 数据库访问层 (禁止向上依赖)
+│   │   ├── /common     # 全局通用配置、常量
+│   │   └── /utils      # 纯函数工具类
+│   ├── pom.xml         # Maven 配置 (或 build.gradle)
+│   └── /scripts        # 部署与环境启动脚本 (如 start-dev.sh)
+├── /frontend           # 前端工程：组件化与类型安全
+│   ├── /src
+│   │   ├── /components # 可复用 UI 组件
+│   │   ├── /pages      # 页面路由组件
+│   │   ├── /api        # 前端 API 调用封装
+│   │   └── /theme      # 语义化主题配置 (禁止硬编码颜色)
+│   ├── [ ]             # 留空：如 vite.config.ts 或 next.config.js
+│   └── package.json
+├── /doc                # 文档中心：AI 的“大脑”输入
+│   ├── /design         # 复杂需求设计文档 (AI 实施前必读)
+│   ├── /prd            # 产品需求文档
+│   └── /ai-rules       # 项目专属 AI Rules 指令集
+├── /sql                # 数据库管理：版本化演进
+│   ├── /init           # 全量初始化脚本
+│   └── /migration      # 增量变更脚本 (按日期排序，如 20260203_add_user_table.sql)
+├── /log                # 日志反馈机制：AI 排错依据
+│   ├── /backend        # 后端运行日志 (如 error.log, info.log)
+│   └── /frontend       # 前端构建或测试日志
+├── .cursorrules        # 根目录 AI 规则文件 (自动生效)
+└── README.md
+
+

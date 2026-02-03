@@ -1,0 +1,17 @@
+// FinCoach 语义化主题变量
+
+$primary-color: #4f46e5; // 靛蓝色
+$secondary-color: #10b981; // 翠绿色
+$background-dark: #0f172a; // 深蓝灰背景
+$text-light: #f8fafc;
+$text-dim: #94a3b8;
+$error-color: #ef4444;
+
+:root {
+  --fc-primary: #{$primary-color};
+  --fc-secondary: #{$secondary-color};
+  --fc-bg: #{$background-dark};
+  --fc-text: #{$text-light};
+  --fc-text-dim: #{$text-dim};
+  --fc-error: #{$error-color};
+}
