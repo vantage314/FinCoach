@@ -3776,3 +3776,5 @@ Caused by: java.sql.SQLSyntaxErrorException: Unknown column 'risk_level' in 'fie
 2026-02-04 03:47:34 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
 2026-02-04 03:47:34 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=InvestmentPlanVO(id=null, riskLevel=aggressive, riskLabel=激进先 (truncated)...]
 2026-02-04 03:47:34 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-04 04:05:59 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-02-04 04:05:59 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

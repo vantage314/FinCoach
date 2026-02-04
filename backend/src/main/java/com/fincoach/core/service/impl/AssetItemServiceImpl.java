@@ -132,7 +132,7 @@ public class AssetItemServiceImpl implements AssetItemService {
         wrapper.eq(AssetItem::getUserId, userId)
                .eq(AssetItem::getCategoryId, categoryId)
                .orderByDesc(AssetItem::getCurrentValue)
-               .last("LIMIT 1);
+               .last("LIMIT 1");
         return assetItemMapper.selectOne(wrapper);
     }
 

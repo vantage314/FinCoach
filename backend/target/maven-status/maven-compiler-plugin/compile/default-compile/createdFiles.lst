@@ -1,0 +1,8 @@
+com\fincoach\core\service\AssetItemService.class
+com\fincoach\core\controller\InvestmentPlanController.class
+com\fincoach\core\service\impl\InvestmentPlanServiceImpl.class
+com\fincoach\core\controller\vo\InvestmentPlanVO$PlanItemVO.class
+com\fincoach\core\repository\entity\InvestmentPlan.class
+com\fincoach\core\controller\vo\InvestmentPlanVO.class
+com\fincoach\core\service\InvestmentPlanService.class
+com\fincoach\core\service\impl\AssetItemServiceImpl.class

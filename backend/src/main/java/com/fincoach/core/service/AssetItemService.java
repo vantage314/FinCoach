@@ -26,6 +26,8 @@ public interface AssetItemService {
     /**
      * 批量删除资产（带越权防御）
      */
+    int deleteAssets(Long userId, List<Long> ids);
+
     /**
      * 更新资产信息
      */

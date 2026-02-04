@@ -2,6 +2,7 @@ package com.fincoach.core.service;
 
 import com.fincoach.core.controller.vo.InvestmentPlanVO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,4 +33,9 @@ public interface InvestmentPlanService {
      * 将建议转化为真实的资产记录
      */
     void executePlan(Long userId, Long planId);
+
+    /**
+     * 标记计划为已执行状态
+     */
+    void markExecuted(Long userId, Long planId);
 }
