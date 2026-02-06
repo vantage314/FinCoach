@@ -6,6 +6,7 @@ import pinia from './store'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import './theme/variables.scss'
+import './theme/element-overwrite.scss'
 
 const app = createApp(App)
 

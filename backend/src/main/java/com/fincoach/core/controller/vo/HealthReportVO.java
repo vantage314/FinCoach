@@ -18,6 +18,9 @@ public class HealthReportVO {
     @Schema(description = "健康等级", example = "良好")
     private String level;
     
+    @Schema(description = "用户画像", example = "NOVICE")
+    private String userType;
+    
     @Schema(description = "流动性得分 (0-20)")
     private Integer liquidityScore;
     

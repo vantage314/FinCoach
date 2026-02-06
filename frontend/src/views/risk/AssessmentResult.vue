@@ -292,7 +292,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/theme/variables.scss";
+@use "@/theme/variables.scss" as *;
 
 .assessment-result {
   min-height: 100vh;

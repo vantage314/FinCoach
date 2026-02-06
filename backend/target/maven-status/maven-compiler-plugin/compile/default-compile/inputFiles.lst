@@ -6,6 +6,7 @@ D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\HealthChe
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\mapper\PlanItemMapper.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\dto\AssetItemDTO.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\config\AuthInterceptor.java
+D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\MarketController.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\entity\PlanItem.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\InvestmentPlanController.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\common\GlobalExceptionHandler.java
@@ -17,6 +18,8 @@ D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\vo\RiskAs
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\entity\AssetItem.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\CoreApplication.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\service\AuthService.java
+D:\project\FinCoach\backend\src\main\java\com\fincoach\core\service\impl\MarketServiceImpl.java
+D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\mapper\MarketSecurityMapper.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\utils\JwtUtils.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\config\SecurityConfig.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\vo\PortfolioSummaryVO.java
@@ -24,6 +27,7 @@ D:\project\FinCoach\backend\src\main\java\com\fincoach\core\service\InvestmentPl
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\common\Result.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\mapper\UserMapper.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\service\impl\HealthCheckServiceImpl.java
+D:\project\FinCoach\backend\src\main\java\com\fincoach\core\service\MarketService.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\AssetCategoryController.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\entity\InvestmentPlan.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\AuthController.java
@@ -35,6 +39,7 @@ D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\dto\Asset
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\service\impl\InvestmentPlanServiceImpl.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\controller\RiskAssessmentController.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\common\AssetCategoryEnum.java
+D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\entity\MarketSecurity.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\mapper\AssetItemMapper.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\service\RiskAssessmentService.java
 D:\project\FinCoach\backend\src\main\java\com\fincoach\core\repository\mapper\InvestmentPlanMapper.java

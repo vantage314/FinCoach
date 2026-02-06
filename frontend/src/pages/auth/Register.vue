@@ -127,7 +127,7 @@ const handleRegister = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/theme/variables.scss";
+@use "@/theme/variables.scss" as *;
 
 .register-page {
   color: white;

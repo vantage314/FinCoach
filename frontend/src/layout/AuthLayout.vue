@@ -17,7 +17,7 @@
 </template>
 
 <style lang="scss" scoped>
-@import "@/theme/variables.scss";
+@use "@/theme/variables.scss" as *;
 
 .auth-wrapper {
   position: relative;

@@ -1,0 +1,55 @@
+/* 强制覆盖 Element Plus 样式 */
+
+// 深色玻璃质感弹窗
+.el-dialog {
+    background: rgba(30, 41, 59, 0.95) !important;
+    /* 深蓝灰 */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3) !important;
+
+    .el-dialog__title {
+        color: #F8FAFC !important;
+    }
+
+    .el-dialog__body {
+        color: #CBD5E1 !important;
+    }
+
+    .el-dialog__headerbtn .el-dialog__close {
+        color: #94a3b8 !important;
+
+        &:hover {
+            color: #06b6d4 !important;
+        }
+    }
+}
+
+// 分页器深色适配
+.el-pagination {
+    --el-pagination-bg-color: transparent !important;
+    --el-pagination-button-bg-color: rgba(255, 255, 255, 0.05) !important;
+    --el-pagination-button-color: #94a3b8 !important;
+    --el-pagination-hover-color: #06b6d4 !important;
+
+    .el-pager li {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: #94a3b8 !important;
+        border: 1px solid transparent;
+
+        &.is-active {
+            background: rgba(6, 182, 212, 0.2) !important;
+            color: #06b6d4 !important;
+            border-color: rgba(6, 182, 212, 0.3) !important;
+        }
+
+        &:hover:not(.is-active) {
+            color: #06b6d4 !important;
+        }
+    }
+
+    button:disabled {
+        background: transparent !important;
+        color: #475569 !important;
+    }
+}

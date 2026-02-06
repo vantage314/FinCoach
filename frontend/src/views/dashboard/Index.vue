@@ -33,6 +33,18 @@
       </div>
     </div>
 
+    <!-- Phase 8: 自适应面板 -->
+    <div class="adaptive-panel-row" v-if="summary.personaTag">
+        <component 
+            :is="summary.liquidityGap > 0 ? 'NovicePanel' : 'InvestorPanel'"
+            :safety-threshold="summary.safetyThreshold"
+            :liquidity-gap="summary.liquidityGap"
+            :safety-progress="summary.safetyProgress"
+            :persona-tag="summary.personaTag"
+            @add-cash="openAddCashDialog"
+        />
+    </div>
+
     <!-- 资产健康度卡片 -->
     <div class="health-row">
       <HealthScoreCard @generate-plan="showPlanDrawer = true" />
@@ -174,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onActivated } from 'vue';
 import { useRouter } from 'vue-router';
 import { Plus, Search, Trash2 } from 'lucide-vue-next';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -184,6 +196,8 @@ import { useHealthStore } from '@/store/modules/health';
 import AssetInputDialog from '../portfolio/components/AssetInputDialog.vue';
 import HealthScoreCard from '@/components/HealthScoreCard.vue';
 import PlanDrawer from '@/components/PlanDrawer.vue';
+import NovicePanel from './components/NovicePanel.vue';
+import InvestorPanel from './components/InvestorPanel.vue';
 
 const router = useRouter();
 const healthStore = useHealthStore();
@@ -395,15 +409,41 @@ const fetchRiskResult = async () => {
   }
 };
 
-onMounted(() => {
+// 封装数据加载逻辑
+const loadData = () => {
+  console.log('[Dashboard] 加载数据...');
   fetchCategories();
   refreshData();
   fetchRiskResult();
+};
+
+// 组件挂载时加载数据
+onMounted(() => {
+  loadData();
 });
+
+// 组件激活，重新加载数据
+onActivated(() => {
+  console.log('[Dashboard] 组件激活，重新加载数据');
+  loadData();
+});
+
+const openAddCashDialog = () => {
+    showDialog.value = true;
+};
+</script>
+
+<script lang="ts">
+export default {
+    components: {
+        NovicePanel,
+        InvestorPanel
+    }
+}
 </script>
 
 <style lang="scss" scoped>
-@import "@/theme/variables.scss";
+@use "@/theme/variables.scss" as *;
 
 .dashboard {
   min-height: 100vh;
@@ -501,6 +541,16 @@ onMounted(() => {
 
 .health-row {
   margin-bottom: 24px;
+}
+
+.adaptive-panel-row {
+    margin-bottom: 24px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .search-bar {

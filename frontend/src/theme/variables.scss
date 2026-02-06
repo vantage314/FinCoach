@@ -7,6 +7,10 @@ $text-light: #f8fafc;
 $text-dim: #94a3b8;
 $error-color: #ef4444;
 
+// 金融色（红涨绿跌 - 中国市场惯例）
+$finance-up: #F56C6C;
+$finance-down: #67C23A;
+
 :root {
   --fc-primary: #{$primary-color};
   --fc-secondary: #{$secondary-color};
@@ -14,4 +18,6 @@ $error-color: #ef4444;
   --fc-text: #{$text-light};
   --fc-text-dim: #{$text-dim};
   --fc-error: #{$error-color};
+  --fc-up: #{$finance-up};
+  --fc-down: #{$finance-down};
 }

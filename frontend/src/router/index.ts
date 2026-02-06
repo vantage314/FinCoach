@@ -1,13 +1,16 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import AuthLayout from '../layout/AuthLayout.vue';
+import TopLayout from '../layout/TopLayout.vue';
 import Login from '../pages/auth/Login.vue';
 import Register from '../pages/auth/Register.vue';
 
 const routes: Array<RouteRecordRaw> = [
+    // 根路径重定向到资产管理（登录后默认页面）
     {
         path: '/',
-        redirect: '/login',
+        redirect: '/dashboard',
     },
+    // 认证相关路由（登录、注册）
     {
         path: '/auth',
         component: AuthLayout,
@@ -26,12 +29,45 @@ const routes: Array<RouteRecordRaw> = [
             }
         ]
     },
+    // 主应用路由 - 使用 TopLayout 顶部导航布局
     {
-        path: '/dashboard',
-        name: 'Dashboard',
-        component: () => import('../views/dashboard/Index.vue'),
-        meta: { requiresAuth: true, title: '资产总览 - FinCoach' }
+        path: '/',
+        component: TopLayout,
+        meta: { requiresAuth: true },
+        children: [
+            {
+                path: '/dashboard',
+                name: 'Dashboard',
+                component: () => import('../views/dashboard/Index.vue'),
+                meta: { requiresAuth: true, title: '资产管理 - FinCoach' }
+            },
+            {
+                path: '/market',
+                name: 'Market',
+                component: () => import('../views/market/Index.vue'),
+                meta: { requiresAuth: true, title: '市场中心 - FinCoach' }
+            },
+            {
+                path: '/market/security/:id',
+                name: 'SecurityDetail',
+                component: () => import('../views/market/SecurityDetail.vue'),
+                meta: { requiresAuth: true, title: '证券详情 - FinCoach' }
+            },
+            {
+                path: '/diagnosis',
+                name: 'Diagnosis',
+                component: () => import('../views/diagnosis/Index.vue'),
+                meta: { requiresAuth: true, title: '资产体检 - FinCoach' }
+            },
+            {
+                path: '/plan',
+                name: 'Plan',
+                component: () => import('../views/plan/Index.vue'),
+                meta: { requiresAuth: true, title: '投资计划 - FinCoach' }
+            }
+        ]
     },
+    // 风险测评路由（保持独立，不使用 TopLayout）
     {
         path: '/risk/assessment',
         name: 'RiskAssessment',

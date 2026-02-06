@@ -143,7 +143,7 @@ const submitResult = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/theme/variables.scss";
+@use "@/theme/variables.scss" as *;
 
 .assessment-wizard {
   min-height: 100vh;

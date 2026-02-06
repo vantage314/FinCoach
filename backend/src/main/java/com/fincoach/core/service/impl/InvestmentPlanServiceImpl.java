@@ -43,8 +43,15 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
     @Autowired
     private RiskAssessmentService riskAssessmentService;
 
+    @Autowired
+    private com.fincoach.core.repository.mapper.MarketSecurityMapper marketSecurityMapper;
+
+
+
     // 最小操作阈值（防止建议买 1 块钱）
     private static final BigDecimal MIN_THRESHOLD = new BigDecimal("1000");
+    // 安全红线：30000
+    private static final BigDecimal SAFETY_THRESHOLD = new BigDecimal("30000");
 
     // 各风险等级的目标配置
     private static final Map<String, Map<String, BigDecimal>> TARGET_RATIOS = new HashMap<>();
@@ -100,86 +107,106 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
         
         // 获取用户风险等级
         RiskAssessmentVO riskProfile = riskAssessmentService.getLatest(userId);
-        String riskLevel = riskProfile != null ? riskProfile.getRiskLevel() : "balanced";
+        String userRiskLevel = riskProfile != null ? riskProfile.getRiskLevel() : "balanced";
         String riskLabel = riskProfile != null ? riskProfile.getLabel() : "平衡探索者";
         
+        // 最终采用的风险等级（可能被降级）
+        String finalRiskLevel = userRiskLevel;
+
         // 获取当前资产分布
         PortfolioSummaryVO summary = assetItemService.getPortfolioSummary(userId);
         BigDecimal currentTotal = summary.getTotalAmount() != null ? summary.getTotalAmount() : BigDecimal.ZERO;
         Map<String, BigDecimal> currentDist = summary.getCategoryDistribution();
         
-        // 计算目标总资产 (当前总资产 + 新增资金)
-        BigDecimal targetTotal = currentTotal.add(investMoney != null ? investMoney : BigDecimal.ZERO);
+        // 获取当前现金余额
+        BigDecimal currentCash = currentDist.getOrDefault("现金储蓄", BigDecimal.ZERO);
         
-        // 获取目标配置比例
-        Map<String, BigDecimal> targetRatios = TARGET_RATIOS.getOrDefault(riskLevel, TARGET_RATIOS.get("balanced"));
-        
-        // 构建计划 VO
-        InvestmentPlanVO plan = new InvestmentPlanVO();
-        plan.setRiskLevel(riskLevel);
-        plan.setRiskLabel(riskLabel);
-        plan.setTotalAmount(currentTotal);
-        plan.setPlanType(planType);
-        plan.setInvestMoney(investMoney);
-        plan.setStatus("draft");
-        plan.setCreateTime(LocalDateTime.now());
+        // Phase 7.6 路由逻辑：计算资金缺口
+        BigDecimal gap = SAFETY_THRESHOLD.subtract(currentCash);
         
         List<PlanItemVO> items = new ArrayList<>();
         
-        // 如果是增量模式且没有总资产，则只按比例分配新资金
-        boolean isContribution = "CONTRIBUTION".equals(planType);
-        
-        // 计算每个分类的目标金额和缺口
-        for (Map.Entry<String, BigDecimal> entry : targetRatios.entrySet()) {
-            String category = entry.getKey();
-            BigDecimal targetRatio = entry.getValue();
+        if ("CONTRIBUTION".equals(planType) && investMoney != null) {
+            // --- 场景 A/B 分流逻辑 ---
+            BigDecimal safeAmount = BigDecimal.ZERO;
+            BigDecimal riskyAmount = BigDecimal.ZERO;
             
-            BigDecimal currentAmount = currentDist.getOrDefault(category, BigDecimal.ZERO);
-            BigDecimal targetAmount = targetTotal.multiply(targetRatio);
-            BigDecimal diff = targetAmount.subtract(currentAmount);
-            
-            // 模式 A：增量模式 (只买不卖，除非严重超标)
-            if (isContribution) {
-                // 在增量模式下，我们主要关注如何分配 investMoney
-                // 如果 diff > 0，说明该分类缺钱，我们可以从 investMoney 中划拨
-                if (diff.compareTo(BigDecimal.ZERO) > 0) {
-                    PlanItemVO item = new PlanItemVO();
-                    item.setCategoryId(CATEGORY_IDS.get(category));
-                    item.setCategoryName(category);
-                    item.setCurrentRatio(currentTotal.compareTo(BigDecimal.ZERO) > 0 ? 
-                            currentAmount.divide(currentTotal, 4, RoundingMode.HALF_UP) : BigDecimal.ZERO);
-                    item.setTargetRatio(targetRatio);
-                    
-                    // 实际分配金额不能超过 diff，也不能超过剩余的 investMoney (简化逻辑：按缺口比例分配)
-                    // 这里采用简化逻辑：直接显示目标需要补足的差额
-                    item.setAmount(diff.setScale(2, RoundingMode.HALF_UP));
-                    item.setAction("BUY");
-                    item.setSubType(getSubType(category, currentAmount));
-                    item.setReason(String.format("根据您的风险偏好，%s类资产尚有缺口，建议优先补足。", category));
-                    items.add(item);
+            if (gap.compareTo(BigDecimal.ZERO) > 0) {
+                // 场景 A: 资金不足 (缺口存在，优先填坑)
+                safeAmount = investMoney.min(gap);
+                riskyAmount = investMoney.subtract(safeAmount);
+                
+                // 如果不仅要填坑，而且填完坑也没剩多少钱给进取投资（导致 riskyAmount == 0），
+                // 或者即使有剩余，但只要触发了“填坑”逻辑且原等级较高，由于重心转移到了安全垫，
+                // 系统判定该计划整体显性风险为 CONSERVATIVE。
+                // 根据需求：如果 riskyAmount == 0 且 userRiskLevel 是激进型，标记为 CONSERVATIVE
+                if (riskyAmount.compareTo(MIN_THRESHOLD) < 0 && isAggressive(userRiskLevel)) {
+                    finalRiskLevel = "conservative";
+                    log.info("触发风险降级: 用户流动资金 {} < 安全红线 {}, 强制降级为 conservative", currentCash, SAFETY_THRESHOLD);
                 }
             } else {
-                // 模式 B：存量再平衡 (原有逻辑)
+                // 场景 B: 资金充裕 (全额进取)
+                riskyAmount = investMoney;
+            }
+
+            log.info("资金路由结果 - 安全垫分配: {}, 进取分配: {}, 最终风险等级: {}", safeAmount, riskyAmount, finalRiskLevel);
+
+            // 1. 生成安全垫资产 (R1/R2)
+            if (safeAmount.compareTo(BigDecimal.ZERO) > 0) {
+                List<com.fincoach.core.repository.entity.MarketSecurity> safePicks = pickSecurities("conservative"); // 强制取稳健资产
+                distributeAmountToSecurities(items, safePicks, safeAmount, "基础安全垫构建 (强制稳健配置)", currentTotal, "conservative");
+            }
+            
+            // 2. 生成进取资产 (User Risk)
+            if (riskyAmount.compareTo(BigDecimal.ZERO) > 0) {
+                List<com.fincoach.core.repository.entity.MarketSecurity> riskyPicks = pickSecurities(userRiskLevel);
+                distributeAmountToSecurities(items, riskyPicks, riskyAmount, "超额资金进取配置", currentTotal, userRiskLevel);
+            }
+
+        } else {
+             // 模式 B：存量再平衡 (保持原有逻辑，但可复用 pickSecurities)
+             // 计算目标总资产
+            BigDecimal targetTotal = currentTotal.add(investMoney != null ? investMoney : BigDecimal.ZERO);
+            Map<String, BigDecimal> targetRatios = TARGET_RATIOS.getOrDefault(userRiskLevel, TARGET_RATIOS.get("balanced"));
+
+             for (Map.Entry<String, BigDecimal> entry : targetRatios.entrySet()) {
+                String category = entry.getKey();
+                BigDecimal targetRatio = entry.getValue();
+                
+                BigDecimal currentAmount = currentDist.getOrDefault(category, BigDecimal.ZERO);
+                BigDecimal targetAmount = targetTotal.multiply(targetRatio);
+                BigDecimal diff = targetAmount.subtract(currentAmount);
+
                 if (diff.abs().compareTo(MIN_THRESHOLD) >= 0) {
-                    PlanItemVO item = new PlanItemVO();
-                    item.setCategoryId(CATEGORY_IDS.get(category));
-                    item.setCategoryName(category);
-                    item.setCurrentRatio(currentTotal.compareTo(BigDecimal.ZERO) > 0 ? 
-                            currentAmount.divide(currentTotal, 4, RoundingMode.HALF_UP) : BigDecimal.ZERO);
-                    item.setTargetRatio(targetRatio);
-                    item.setAmount(diff.abs().setScale(2, RoundingMode.HALF_UP));
-                    
                     if (diff.compareTo(BigDecimal.ZERO) > 0) {
-                        item.setAction("BUY");
-                        item.setSubType(getSubType(category, currentAmount));
-                        item.setReason(generateBuyReason(category, item.getCurrentRatio(), targetRatio));
+                        // BUY
+                        if ("金融投资".equals(category)) {
+                            List<com.fincoach.core.repository.entity.MarketSecurity> picks = pickSecurities(userRiskLevel);
+                            if (!picks.isEmpty()) {
+                                distributeAmountToSecurities(items, picks, diff, 
+                                    String.format("基于您【%s】的偏好，优选核心资产", RiskLevelEnum.getByCode(userRiskLevel).getLabel()), 
+                                    currentTotal, userRiskLevel);
+                            } else {
+                                items.add(createGenericBuyItem(category, diff, currentTotal, currentAmount, targetRatio));
+                            }
+                        } else {
+                            items.add(createGenericBuyItem(category, diff, currentTotal, currentAmount, targetRatio));
+                        }
                     } else {
+                        // SELL
+                        PlanItemVO item = new PlanItemVO();
+                        item.setCategoryId(CATEGORY_IDS.get(category));
+                        item.setCategoryName(category);
+                        item.setCurrentRatio(currentTotal.compareTo(BigDecimal.ZERO) > 0 ? 
+                                currentAmount.divide(currentTotal, 4, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                        item.setTargetRatio(targetRatio);
+                        item.setAmount(diff.abs().setScale(2, RoundingMode.HALF_UP));
                         item.setAction("SELL");
                         item.setReason(generateSellReason(category, item.getCurrentRatio(), targetRatio));
+                        items.add(item);
                     }
-                    items.add(item);
                 }
-            }
+             }
         }
         
         // 排序：先卖后买
@@ -188,7 +215,7 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
             if ("BUY".equals(a.getAction()) && "SELL".equals(b.getAction())) return 1;
             return 0;
         });
-        
+
         if (items.isEmpty()) {
             PlanItemVO item = new PlanItemVO();
             item.setAction("INFO");
@@ -196,9 +223,112 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
             item.setReason("✅ 您的资产配置已经非常接近目标，暂无调仓建议！");
             items.add(item);
         }
-        
+
+        // 构建计划 VO
+        InvestmentPlanVO plan = new InvestmentPlanVO();
+        plan.setRiskLevel(finalRiskLevel); // 使用最终（可能降级）的等级
+        plan.setRiskLabel(RiskLevelEnum.getByCode(finalRiskLevel).getLabel());
+        plan.setTotalAmount(currentTotal);
+        plan.setPlanType(planType);
+        plan.setInvestMoney(investMoney);
+        plan.setStatus("draft");
+        plan.setCreateTime(LocalDateTime.now());
         plan.setItems(items);
+        
         return plan;
+    }
+    
+    // 辅助判断是否激进
+    private boolean isAggressive(String riskLevel) {
+        return "growth".equals(riskLevel) || "aggressive".equals(riskLevel);
+    }
+    
+    // 辅助分配方法
+    private void distributeAmountToSecurities(List<PlanItemVO> items, 
+                                              List<com.fincoach.core.repository.entity.MarketSecurity> picks, 
+                                              BigDecimal totalAmount, 
+                                              String baseReason, 
+                                              BigDecimal portfolioTotal,
+                                              String riskLevel) {
+        if (picks.isEmpty()) return;
+        
+        BigDecimal amountPerSec = totalAmount.divide(new BigDecimal(picks.size()), 2, RoundingMode.HALF_UP);
+        for (com.fincoach.core.repository.entity.MarketSecurity sec : picks) {
+            PlanItemVO subItem = new PlanItemVO();
+            subItem.setCategoryId(CATEGORY_IDS.get("金融投资"));
+            subItem.setCategoryName("金融投资");
+            // 简单估算 currentRatio，实际上对于新资产是 0
+            subItem.setCurrentRatio(BigDecimal.ZERO); 
+            // 这里的 targetRatio 很难精确计算，因为是动态路由，暂时设为 0 或不展示
+            subItem.setTargetRatio(BigDecimal.ZERO);
+            subItem.setAmount(amountPerSec);
+            subItem.setAction("BUY");
+            subItem.setSubType(sec.getName());
+            
+            String riskLabel = RiskLevelEnum.getByCode(riskLevel) != null ? RiskLevelEnum.getByCode(riskLevel).getLabel() : riskLevel;
+            subItem.setReason(String.format("%s。优选 %s 级资产【%s】，预期年涨幅 %s%%。", 
+                    baseReason, sec.getRiskLevel(), sec.getName(), sec.getChangePercent()));
+            items.add(subItem);
+        }
+    }
+
+    /**
+     * 智能选股逻辑
+     */
+    private List<com.fincoach.core.repository.entity.MarketSecurity> pickSecurities(String userRiskProfile) {
+        List<String> targetRiskLevels = new ArrayList<>();
+        int limit = 2; // 默认取2只
+
+        // 风险等级映射矩阵
+        switch (userRiskProfile) {
+            case "conservative": // 保守型 -> R1 (国债、货币基金)
+                targetRiskLevels.add("R1");
+                limit = 1;
+                break;
+            case "steady": // 稳健型 -> R1, R2 (债券、固收+)
+                targetRiskLevels.add("R1");
+                targetRiskLevels.add("R2");
+                limit = 2;
+                break;
+            case "balanced": // 平衡型 -> R2, R3 (大盘股、混合基金)
+                targetRiskLevels.add("R2");
+                targetRiskLevels.add("R3");
+                limit = 2;
+                break;
+            case "growth": // 进取型 -> R3, R4 (成长股、行业ETF)
+                targetRiskLevels.add("R3");
+                targetRiskLevels.add("R4");
+                limit = 3;
+                break;
+            case "aggressive": // 激进型 -> R4, R5 (科技股、高波资产)
+                targetRiskLevels.add("R4");
+                targetRiskLevels.add("R5");
+                limit = 3;
+                break;
+            default:
+                targetRiskLevels.add("R2");
+                targetRiskLevels.add("R3");
+        }
+
+        LambdaQueryWrapper<com.fincoach.core.repository.entity.MarketSecurity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(com.fincoach.core.repository.entity.MarketSecurity::getRiskLevel, targetRiskLevels)
+               .orderByDesc(com.fincoach.core.repository.entity.MarketSecurity::getChangePercent) // 优选近期表现好的
+               .last("LIMIT " + limit);
+
+        List<com.fincoach.core.repository.entity.MarketSecurity> result = marketSecurityMapper.selectList(wrapper);
+        
+        // --- 兜底逻辑 ---
+        if (result == null || result.isEmpty()) {
+            com.fincoach.core.repository.entity.MarketSecurity fallback = new com.fincoach.core.repository.entity.MarketSecurity();
+            fallback.setName("广发货币基金E(兜底)");
+            fallback.setCode("000000");
+            fallback.setType("FUND");
+            fallback.setRiskLevel("R1");
+            fallback.setChangePercent(new BigDecimal("2.5")); // 模拟收益率
+            return Collections.singletonList(fallback);
+        }
+        
+        return result;
     }
 
     @Override
@@ -320,6 +450,20 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
                 newAsset.setSubType(item.getSubType());
                 newAsset.setUpdateTime(LocalDateTime.now());
                 assetItemService.internalAddAsset(newAsset);
+                
+                // Phase 7.5 新增逻辑: 资金同源扣减 (买入同时也需要扣钱)
+                // 找一个钱够的现金账户
+                com.fincoach.core.repository.entity.AssetItem cashAccount = assetItemService.getLargestByCategory(userId, 1); // 1 = 现金储蓄
+                if (cashAccount != null && cashAccount.getCurrentValue().compareTo(item.getAmount()) >= 0) {
+                    cashAccount.setCurrentValue(cashAccount.getCurrentValue().subtract(item.getAmount()));
+                    cashAccount.setUpdateTime(LocalDateTime.now());
+                    assetItemService.updateAsset(cashAccount);
+                    log.info("自动扣减现金账户: {} - {}", cashAccount.getAssetName(), item.getAmount());
+                } else {
+                    // 如果现金不足，但可能是导入的历史数据问题，这里选择记录日志但不阻断(或者阻断?)
+                    // 根据需求："校验：如果现金余额不足，禁止执行" -> 抛出异常
+                    throw new RuntimeException("现金余额不足 (需 ¥" + item.getAmount() + ")，无法自动执行扣款，请先补充现金资产。");
+                }
             } else if ("SELL".equals(item.getAction())) {
                 // 卖出逻辑：查找该分类下金额最大的资产进行扣减
                 com.fincoach.core.repository.entity.AssetItem largestAsset = assetItemService.getLargestByCategory(userId, item.getCategoryId());
@@ -392,5 +536,20 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
         } else {
             return String.format("当前占比 %d%%，高于目标 %d%%，建议适当减持。", currentPct, targetPct);
         }
+    }
+
+    
+    private PlanItemVO createGenericBuyItem(String category, BigDecimal amount, BigDecimal total, BigDecimal current, BigDecimal targetRatio) {
+        PlanItemVO item = new PlanItemVO();
+        item.setCategoryId(CATEGORY_IDS.get(category));
+        item.setCategoryName(category);
+        item.setCurrentRatio(total.compareTo(BigDecimal.ZERO) > 0 ? 
+                current.divide(total, 4, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        item.setTargetRatio(targetRatio);
+        item.setAmount(amount.setScale(2, RoundingMode.HALF_UP));
+        item.setAction("BUY");
+        item.setSubType(getSubType(category, current));
+        item.setReason(generateBuyReason(category, item.getCurrentRatio(), targetRatio));
+        return item;
     }
 }

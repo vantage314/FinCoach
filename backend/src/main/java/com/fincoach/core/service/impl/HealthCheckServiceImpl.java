@@ -52,30 +52,77 @@ public class HealthCheckServiceImpl implements HealthCheckService {
         // 获取风险测评结果
         RiskAssessmentVO riskProfile = riskAssessmentService.getLatest(userId);
         
-        // ===== A. 流动性评分 (20分) =====
-        int liquidityScore = calculateLiquidity(totalAmount, distribution, suggestions);
-        report.setLiquidityScore(liquidityScore);
+        // 1. 判定用户类型
+        boolean isInvestor = isInvestorUser(distribution);
+        report.setUserType(isInvestor ? "INVESTOR" : "NOVICE");
         
-        // ===== B. 风险匹配评分 (40分) =====
-        int riskMatchScore = calculateRiskMatch(totalAmount, distribution, riskProfile, suggestions);
-        report.setRiskMatchScore(riskMatchScore);
+        int totalScore;
         
-        // ===== C. 保障力评分 (20分) =====
-        int protectionScore = calculateProtection(distribution, suggestions);
-        report.setProtectionScore(protectionScore);
+        if (!isInvestor) {
+            // ===== 小白模式 (Novice Mode) =====
+            totalScore = calculateNoviceScore(totalAmount, distribution, suggestions);
+            // 填充默认维度分，避免空值
+            report.setLiquidityScore(totalScore); 
+            report.setRiskMatchScore(0);
+            report.setProtectionScore(0); 
+            report.setDiversityScore(0);
+        } else {
+            // ===== 进阶模式 (Investor Mode) =====
+            // A. 流动性评分 (20分)
+            int liquidityScore = calculateLiquidity(totalAmount, distribution, suggestions);
+            report.setLiquidityScore(liquidityScore);
+            
+            // B. 风险匹配评分 (40分)
+            int riskMatchScore = calculateRiskMatch(totalAmount, distribution, riskProfile, suggestions);
+            report.setRiskMatchScore(riskMatchScore);
+            
+            // C. 保障力评分 (20分)
+            int protectionScore = calculateProtection(distribution, suggestions);
+            report.setProtectionScore(protectionScore);
+            
+            // D. 分散度评分 (20分)
+            int diversityScore = calculateDiversity(distribution, suggestions);
+            report.setDiversityScore(diversityScore);
+            
+            totalScore = liquidityScore + riskMatchScore + protectionScore + diversityScore;
+        }
         
-        // ===== D. 分散度评分 (20分) =====
-        int diversityScore = calculateDiversity(distribution, suggestions);
-        report.setDiversityScore(diversityScore);
-        
-        // 计算总分
-        int totalScore = liquidityScore + riskMatchScore + protectionScore + diversityScore;
         report.setScore(totalScore);
         report.setLevel(getLevel(totalScore));
         report.setSuggestions(suggestions);
         
-        log.info("体检完成，用户ID: {}, 总分: {}, 等级: {}", userId, totalScore, report.getLevel());
+        log.info("体检完成，用户ID: {}, 类型: {}, 总分: {}", userId, report.getUserType(), totalScore);
         return report;
+    }
+
+    private boolean isInvestorUser(Map<String, BigDecimal> dist) {
+        BigDecimal equity = dist.getOrDefault("金融投资", BigDecimal.ZERO);
+        return equity.compareTo(BigDecimal.ZERO) > 0;
+    }
+
+    /**
+     * 小白模式评分算法
+     * 基准分 60
+     * - 没有投资资产 -> 扣 10 分
+     * + 现金流充足 (> 30000) -> 加 20 分
+     */
+    private int calculateNoviceScore(BigDecimal total, Map<String, BigDecimal> dist, List<HealthSuggestion> suggestions) {
+        int score = 60;
+        
+        // 检查抗通胀能力
+        suggestions.add(new HealthSuggestion("warning", "⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀"));
+        score -= 10;
+        
+        // 检查应急准备金 (默认阈值 30000)
+        BigDecimal cash = dist.getOrDefault("现金储蓄", BigDecimal.ZERO);
+        if (cash.compareTo(new BigDecimal("30000")) >= 0) {
+            suggestions.add(new HealthSuggestion("success", "✅ 应急准备金充足 (>6个月支出)"));
+            score += 20;
+        } else {
+            suggestions.add(new HealthSuggestion("info", "💡 建议并在留足3~6个月应急金后，尝试低风险理财"));
+        }
+        
+        return Math.min(100, Math.max(0, score));
     }
 
     /**

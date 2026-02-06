@@ -53,8 +53,10 @@ import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { User as UserIcon, Lock as LockIcon } from 'lucide-vue-next';
 import request from '@/api/request';
+import { useUserStore } from '@/store/modules/user';
 
 const router = useRouter();
+const userStore = useUserStore();
 const loginFormRef = ref();
 const loading = ref(false);
 
@@ -83,7 +85,8 @@ const handleLogin = async () => {
       try {
         const res: any = await request.post('/auth/login', loginForm);
         if (res.code === 200) {
-          localStorage.setItem('token', res.data);
+          // 使用 userStore 保存 token 和 username
+          userStore.setUser(res.data, loginForm.username);
           ElMessage.success('登录成功');
           router.push('/dashboard');
         } else {
@@ -101,7 +104,7 @@ const handleLogin = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/theme/variables.scss";
+@use "@/theme/variables.scss" as *;
 
 .login-page {
   color: white;
