@@ -48,6 +48,13 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/market/Index.vue'),
                 meta: { title: '市场中心', requiresAuth: true }
             },
+            // 🔥 新增：证券详情页
+            {
+                path: '/market/detail/:code',
+                name: 'StockDetail',
+                component: () => import('@/views/market/StockDetail.vue'),
+                meta: { title: '证券详情', requiresAuth: true }
+            },
             {
                 path: '/market/security/:id',
                 name: 'SecurityDetail',

@@ -56,6 +56,7 @@ const initChart = () => {
             ],
             center: ['50%', '50%'],
             radius: '70%',
+            splitNumber: 5,
             splitArea: {
                 areaStyle: {
                     color: ['rgba(255, 255, 255, 0.01)', 'rgba(255, 255, 255, 0.05)']

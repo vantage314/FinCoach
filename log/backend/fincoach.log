@@ -5429,3 +5429,643 @@ Identify and stop the process that's listening on port 8080 or configure this ap
 2026-02-06 16:42:28 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
 2026-02-06 16:42:28 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@7a (truncated)...]
 2026-02-06 16:42:28 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:55:33 [main] INFO  com.fincoach.core.CoreApplication - Starting CoreApplication using Java 22.0.1 with PID 19664 (D:\project\FinCoach\backend\target\classes started by Pan in D:\project\FinCoach\backend)
+2026-02-06 16:55:33 [main] DEBUG com.fincoach.core.CoreApplication - Running with Spring Boot v3.2.2, Spring v6.1.3
+2026-02-06 16:55:33 [main] INFO  com.fincoach.core.CoreApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\AssetItem.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\InvestmentPlan.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\MarketSecurity.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\PlanItem.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\RiskAssessment.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\TransactionRecord.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\User.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\AssetItemMapper.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\InvestmentPlanMapper.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\MarketSecurityMapper.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\PlanItemMapper.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\RiskAssessmentMapper.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\TransactionRecordMapper.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\UserMapper.class]
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'assetItemMapper' and 'com.fincoach.core.repository.mapper.AssetItemMapper' mapperInterface
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'assetItemMapper'.
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'investmentPlanMapper' and 'com.fincoach.core.repository.mapper.InvestmentPlanMapper' mapperInterface
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'investmentPlanMapper'.
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'marketSecurityMapper' and 'com.fincoach.core.repository.mapper.MarketSecurityMapper' mapperInterface
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'marketSecurityMapper'.
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'planItemMapper' and 'com.fincoach.core.repository.mapper.PlanItemMapper' mapperInterface
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'planItemMapper'.
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'riskAssessmentMapper' and 'com.fincoach.core.repository.mapper.RiskAssessmentMapper' mapperInterface
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'riskAssessmentMapper'.
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'transactionRecordMapper' and 'com.fincoach.core.repository.mapper.TransactionRecordMapper' mapperInterface
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'transactionRecordMapper'.
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userMapper' and 'com.fincoach.core.repository.mapper.UserMapper' mapperInterface
+2026-02-06 16:55:34 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'userMapper'.
+2026-02-06 16:55:34 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-02-06 16:55:34 [main] INFO  o.a.c.core.AprLifecycleListener - An older version [1.2.36] of the Apache Tomcat Native library is installed, while Tomcat recommends a minimum version of [2.0.5]
+2026-02-06 16:55:34 [main] INFO  o.a.c.core.AprLifecycleListener - Loaded Apache Tomcat Native library [1.2.36] using APR version [1.7.2].
+2026-02-06 16:55:34 [main] INFO  o.a.c.core.AprLifecycleListener - OpenSSL successfully initialized [OpenSSL 1.1.1t  7 Feb 2023]
+2026-02-06 16:55:35 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-06 16:55:35 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.18]
+2026-02-06 16:55:35 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-02-06 16:55:35 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1986 ms
+2026-02-06 16:55:36 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 26 mappings in 'requestMappingHandlerMapping'
+2026-02-06 16:55:36 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+2026-02-06 16:55:36 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-02-06 16:55:36 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-02-06 16:55:36 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-02-06 16:55:36 [main] INFO  com.fincoach.core.CoreApplication - Started CoreApplication in 4.287 seconds (process running for 4.966)
+2026-02-06 16:56:20 [http-nio-8080-exec-4] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-06 16:56:20 [http-nio-8080-exec-4] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-06 16:56:20 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+2026-02-06 16:56:20 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Detected AcceptHeaderLocaleResolver
+2026-02-06 16:56:20 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Detected FixedThemeResolver
+2026-02-06 16:56:20 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@7cd56f90
+2026-02-06 16:56:20 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@3ce50894
+2026-02-06 16:56:20 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2026-02-06 16:56:20 [http-nio-8080-exec-4] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-02-06 16:56:20 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:56:20 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 16:56:20 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 16:56:20 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:56:20 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 16:56:20 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 16:56:20 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 16:56:20 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 16:56:20 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 16:56:20 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:56:20 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 16:56:20 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:56:20 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:20 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:20 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 16:56:20 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 16:56:20 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:20 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:20 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 16:56:20 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 16:56:20 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:56:20 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:56:20 [http-nio-8080-exec-4] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-06 16:56:20 [http-nio-8080-exec-4] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@23bd6ce
+2026-02-06 16:56:20 [http-nio-8080-exec-4] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-06 16:56:21 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:21 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:21 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:21 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:21 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:21 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=37, userId=1, categoryId=2, assetName=多萨, curre (truncated)...]
+2026-02-06 16:56:21 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:21 [http-nio-8080-exec-7] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:56:21 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:21 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=100000.00, categoryDistributio (truncated)...]
+2026-02-06 16:56:21 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 16:56:21 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:21 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:21 [http-nio-8080-exec-5] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:56:21 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:56:21 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:56:21 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:56:21 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:21 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:21 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:21 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:21 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:21 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:56:21 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:56:21 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:21 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:21 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 16:56:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 16:56:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@31 (truncated)...]
+2026-02-06 16:56:21 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:32 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 16:56:32 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:56:32 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:56:32 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 16:56:32 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 16:56:32 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 16:56:32 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 16:56:32 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 16:56:32 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:56:32 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 16:56:32 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:32 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 16:56:32 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:56:32 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:32 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:56:32 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 16:56:32 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 16:56:32 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:32 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:56:32 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:32 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:32 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:32 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:32 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:32 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:32 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=100000.00, categoryDistributio (truncated)...]
+2026-02-06 16:56:32 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=37, userId=1, categoryId=2, assetName=多萨, curre (truncated)...]
+2026-02-06 16:56:32 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:32 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:32 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 16:56:32 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 16:56:32 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:32 [http-nio-8080-exec-9] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:56:32 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:32 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:56:32 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:56:32 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:56:32 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:32 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:32 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:56:32 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:56:32 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:32 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:32 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:32 [http-nio-8080-exec-2] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:56:32 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:32 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 16:56:32 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:56:35 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:56:35 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:56:35 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:56:35 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:35 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:56:35 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:56:35 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:56:35 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:56:35 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:56:35 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:58:14 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:58:14 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:58:14 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:58:14 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:58:14 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:58:14 [http-nio-8080-exec-5] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:58:14 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:58:14 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:58:14 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:58:14 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:26 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 16:59:26 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 16:59:26 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:26 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@fe (truncated)...]
+2026-02-06 16:59:26 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:30 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:59:30 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:59:30 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 16:59:30 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 16:59:30 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:59:30 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:30 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 16:59:30 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:30 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 16:59:30 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 16:59:30 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 16:59:30 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 16:59:30 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 16:59:30 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:30 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 16:59:30 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 16:59:30 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:59:30 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:59:30 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:30 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:59:30 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:59:30 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:59:30 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:30 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:30 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 16:59:30 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=100000.00, categoryDistributio (truncated)...]
+2026-02-06 16:59:30 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=37, userId=1, categoryId=2, assetName=多萨, curre (truncated)...]
+2026-02-06 16:59:30 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 16:59:30 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:30 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:30 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:59:30 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:59:30 [http-nio-8080-exec-10] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:59:30 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:59:30 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:30 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:59:30 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:30 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:59:30 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:59:30 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:59:30 [http-nio-8080-exec-2] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:59:30 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:59:30 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:30 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:30 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:59:30 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 16:59:30 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:30 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 16:59:34 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 16:59:34 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 16:59:34 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 16:59:34 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:59:34 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 16:59:34 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 16:59:34 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 16:59:34 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 16:59:34 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 16:59:34 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:09 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:04:09 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:04:09 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:09 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@42 (truncated)...]
+2026-02-06 17:04:09 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:11 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 17:04:11 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 17:04:11 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 17:04:11 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 17:04:11 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 17:04:11 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:11 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 17:04:11 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 17:04:11 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 17:04:11 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:11 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 17:04:11 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 17:04:11 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 17:04:11 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 17:04:11 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 17:04:11 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 17:04:11 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:11 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 17:04:11 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:11 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 17:04:11 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 17:04:11 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 17:04:11 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:11 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=37, userId=1, categoryId=2, assetName=多萨, curre (truncated)...]
+2026-02-06 17:04:11 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 17:04:11 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 17:04:11 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 17:04:11 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:11 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:11 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=100000.00, categoryDistributio (truncated)...]
+2026-02-06 17:04:11 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:11 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 17:04:11 [http-nio-8080-exec-8] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 17:04:11 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 17:04:11 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:11 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 17:04:11 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:11 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 17:04:11 [http-nio-8080-exec-10] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 17:04:11 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 17:04:11 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:11 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 17:04:11 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:11 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 17:04:11 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 17:04:11 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:11 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 17:04:11 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:13 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 17:04:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 17:04:13 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 17:04:13 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 17:04:13 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 100000.00, 缺口: 30000.00, 标签: 🌱 蓄力期
+2026-02-06 17:04:13 [http-nio-8080-exec-2] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0010, 理想占比: 0.40, 偏差: -0.3990
+2026-02-06 17:04:13 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: INVESTOR, 总分: 30
+2026-02-06 17:04:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=30, level=待优化, userType=INVESTOR, liquid (truncated)...]
+2026-02-06 17:04:13 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:15 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/plan/list", parameters={}
+2026-02-06 17:04:15 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.InvestmentPlanController#list(HttpServletRequest)
+2026-02-06 17:04:15 [http-nio-8080-exec-4] INFO  c.f.c.s.i.InvestmentPlanServiceImpl - 查询用户调仓历史，用户ID: 1
+2026-02-06 17:04:15 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:15 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[InvestmentPlanVO(id=8, planName=1, riskLevel=balanced, riskL (truncated)...]
+2026-02-06 17:04:15 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:04:39 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/plan/execute?planId=8", parameters={masked}
+2026-02-06 17:04:39 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.InvestmentPlanController#executePlan(HttpServletRequest, Long)
+2026-02-06 17:04:39 [http-nio-8080-exec-5] INFO  c.f.c.s.i.InvestmentPlanServiceImpl - 一键执行调仓计划，用户ID: 1, 计划ID: 8
+2026-02-06 17:04:39 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Using @ExceptionHandler com.fincoach.core.common.GlobalExceptionHandler#handleRuntimeException(RuntimeException)
+2026-02-06 17:04:39 [http-nio-8080-exec-5] ERROR c.f.c.common.GlobalExceptionHandler - 系统业务异常: 
+java.lang.RuntimeException: 现金余额不足 (需 ¥1000.00)，无法自动执行扣款，请先补充现金资产。
+	at com.fincoach.core.service.impl.InvestmentPlanServiceImpl.executePlan(InvestmentPlanServiceImpl.java:499)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:351)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:385)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:717)
+	at com.fincoach.core.service.impl.InvestmentPlanServiceImpl$$SpringCGLIB$$0.executePlan(<generated>)
+	at com.fincoach.core.controller.InvestmentPlanController.executePlan(InvestmentPlanController.java:78)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:261)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:189)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:917)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:829)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:340)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:1570)
+2026-02-06 17:04:39 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:04:39 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=500, message=现金余额不足 (需 ¥1000.00)，无法自动执行扣款，请先补充现金资产。, data=null)]
+2026-02-06 17:04:39 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - Resolved [java.lang.RuntimeException: 现金余额不足 (需 ¥1000.00)，无法自动执行扣款，请先补充现金资产。]
+2026-02-06 17:04:39 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:05:11 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:05:11 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:05:11 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:05:11 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@19 (truncated)...]
+2026-02-06 17:05:11 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:05:13 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=stock&keyword=", parameters={masked}
+2026-02-06 17:05:13 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:05:13 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:05:13 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@64 (truncated)...]
+2026-02-06 17:05:13 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:05:57 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=all&keyword=", parameters={masked}
+2026-02-06 17:05:57 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:05:57 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:05:57 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@a9 (truncated)...]
+2026-02-06 17:05:57 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:06:44 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=stock&keyword=", parameters={masked}
+2026-02-06 17:06:44 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:06:44 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:06:44 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@14 (truncated)...]
+2026-02-06 17:06:44 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:06:45 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=fund&keyword=", parameters={masked}
+2026-02-06 17:06:45 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:06:45 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:06:45 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@32 (truncated)...]
+2026-02-06 17:06:45 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:07:07 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=fund&keyword=%E8%B4%B5%E5%B7%9E%E8%8C%85%E5%8F%B0", parameters={masked}
+2026-02-06 17:07:07 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:07:07 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:07:07 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@33 (truncated)...]
+2026-02-06 17:07:07 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:07:08 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=fund&keyword=%E8%B4%B5%E5%B7%9E%E8%8C%85%E5%8F%B0", parameters={masked}
+2026-02-06 17:07:08 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:07:08 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:07:08 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@72 (truncated)...]
+2026-02-06 17:07:08 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:07:08 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=fund&keyword=%E8%B4%B5%E5%B7%9E%E8%8C%85%E5%8F%B0", parameters={masked}
+2026-02-06 17:07:08 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:07:08 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:07:08 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@17 (truncated)...]
+2026-02-06 17:07:08 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:07:08 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=fund&keyword=%E8%B4%B5%E5%B7%9E%E8%8C%85%E5%8F%B0", parameters={masked}
+2026-02-06 17:07:08 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:07:08 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:07:08 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@13 (truncated)...]
+2026-02-06 17:07:08 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:07:08 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=fund&keyword=%E8%B4%B5%E5%B7%9E%E8%8C%85%E5%8F%B0", parameters={masked}
+2026-02-06 17:07:08 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:07:09 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:07:09 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@75 (truncated)...]
+2026-02-06 17:07:09 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:07:09 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=bond&keyword=%E8%B4%B5%E5%B7%9E%E8%8C%85%E5%8F%B0", parameters={masked}
+2026-02-06 17:07:09 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:07:09 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:07:09 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@2c (truncated)...]
+2026-02-06 17:07:09 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:07:10 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=stock&keyword=%E8%B4%B5%E5%B7%9E%E8%8C%85%E5%8F%B0", parameters={masked}
+2026-02-06 17:07:10 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:07:10 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:07:10 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@28 (truncated)...]
+2026-02-06 17:07:10 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:05 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:11:05 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:05 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:05 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@38 (truncated)...]
+2026-02-06 17:11:05 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:15 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:11:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@65 (truncated)...]
+2026-02-06 17:11:15 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:21 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities", parameters={}
+2026-02-06 17:11:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@51 (truncated)...]
+2026-02-06 17:11:21 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:24 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:11:24 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:24 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:24 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@31 (truncated)...]
+2026-02-06 17:11:24 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:40 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:11:40 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:40 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:40 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@59 (truncated)...]
+2026-02-06 17:11:40 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:42 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities", parameters={}
+2026-02-06 17:11:42 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:42 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:42 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@11 (truncated)...]
+2026-02-06 17:11:42 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:45 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:11:45 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:45 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:45 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@45 (truncated)...]
+2026-02-06 17:11:45 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:51 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities", parameters={}
+2026-02-06 17:11:51 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:51 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:51 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@5c (truncated)...]
+2026-02-06 17:11:51 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:54 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:11:54 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:54 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:54 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@66 (truncated)...]
+2026-02-06 17:11:54 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:11:57 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:11:57 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:11:57 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:11:57 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@2e (truncated)...]
+2026-02-06 17:11:57 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:12:00 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities", parameters={}
+2026-02-06 17:12:00 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:12:00 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:12:00 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@1a (truncated)...]
+2026-02-06 17:12:00 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:15:36 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities", parameters={}
+2026-02-06 17:15:36 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:15:36 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:15:36 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@6c (truncated)...]
+2026-02-06 17:15:36 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:15:39 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:15:39 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:15:39 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:15:39 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@e4 (truncated)...]
+2026-02-06 17:15:39 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:15:41 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:15:41 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:15:41 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:15:41 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@a5 (truncated)...]
+2026-02-06 17:15:41 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:15:49 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:15:49 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:15:49 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:15:49 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@31 (truncated)...]
+2026-02-06 17:15:49 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:15:50 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:15:50 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:15:50 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:15:50 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@63 (truncated)...]
+2026-02-06 17:15:50 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:15:54 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:15:54 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:15:54 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:15:54 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@8c (truncated)...]
+2026-02-06 17:15:54 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:15:59 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:15:59 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:15:59 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:15:59 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@4d (truncated)...]
+2026-02-06 17:15:59 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:22:07 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:22:07 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:22:07 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:22:07 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@5a (truncated)...]
+2026-02-06 17:22:07 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:22:34 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:22:34 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:22:34 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:22:34 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@47 (truncated)...]
+2026-02-06 17:22:34 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:23:07 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:23:07 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:23:07 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:23:07 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@54 (truncated)...]
+2026-02-06 17:23:07 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:23:12 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:23:12 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:23:12 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:23:12 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@13 (truncated)...]
+2026-02-06 17:23:12 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:23:13 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=STOCK&keyword=", parameters={masked}
+2026-02-06 17:23:13 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:23:13 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:23:13 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@b8 (truncated)...]
+2026-02-06 17:23:13 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:23:14 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=FUND&keyword=", parameters={masked}
+2026-02-06 17:23:14 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:23:14 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:23:14 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@63 (truncated)...]
+2026-02-06 17:23:14 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:27:17 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:27:17 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:27:17 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:27:17 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@72 (truncated)...]
+2026-02-06 17:27:17 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:27:18 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:27:18 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:27:18 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:27:18 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@69 (truncated)...]
+2026-02-06 17:27:18 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:27:31 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=STOCK&keyword=", parameters={masked}
+2026-02-06 17:27:31 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:27:31 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:27:31 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@66 (truncated)...]
+2026-02-06 17:27:31 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:27:32 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=FUND&keyword=", parameters={masked}
+2026-02-06 17:27:32 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:27:32 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:27:32 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@6c (truncated)...]
+2026-02-06 17:27:32 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:27:33 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=BOND&keyword=", parameters={masked}
+2026-02-06 17:27:33 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:27:33 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:27:33 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@9d (truncated)...]
+2026-02-06 17:27:33 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:27:34 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:27:34 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:27:34 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:27:34 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@2c (truncated)...]
+2026-02-06 17:27:34 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:27:41 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=STOCK&keyword=", parameters={masked}
+2026-02-06 17:27:41 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:27:41 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:27:41 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@58 (truncated)...]
+2026-02-06 17:27:41 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:29:37 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:29:37 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:29:37 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:29:37 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@1f (truncated)...]
+2026-02-06 17:29:37 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:36:21 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:36:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:36:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:36:21 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@29 (truncated)...]
+2026-02-06 17:36:21 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:39:41 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:39:41 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:39:41 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:39:41 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@2f (truncated)...]
+2026-02-06 17:39:41 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:40:00 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:40:00 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:40:00 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:40:00 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@43 (truncated)...]
+2026-02-06 17:40:00 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:40:12 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&type=STOCK&keyword=", parameters={masked}
+2026-02-06 17:40:12 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:40:12 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:40:12 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@21 (truncated)...]
+2026-02-06 17:40:12 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:40:27 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/plan/list", parameters={}
+2026-02-06 17:40:27 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.InvestmentPlanController#list(HttpServletRequest)
+2026-02-06 17:40:27 [http-nio-8080-exec-4] INFO  c.f.c.s.i.InvestmentPlanServiceImpl - 查询用户调仓历史，用户ID: 1
+2026-02-06 17:40:27 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:40:27 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[InvestmentPlanVO(id=8, planName=1, riskLevel=balanced, riskL (truncated)...]
+2026-02-06 17:40:27 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:40:31 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10&keyword=", parameters={masked}
+2026-02-06 17:40:31 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 17:40:31 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:40:31 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@72 (truncated)...]
+2026-02-06 17:40:31 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 17:40:32 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/plan/list", parameters={}
+2026-02-06 17:40:32 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.InvestmentPlanController#list(HttpServletRequest)
+2026-02-06 17:40:32 [http-nio-8080-exec-6] INFO  c.f.c.s.i.InvestmentPlanServiceImpl - 查询用户调仓历史，用户ID: 1
+2026-02-06 17:40:32 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 17:40:32 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[InvestmentPlanVO(id=8, planName=1, riskLevel=balanced, riskL (truncated)...]
+2026-02-06 17:40:32 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK

@@ -40,13 +40,6 @@ const healthStore = useHealthStore();
 const report = computed(() => healthStore.report);
 const animatedScore = ref(0);
 
-// 分数动画
-watch(() => report.value?.score, (newScore) => {
-  if (newScore !== undefined) {
-    animateScore(newScore);
-  }
-}, { immediate: true });
-
 const animateScore = (target: number) => {
   const duration = 1000;
   const start = animatedScore.value;
@@ -66,6 +59,13 @@ const animateScore = (target: number) => {
   
   requestAnimationFrame(animate);
 };
+
+// 分数动画
+watch(() => report.value?.score, (newScore) => {
+  if (newScore !== undefined) {
+    animateScore(newScore);
+  }
+}, { immediate: true });
 
 const levelClass = computed(() => {
   if (!report.value) return 'empty';
