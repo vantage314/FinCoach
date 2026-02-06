@@ -99,7 +99,36 @@ public class AssetItemServiceImpl implements AssetItemService {
         // 计算投资红线 (总额的20%)
         vo.setInvestmentLimit(total.multiply(new BigDecimal("0.20")).setScale(2, RoundingMode.HALF_UP));
         
-        log.info("资产统计完成，用户ID: {}, 总金额: {}", userId, total);
+        // --- Phase 8: 小白保护指标计算 ---
+        BigDecimal cash = distribution.getOrDefault("现金储蓄", BigDecimal.ZERO); // 占比
+        // 为了计算 Gap，我们需要现金的绝对值
+        BigDecimal cashAmount = assets.stream()
+                .filter(a -> a.getCategoryId() == 1) // 1=CASH
+                .map(AssetItem::getCurrentValue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal threshold = new BigDecimal("30000");
+        BigDecimal gap = threshold.subtract(cashAmount);
+        
+        vo.setSafetyThreshold(threshold);
+        vo.setLiquidityGap(gap.max(BigDecimal.ZERO)); // 缺口不为负
+        
+        // 进度计算: min(cash / 30000, 1) * 100
+        double progress = 0.0;
+        if (threshold.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal p = cashAmount.divide(threshold, 4, RoundingMode.HALF_UP);
+            progress = Math.min(p.doubleValue(), 1.0) * 100;
+        }
+        vo.setSafetyProgress(progress);
+        
+        // 画像标签
+        if (gap.compareTo(BigDecimal.ZERO) > 0) {
+            vo.setPersonaTag("🌱 蓄力期"); // 还是新手，需要存钱
+        } else {
+            vo.setPersonaTag("🌳 增值期"); // 钱够了，可以去浪
+        }
+
+        log.info("资产统计完成，用户ID: {}, 总金额: {}, 缺口: {}, 标签: {}", userId, total, gap, vo.getPersonaTag());
         return vo;
     }
 

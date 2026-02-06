@@ -32,6 +32,12 @@ export interface PortfolioSummary {
     totalAmount: number;
     categoryDistribution: Record<string, number>;
     investmentLimit: number;
+
+    // Phase 8: 小白保护机制
+    safetyThreshold?: number;
+    liquidityGap?: number;
+    safetyProgress?: number;
+    personaTag?: string;
 }
 
 /**

@@ -11,6 +11,18 @@ $error-color: #ef4444;
 $finance-up: #F56C6C;
 $finance-down: #67C23A;
 
+// Aliases for compatibility
+$primary: $primary-color;
+$success: $secondary-color;
+$warning: #e6a23c;
+$danger: $error-color;
+$info: #909399;
+$text-primary: $text-light;
+$text-secondary: $text-dim;
+
+$accent-green: $secondary-color;
+$accent-red: $finance-up; // 红色代表重点/卖出/风险
+
 :root {
   --fc-primary: #{$primary-color};
   --fc-secondary: #{$secondary-color};

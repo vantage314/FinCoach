@@ -1,0 +1,682 @@
+2026-02-06 11:04:48 [main] INFO  com.fincoach.core.CoreApplication - Starting CoreApplication using Java 22.0.1 with PID 12732 (D:\project\FinCoach\backend\target\classes started by Pan in D:\project\FinCoach\backend)
+2026-02-06 11:04:48 [main] DEBUG com.fincoach.core.CoreApplication - Running with Spring Boot v3.2.2, Spring v6.1.3
+2026-02-06 11:04:48 [main] INFO  com.fincoach.core.CoreApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\AssetItem.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\InvestmentPlan.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\MarketSecurity.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\PlanItem.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\RiskAssessment.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Ignored because not a concrete top-level class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\entity\User.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\AssetItemMapper.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\InvestmentPlanMapper.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\MarketSecurityMapper.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\PlanItemMapper.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\RiskAssessmentMapper.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [D:\project\FinCoach\backend\target\classes\com\fincoach\core\repository\mapper\UserMapper.class]
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'assetItemMapper' and 'com.fincoach.core.repository.mapper.AssetItemMapper' mapperInterface
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'assetItemMapper'.
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'investmentPlanMapper' and 'com.fincoach.core.repository.mapper.InvestmentPlanMapper' mapperInterface
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'investmentPlanMapper'.
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'marketSecurityMapper' and 'com.fincoach.core.repository.mapper.MarketSecurityMapper' mapperInterface
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'marketSecurityMapper'.
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'planItemMapper' and 'com.fincoach.core.repository.mapper.PlanItemMapper' mapperInterface
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'planItemMapper'.
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'riskAssessmentMapper' and 'com.fincoach.core.repository.mapper.RiskAssessmentMapper' mapperInterface
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'riskAssessmentMapper'.
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userMapper' and 'com.fincoach.core.repository.mapper.UserMapper' mapperInterface
+2026-02-06 11:04:49 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'userMapper'.
+2026-02-06 11:04:50 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-02-06 11:04:50 [main] INFO  o.a.c.core.AprLifecycleListener - An older version [1.2.36] of the Apache Tomcat Native library is installed, while Tomcat recommends a minimum version of [2.0.5]
+2026-02-06 11:04:50 [main] INFO  o.a.c.core.AprLifecycleListener - Loaded Apache Tomcat Native library [1.2.36] using APR version [1.7.2].
+2026-02-06 11:04:50 [main] INFO  o.a.c.core.AprLifecycleListener - OpenSSL successfully initialized [OpenSSL 1.1.1t  7 Feb 2023]
+2026-02-06 11:04:50 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-06 11:04:50 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.18]
+2026-02-06 11:04:50 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-02-06 11:04:50 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2101 ms
+2026-02-06 11:04:51 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 22 mappings in 'requestMappingHandlerMapping'
+2026-02-06 11:04:51 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+2026-02-06 11:04:51 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-02-06 11:04:51 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-02-06 11:04:51 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2026-02-06 11:04:52 [main] INFO  com.fincoach.core.CoreApplication - Started CoreApplication in 4.709 seconds (process running for 5.517)
+2026-02-06 11:04:56 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-06 11:04:56 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-06 11:04:56 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+2026-02-06 11:04:56 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Detected AcceptHeaderLocaleResolver
+2026-02-06 11:04:56 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Detected FixedThemeResolver
+2026-02-06 11:04:56 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@98485f8
+2026-02-06 11:04:56 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@3e564869
+2026-02-06 11:04:56 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2026-02-06 11:04:56 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-02-06 11:04:57 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:04:57 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:04:57 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:04:57 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:04:57 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:04:57 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:04:57 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:04:57 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:04:57 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:04:57 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:04:57 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:04:57 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:04:57 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:04:57 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:04:57 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:04:57 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:04:57 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:04:57 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:04:57 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:04:57 [http-nio-8080-exec-2] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-02-06 11:04:57 [http-nio-8080-exec-2] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@440f88b6
+2026-02-06 11:04:57 [http-nio-8080-exec-2] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-02-06 11:04:57 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:04:57 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:04:57 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:04:57 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=18, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:04:57 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:04:57 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:04:57 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=10000.00, categoryDistribution (truncated)...]
+2026-02-06 11:04:57 [http-nio-8080-exec-2] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:04:57 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:04:57 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=3, totalScore=82, riskLevel=aggressive, l (truncated)...]
+2026-02-06 11:04:57 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:04:57 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:04:57 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:04:57 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:04:57 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:04:57 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:04:57 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:04:57 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:04:57 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:04:57 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:04:57 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:04:57 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:04:57 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:04:57 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:04:57 [http-nio-8080-exec-7] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:04:57 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:04:57 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:04:57 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:04:57 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:06 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10", parameters={masked}
+2026-02-06 11:05:06 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 11:05:06 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:06 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@2a (truncated)...]
+2026-02-06 11:05:06 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:13 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:05:13 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:05:13 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:05:13 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:05:13 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:05:13 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:05:13 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:05:13 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:05:13 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:05:13 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:05:13 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:05:13 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:13 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:05:13 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:13 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:05:13 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:13 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=18, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:05:13 [http-nio-8080-exec-6] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:05:13 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:13 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:13 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=10000.00, categoryDistribution (truncated)...]
+2026-02-06 11:05:13 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:05:13 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:13 [http-nio-8080-exec-3] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:05:13 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:13 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=3, totalScore=82, riskLevel=aggressive, l (truncated)...]
+2026-02-06 11:05:13 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:05:13 [http-nio-8080-exec-9] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:05:13 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:13 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:05:13 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:13 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:05:13 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:13 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:05:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:05:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:05:13 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:05:13 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:13 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:05:13 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:05:13 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:05:13 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 10000.00, 缺口: 20000.00, 标签: 🌱 蓄力期
+2026-02-06 11:05:13 [http-nio-8080-exec-5] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:05:13 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:05:13 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:13 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:05:13 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:46 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/asset/add", parameters={}
+2026-02-06 11:05:46 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#addAsset(AssetItemDTO, HttpServletRequest)
+2026-02-06 11:05:46 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [AssetItemDTO(categoryId=1, subType=null, assetName=现金, currentValue=20000, holdingCost=null, assetCo (truncated)...]
+2026-02-06 11:05:46 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 开始录入资产，用户ID: 1, 资产名称: 现金, 分类ID: 1
+2026-02-06 11:05:46 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产录入成功，影响行数: 1, 资产ID: 29
+2026-02-06 11:05:46 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:46 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=资产录入成功)]
+2026-02-06 11:05:46 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:46 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:05:46 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:05:46 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:05:46 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:05:46 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:05:46 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:05:46 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:05:46 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:05:46 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:05:46 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:46 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:46 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=29, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:05:46 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=30000.00, categoryDistribution (truncated)...]
+2026-02-06 11:05:46 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:46 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:05:46 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:05:46 [http-nio-8080-exec-10] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:05:46 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:05:46 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:05:46 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:05:46 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:22 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/plan/generate?planType=REBALANCE", parameters={masked}
+2026-02-06 11:06:22 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.InvestmentPlanController#generatePlan(HttpServletRequest, String, BigDecimal)
+2026-02-06 11:06:22 [http-nio-8080-exec-4] INFO  c.f.c.s.i.InvestmentPlanServiceImpl - 开始生成调仓计划，用户ID: 1, 类型: REBALANCE, 新资金: null
+2026-02-06 11:06:22 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:22 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:06:22 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:22 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:22 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=InvestmentPlanVO(id=null, planName=null, riskLevel=aggressive (truncated)...]
+2026-02-06 11:06:22 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:44 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:06:44 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:06:44 [http-nio-8080-exec-6] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:44 [http-nio-8080-exec-6] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:06:44 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:44 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=3, totalScore=82, riskLevel=aggressive, l (truncated)...]
+2026-02-06 11:06:44 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:53 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:06:53 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:06:53 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:06:53 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:06:53 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:06:53 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:06:53 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:06:53 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:06:53 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:53 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:06:53 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:06:53 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:53 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:53 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:53 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=30000.00, categoryDistribution (truncated)...]
+2026-02-06 11:06:53 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=29, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:06:53 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:06:53 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:53 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:53 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:06:53 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:53 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=3, totalScore=82, riskLevel=aggressive, l (truncated)...]
+2026-02-06 11:06:53 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:53 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:53 [http-nio-8080-exec-3] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:06:53 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:06:53 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:53 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:06:53 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:06:53 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:06:53 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:06:53 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:06:53 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:53 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:06:53 [http-nio-8080-exec-8] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:06:53 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:06:53 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:06:53 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:06:53 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:07:08 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:07:08 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:07:08 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:07:08 [http-nio-8080-exec-10] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:07:08 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:07:08 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=3, totalScore=82, riskLevel=aggressive, l (truncated)...]
+2026-02-06 11:07:08 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:07:15 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:07:15 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:07:15 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:07:15 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:07:15 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:07:15 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:07:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:07:15 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:07:15 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:07:15 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:07:15 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:07:15 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:07:15 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:07:15 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:07:15 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:07:15 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:07:15 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:07:15 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:07:15 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=29, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:07:15 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=30000.00, categoryDistribution (truncated)...]
+2026-02-06 11:07:15 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:07:15 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:07:15 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:07:15 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:07:15 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:07:15 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:07:15 [http-nio-8080-exec-7] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:07:15 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:07:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:07:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=3, totalScore=82, riskLevel=aggressive, l (truncated)...]
+2026-02-06 11:07:15 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:07:15 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:07:15 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:07:15 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:07:15 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:07:15 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:07:15 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:07:15 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:07:15 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:07:15 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:07:15 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:07:15 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:07:15 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:07:15 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:07:15 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:07:15 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:07:15 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:07:15 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:15:50 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:15:50 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:15:50 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:15:50 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:15:50 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:15:50 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:15:50 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:15:50 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:15:50 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:15:50 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:15:50 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:15:50 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:15:50 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:15:50 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:15:50 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:15:50 [http-nio-8080-exec-6] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:15:50 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:15:50 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=30000.00, categoryDistribution (truncated)...]
+2026-02-06 11:15:50 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:15:50 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=29, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:15:50 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:15:50 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:15:50 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:15:50 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:15:50 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:15:50 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:15:50 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:15:50 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:15:50 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:15:50 [http-nio-8080-exec-2] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:15:50 [http-nio-8080-exec-3] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:15:50 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:15:50 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:15:50 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:15:50 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=3, totalScore=82, riskLevel=aggressive, l (truncated)...]
+2026-02-06 11:15:50 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:15:50 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:15:50 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:15:50 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:15:50 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:15:51 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:15:51 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:15:51 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:15:51 [http-nio-8080-exec-7] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:15:51 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:15:51 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:15:51 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:15:51 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:15:53 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:15:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:15:53 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:15:53 [http-nio-8080-exec-5] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.80, 偏差: -0.8000
+2026-02-06 11:15:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:15:53 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=3, totalScore=82, riskLevel=aggressive, l (truncated)...]
+2026-02-06 11:15:53 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:19 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/risk/assess", parameters={}
+2026-02-06 11:16:19 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#assess(RiskAssessmentDTO, HttpServletRequest)
+2026-02-06 11:16:19 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [RiskAssessmentDTO(answers={q1=8, q2=8, q3=8, q4=8, q5=12, q6=2, q7=2, q8=2})]
+2026-02-06 11:16:19 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 开始风险测评，用户ID: 1, 答卷: {q1=8, q2=8, q3=8, q4=8, q5=12, q6=2, q7=2, q8=2}
+2026-02-06 11:16:19 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 测评计算完成，用户ID: 1, 总分: 50, 等级: balanced
+2026-02-06 11:16:19 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 测评结果已保存，记录ID: 4
+2026-02-06 11:16:19 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:19 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:16:19 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:19 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:16:19 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:19 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:16:19 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:16:20 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:20 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:16:20 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:20 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:16:20 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:26 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:16:26 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:16:26 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:16:26 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:16:26 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:16:26 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:16:26 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:16:26 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:16:26 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:16:26 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:16:26 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:26 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:16:26 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:16:26 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:26 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:26 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:26 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:26 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=29, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:16:26 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:26 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=30000.00, categoryDistribution (truncated)...]
+2026-02-06 11:16:26 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:26 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:26 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:16:26 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:16:26 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:26 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:26 [http-nio-8080-exec-3] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:16:26 [http-nio-8080-exec-8] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:16:26 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:16:26 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:26 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:26 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:26 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:16:26 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:16:26 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:16:26 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:26 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:26 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:26 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:16:26 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:16:26 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:16:26 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:26 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:26 [http-nio-8080-exec-7] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:16:26 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:16:26 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:26 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:16:26 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:37 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/plan/generate?planType=REBALANCE", parameters={masked}
+2026-02-06 11:16:37 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.InvestmentPlanController#generatePlan(HttpServletRequest, String, BigDecimal)
+2026-02-06 11:16:37 [http-nio-8080-exec-5] INFO  c.f.c.s.i.InvestmentPlanServiceImpl - 开始生成调仓计划，用户ID: 1, 类型: REBALANCE, 新资金: null
+2026-02-06 11:16:37 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:37 [http-nio-8080-exec-5] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:16:37 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:37 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:37 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=InvestmentPlanVO(id=null, planName=null, riskLevel=balanced,  (truncated)...]
+2026-02-06 11:16:37 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:56 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:16:56 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:16:56 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:56 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:16:56 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:56 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:16:56 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:16:57 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:16:57 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:16:57 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:16:57 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:16:57 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:16:57 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:16:57 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:04 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:17:04 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:17:04 [http-nio-8080-exec-6] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:04 [http-nio-8080-exec-6] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:17:04 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:04 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:17:04 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:06 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:17:06 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:17:06 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:17:06 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:17:06 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:17:06 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:17:06 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:17:06 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:17:06 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:17:06 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:17:06 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:06 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:17:06 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:17:06 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:06 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:06 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:06 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:06 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:06 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=29, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:17:06 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=30000.00, categoryDistribution (truncated)...]
+2026-02-06 11:17:06 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:06 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:06 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:06 [http-nio-8080-exec-3] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:17:06 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:06 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:17:06 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:17:06 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:17:06 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:06 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:06 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:17:06 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:06 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:06 [http-nio-8080-exec-9] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:17:06 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:17:06 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:06 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:17:06 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:06 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:17:06 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:17:06 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:17:06 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:06 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:06 [http-nio-8080-exec-5] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:17:06 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:17:06 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:06 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:17:06 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:07 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10", parameters={masked}
+2026-02-06 11:17:07 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 11:17:07 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:07 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@50 (truncated)...]
+2026-02-06 11:17:07 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:15 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:17:15 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:17:15 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:17:15 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:17:15 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:17:15 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:17:15 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:17:15 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:17:15 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:17:15 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:17:15 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:17:15 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:15 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:17:15 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:15 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:15 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=29, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:17:15 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:15 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:15 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:15 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:15 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=30000.00, categoryDistribution (truncated)...]
+2026-02-06 11:17:15 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:15 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:15 [http-nio-8080-exec-2] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:17:15 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:15 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:17:15 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:15 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:15 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:17:15 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:17:15 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:15 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:17:15 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:17:15 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:15 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:17:15 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:15 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:17:15 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:15 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:17:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:17:15 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:17:15 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:15 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:17:15 [http-nio-8080-exec-7] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:17:15 [http-nio-8080-exec-7] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:17:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:15 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:17:15 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:32 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10", parameters={masked}
+2026-02-06 11:17:32 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 11:17:32 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:32 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@52 (truncated)...]
+2026-02-06 11:17:32 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:33 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10", parameters={masked}
+2026-02-06 11:17:33 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 11:17:33 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:33 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@25 (truncated)...]
+2026-02-06 11:17:33 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:17:43 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10", parameters={masked}
+2026-02-06 11:17:43 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 11:17:43 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:17:43 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@6d (truncated)...]
+2026-02-06 11:17:43 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:39 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/market/securities?page=1&size=10", parameters={masked}
+2026-02-06 11:21:39 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.MarketController#getSecurities(Integer, Integer, String, String)
+2026-02-06 11:21:39 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:39 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=com.baomidou.mybatisplus.extension.plugins.pagination.Page@15 (truncated)...]
+2026-02-06 11:21:39 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:42 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:21:42 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:21:42 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/list", parameters={}
+2026-02-06 11:21:42 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/summary", parameters={}
+2026-02-06 11:21:42 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/risk/latest", parameters={}
+2026-02-06 11:21:42 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getPortfolioSummary(HttpServletRequest)
+2026-02-06 11:21:42 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:21:42 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:21:42 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetItemController#getUserAssets(Integer, String, HttpServletRequest)
+2026-02-06 11:21:42 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.RiskAssessmentController#getLatest(HttpServletRequest)
+2026-02-06 11:21:42 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:42 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:21:42 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:21:42 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:42 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:42 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:42 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:42 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:42 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=PortfolioSummaryVO(totalAmount=30000.00, categoryDistribution (truncated)...]
+2026-02-06 11:21:42 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[AssetItem(id=29, userId=1, categoryId=1, assetName=现金, curre (truncated)...]
+2026-02-06 11:21:42 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:42 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:42 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/asset/categories", parameters={}
+2026-02-06 11:21:42 [http-nio-8080-exec-1] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:42 [http-nio-8080-exec-1] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:21:42 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.AssetCategoryController#getCategories()
+2026-02-06 11:21:42 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:42 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=RiskAssessmentVO(id=4, totalScore=50, riskLevel=balanced, lab (truncated)...]
+2026-02-06 11:21:42 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:42 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=[{formType=SIMPLE, iconSlug=wallet, name=现金, id=1}, {formType (truncated)...]
+2026-02-06 11:21:42 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:42 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:42 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:42 [http-nio-8080-exec-10] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:21:42 [http-nio-8080-exec-10] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:21:42 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:42 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:21:42 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:42 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:21:42 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:21:42 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:21:42 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:42 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:42 [http-nio-8080-exec-9] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:21:42 [http-nio-8080-exec-9] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:21:42 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:42 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:21:42 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:46 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:21:46 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:21:46 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:21:46 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:46 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:46 [http-nio-8080-exec-5] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:21:46 [http-nio-8080-exec-5] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:21:46 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:46 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:21:46 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:21:59 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:21:59 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:21:59 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:21:59 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:59 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:21:59 [http-nio-8080-exec-4] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:21:59 [http-nio-8080-exec-4] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:21:59 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:21:59 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:21:59 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:22:20 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:22:20 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:22:20 [http-nio-8080-exec-6] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:22:20 [http-nio-8080-exec-6] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:22:20 [http-nio-8080-exec-6] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:22:20 [http-nio-8080-exec-6] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:22:20 [http-nio-8080-exec-6] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:22:20 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:22:20 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:22:20 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:22:32 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:22:32 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:22:32 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:22:32 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:22:32 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:22:32 [http-nio-8080-exec-8] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:22:32 [http-nio-8080-exec-8] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:22:32 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:22:32 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:22:32 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:22:54 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:22:54 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:22:54 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:22:54 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:22:54 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:22:54 [http-nio-8080-exec-3] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:22:54 [http-nio-8080-exec-3] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:22:54 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:22:54 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:22:54 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-02-06 11:23:13 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/health/check", parameters={}
+2026-02-06 11:23:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.fincoach.core.controller.HealthCheckController#checkHealth(HttpServletRequest)
+2026-02-06 11:23:13 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 开始资产健康度体检，用户ID: 1
+2026-02-06 11:23:13 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:23:13 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.AssetItemServiceImpl - 资产统计完成，用户ID: 1, 总金额: 30000.00, 缺口: 0.00, 标签: 🌳 增值期
+2026-02-06 11:23:13 [http-nio-8080-exec-2] INFO  c.f.c.s.i.RiskAssessmentServiceImpl - 诊断完成，用户ID: 1, 实际占比: 0.0000, 理想占比: 0.40, 偏差: -0.4000
+2026-02-06 11:23:13 [http-nio-8080-exec-2] INFO  c.f.c.s.impl.HealthCheckServiceImpl - 体检完成，用户ID: 1, 类型: NOVICE, 总分: 50
+2026-02-06 11:23:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-02-06 11:23:13 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [Result(code=200, message=success, data=HealthReportVO(score=50, level=一般, userType=NOVICE, liquidity (truncated)...]
+2026-02-06 11:23:13 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK

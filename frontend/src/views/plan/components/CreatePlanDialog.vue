@@ -157,7 +157,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import { useInvestmentPlanStore } from '@/store/modules/investmentPlan';
-import { getLatestResult } from '@/api/risk';
+import { useRiskAssessmentStore } from '@/store/modules/riskAssessment';
 import * as echarts from 'echarts';
 import dayjs from 'dayjs';
 
@@ -168,54 +168,21 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue', 'success']);
 
 const store = useInvestmentPlanStore();
+const riskStore = useRiskAssessmentStore();
+
 const visible = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val)
 });
 
-const step = ref(1);
-const generating = ref(false);
-const saving = ref(false);
-const draft = ref<any>(null);
-const planName = ref('');
-const userRiskLevel = ref('');
-
-const form = ref({
-  planType: 'CONTRIBUTION',
-  investMoney: 10000
-});
-
-const chartRef = ref<HTMLElement | null>(null);
-let chartInstance: echarts.ECharts | null = null;
-
-// 重置状态
-watch(visible, async (val) => {
-  if (val) {
-    step.value = 1;
-    form.value = {
-      planType: 'CONTRIBUTION',
-      investMoney: 10000
-    };
-    draft.value = null;
-    fetchLiquidityInfo();
-    fetchUserRisk();
-    
-    // 重置图表
-    await nextTick();
-    initChart();
-  } else {
-    if (chartInstance) {
-      chartInstance.dispose();
-      chartInstance = null;
-    }
-  }
-});
+// ... (省略中间代码)
 
 const fetchUserRisk = async () => {
     try {
-        const res: any = await getLatestResult();
-        if (res.code === 200 && res.data) {
-            userRiskLevel.value = res.data.riskLevel;
+        // 强制从后端拉取最新画像 (Phase 7.7: Sync)
+        const data = await riskStore.fetchLatestResult();
+        if (data) {
+            userRiskLevel.value = data.riskLevel;
         }
     } catch (e) {
         console.error('获取用户风险等级失败', e);

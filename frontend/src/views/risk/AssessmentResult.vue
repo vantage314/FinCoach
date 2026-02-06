@@ -95,9 +95,14 @@
             <p class="ai-text">{{ result.diagnosis }}</p>
           </div>
 
-          <el-button type="primary" class="cta-btn" @click="goToDashboard">
-            去调整我的持仓
-          </el-button>
+          <div class="flex gap-4 mt-6 btn-group">
+            <el-button type="primary" class="cta-btn flex-1" @click="goToDashboard">
+              去调整我的持仓
+            </el-button>
+            <el-button class="retake-btn flex-1" @click="handleRetake">
+              重新测评
+            </el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -114,8 +119,10 @@ import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import * as echarts from 'echarts';
 import { getLatestResult, type RiskAssessmentResult } from '@/api/risk';
+import { useRiskAssessmentStore } from '@/store/modules/riskAssessment';
 
 const router = useRouter();
+const riskStore = useRiskAssessmentStore();
 
 const result = ref<RiskAssessmentResult | null>(null);
 const mercuryHeight = ref(0);
@@ -198,6 +205,11 @@ const getIcon = (level: string) => {
 
 const goToDashboard = () => {
   router.push('/dashboard');
+};
+
+const handleRetake = () => {
+  riskStore.resetAssessment();
+  router.push('/risk/assessment');
 };
 
 const initPieChart = () => {
@@ -574,5 +586,30 @@ onMounted(() => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.btn-group {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.retake-btn {
+    height: 50px;
+    border-radius: 14px;
+    font-size: 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #94a3b8;
+}
+
+.retake-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-color: rgba(255,255,255,0.2);
 }
 </style>

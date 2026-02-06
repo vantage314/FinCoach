@@ -34,6 +34,9 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
+              <el-dropdown-item @click="router.push('/risk/result')">
+                 我的风险画像
+              </el-dropdown-item>
               <el-dropdown-item>个人中心</el-dropdown-item>
               <el-dropdown-item divided @click="handleLogout">
                 退出登录
