@@ -76,31 +76,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Plus } from '@element-plus/icons-vue';
+import { ref, reactive, onMounted, onActivated } from 'vue';
+import { getPlanList, executePlan } from '@/api/plan';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import dayjs from 'dayjs';
 import CreatePlanDialog from './components/CreatePlanDialog.vue';
 import PlanDetailDialog from './components/PlanDetailDialog.vue';
-import { useInvestmentPlanStore } from '@/store/modules/investmentPlan';
-import { storeToRefs } from 'pinia';
-import dayjs from 'dayjs';
-
-const store = useInvestmentPlanStore();
-const { plans, loading } = storeToRefs(store);
 
 const showCreateDialog = ref(false);
 const showDetailDialog = ref(false);
 const currentPlan = ref<any>(null);
+const plans = ref<any[]>([]);
+const loading = ref(false);
 
-onMounted(() => {
-  store.fetchHistory();
-});
+const loadData = () => {
+  loading.value = true;
+  getPlanList().then((res: any) => {
+    if (res.code === 200) {
+      // 兼容分页结构或数组
+      const raw = res.data;
+      plans.value = Array.isArray(raw) ? raw : (raw?.records || []);
+    }
+  }).finally(() => loading.value = false);
+};
+
+// 初始加载 & 切换回页面刷新
+onMounted(loadData);
+onActivated(loadData);
+
+// 处理一键执行
+const handleExecute = async (planId: number) => {
+  try {
+    await ElMessageBox.confirm('确定要执行该计划吗？资金将自动扣除并买入对应资产。', '执行确认');
+    
+    const res: any = await executePlan(planId); // 调用执行接口
+    if (res.code === 200) {
+      ElMessage.success('计划执行成功！请前往资产页面查看。');
+      loadData(); // 刷新列表状态
+    }
+  } catch (error) {
+    if (error !== 'cancel') ElMessage.error('执行失败');
+  }
+};
 
 const handlePlanCreated = () => {
-  store.fetchHistory();
+  loadData();
 };
 
 const handlePlanExecuted = () => {
-  store.fetchHistory();
+  loadData();
 };
 
 const viewPlan = (plan: any) => {
@@ -123,11 +147,11 @@ const getRiskTag = (level: string) => {
 };
 
 const getStatusType = (status: string) => {
-  return status === 'executed' ? 'success' : 'info';
+  return status === 'executed' || status === 'COMPLETED' ? 'success' : 'info';
 };
 
 const getStatusLabel = (status: string) => {
-  return status === 'executed' ? '已执行' : '待执行';
+  return status === 'executed' || status === 'COMPLETED' ? '已执行' : '待执行';
 };
 </script>
 

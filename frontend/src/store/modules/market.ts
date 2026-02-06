@@ -162,31 +162,53 @@ export const useMarketStore = defineStore('market', () => {
     }
 
     // 获取证券列表（支持类型、关键词搜索和分页）
-    const fetchSecurities = async (params?: QueryParams | string) => {
+    const fetchSecurities = async (params: any) => {
         loading.value = true;
         try {
-            // 兼容旧版调用方式
-            const queryParams: QueryParams = typeof params === 'string'
-                ? { type: params, page: 1, size: 10 }
-                : { page: 1, size: 10, ...params };
+            const res: any = await getSecurities(params);
 
-            // 更新当前分页状态
-            if (queryParams.page) currentPage.value = queryParams.page;
-            if (queryParams.size) pageSize.value = queryParams.size;
+            // 🚀 [调试核心]：在浏览器控制台打印真实数据结构
+            console.log('📊 [Market Debug] 原始响应:', res);
 
-            // 调用后端接口
-            const { data } = await getSecurities(queryParams);
+            // 定义临时变量接收列表和总数
+            let list: any[] = [];
+            let totalCount = 0;
 
-            if (data.code === 200) {
-                const pageData = data.data;
-                securities.value = pageData.records;
-                total.value = pageData.total;
-            } else {
-                securities.value = [];
-                total.value = 0;
+            // 🕵️ 场景 1: 经过 Axios 拦截器处理，res 直接就是 Response Body
+            if (res.data) {
+                // 情况 A: 标准分页 { records: [...], total: 10 }
+                if (Array.isArray(res.data.records)) {
+                    console.log('✅ 识别为: MyBatis Plus 分页对象');
+                    list = res.data.records;
+                    totalCount = Number(res.data.total);
+                }
+                // 情况 B: 直接是数组 [ ... ]
+                else if (Array.isArray(res.data)) {
+                    console.log('✅ 识别为: 纯数组');
+                    list = res.data;
+                    totalCount = list.length;
+                }
             }
+            // 🕵️ 场景 2: 拦截器可能没剥离外层，或者结构特殊
+            else if (res.records && Array.isArray(res.records)) {
+                console.log('✅ 识别为: 解包后的分页对象');
+                list = res.records;
+                totalCount = Number(res.total);
+            }
+            else if (Array.isArray(res)) {
+                console.log('✅ 识别为: 解包后的数组');
+                list = res;
+                totalCount = list.length;
+            }
+
+            // 赋值
+            securities.value = list;
+            total.value = totalCount;
+
+            console.log(`🎉 最终解析: ${list.length} 条数据`);
+
         } catch (error) {
-            console.error('Fetch securities failed:', error);
+            console.error('❌ 获取市场数据崩溃:', error);
             securities.value = [];
         } finally {
             loading.value = false;

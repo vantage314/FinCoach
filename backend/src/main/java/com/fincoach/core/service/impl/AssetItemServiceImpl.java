@@ -25,6 +25,9 @@ import java.util.Map;
 public class AssetItemServiceImpl implements AssetItemService {
 
     @Autowired
+    private com.fincoach.core.service.TransactionService transactionService;
+
+    @Autowired
     private AssetItemMapper assetItemMapper;
 
     @Override
@@ -48,6 +51,13 @@ public class AssetItemServiceImpl implements AssetItemService {
         
         int rows = assetItemMapper.insert(item);
         log.info("资产录入成功，影响行数: {}, 资产ID: {}", rows, item.getId());
+
+        // 记录流水 (DEPOSIT)
+        try {
+            transactionService.record(userId, item.getId(), item.getAssetName(), "DEPOSIT", item.getCurrentValue(), "手动录入资产");
+        } catch (Exception e) {
+            log.error("记账失败", e);
+        }
     }
 
     @Override
@@ -145,6 +155,16 @@ public class AssetItemServiceImpl implements AssetItemService {
         wrapper.in(AssetItem::getId, ids)
                .eq(AssetItem::getUserId, userId);
         
+        // 记录流水 (DELETE) - 先查再删
+        try {
+            List<AssetItem> assetsToDelete = assetItemMapper.selectList(wrapper);
+            for (AssetItem asset : assetsToDelete) {
+                transactionService.record(userId, asset.getId(), asset.getAssetName(), "DELETE", asset.getCurrentValue().negate(), "删除资产");
+            }
+        } catch (Exception e) {
+            log.warn("记账失败 (删除操作)", e);
+        }
+
         int rows = assetItemMapper.delete(wrapper);
         log.info("资产删除完成，实际删除行数: {}", rows);
         return rows;

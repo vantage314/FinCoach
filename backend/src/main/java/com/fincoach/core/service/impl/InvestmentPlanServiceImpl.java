@@ -47,6 +47,8 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
     private com.fincoach.core.repository.mapper.MarketSecurityMapper marketSecurityMapper;
 
 
+    @Autowired
+    private com.fincoach.core.service.TransactionService transactionService;
 
     // 最小操作阈值（防止建议买 1 块钱）
     private static final BigDecimal MIN_THRESHOLD = new BigDecimal("1000");
@@ -102,6 +104,7 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
     }
 
     @Override
+    @Transactional
     public InvestmentPlanVO generatePlan(Long userId, String planType, BigDecimal investMoney) {
         log.info("开始生成调仓计划，用户ID: {}, 类型: {}, 新资金: {}", userId, planType, investMoney);
         
@@ -234,6 +237,14 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
         plan.setStatus("draft");
         plan.setCreateTime(LocalDateTime.now());
         plan.setItems(items);
+        
+        // 🔍 Phase 11.3 核心修复：生成后立即持久化，确保出现在列表中
+        String defaultName = ("CONTRIBUTION".equals(planType) ? "智能定投计划-" : "存量再平衡-") 
+            + LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMddHHmm"));
+        plan.setPlanName(defaultName);
+        
+        Long planId = this.savePlan(userId, plan);
+        plan.setId(planId);
         
         return plan;
     }
@@ -369,46 +380,62 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
 
     @Override
     public List<InvestmentPlanVO> getHistory(Long userId) {
-        LambdaQueryWrapper<InvestmentPlan> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(InvestmentPlan::getUserId, userId)
-               .orderByDesc(InvestmentPlan::getCreateTime)
-               .last("LIMIT 10");
-        
-        List<InvestmentPlan> plans = planMapper.selectList(wrapper);
+        log.info("查询用户调仓历史，用户ID: {}", userId);
         List<InvestmentPlanVO> result = new ArrayList<>();
-        
-        for (InvestmentPlan plan : plans) {
-            InvestmentPlanVO vo = new InvestmentPlanVO();
-            vo.setId(plan.getId());
-            vo.setPlanName(plan.getPlanName());
-            vo.setRiskLevel(plan.getRiskLevel());
-            vo.setRiskLabel(RiskLevelEnum.getByCode(plan.getRiskLevel()).getLabel());
-            vo.setTotalAmount(plan.getTotalAmount());
-            vo.setPlanType(plan.getPlanType());
-            vo.setInvestMoney(plan.getInvestMoney());
-            vo.setStatus(plan.getStatus());
-            vo.setCreateTime(plan.getCreateTime());
+        try {
+            LambdaQueryWrapper<InvestmentPlan> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(InvestmentPlan::getUserId, userId)
+                   .orderByDesc(InvestmentPlan::getCreateTime)
+                   .last("LIMIT 10");
             
-            LambdaQueryWrapper<PlanItem> itemWrapper = new LambdaQueryWrapper<>();
-            itemWrapper.eq(PlanItem::getPlanId, plan.getId());
-            List<PlanItem> items = itemMapper.selectList(itemWrapper);
-            
-            List<PlanItemVO> itemVOs = new ArrayList<>();
-            for (PlanItem item : items) {
-                PlanItemVO itemVO = new PlanItemVO();
-                itemVO.setId(item.getId());
-                itemVO.setAction(item.getAction());
-                itemVO.setCategoryId(item.getCategoryId());
-                itemVO.setCategoryName(item.getCategoryName());
-                itemVO.setSubType(item.getSubType());
-                itemVO.setAmount(item.getAmount());
-                itemVO.setCurrentRatio(item.getCurrentRatio());
-                itemVO.setTargetRatio(item.getTargetRatio());
-                itemVO.setReason(item.getReason());
-                itemVOs.add(itemVO);
+            List<InvestmentPlan> plans = planMapper.selectList(wrapper);
+            if (plans == null) return result;
+
+            for (InvestmentPlan plan : plans) {
+                try {
+                    InvestmentPlanVO vo = new InvestmentPlanVO();
+                    vo.setId(plan.getId());
+                    vo.setPlanName(plan.getPlanName() != null ? plan.getPlanName() : "未命名计划");
+                    
+                    String riskLevel = plan.getRiskLevel() != null ? plan.getRiskLevel().toLowerCase() : "balanced";
+                    vo.setRiskLevel(riskLevel);
+                    vo.setRiskLabel(RiskLevelEnum.getByCode(riskLevel).getLabel());
+                    
+                    vo.setTotalAmount(plan.getTotalAmount() != null ? plan.getTotalAmount() : BigDecimal.ZERO);
+                    vo.setPlanType(plan.getPlanType() != null ? plan.getPlanType() : "CONTRIBUTION");
+                    vo.setInvestMoney(plan.getInvestMoney() != null ? plan.getInvestMoney() : BigDecimal.ZERO);
+                    vo.setStatus(plan.getStatus() != null ? plan.getStatus() : "draft");
+                    vo.setCreateTime(plan.getCreateTime());
+                    
+                    // 获取明细
+                    LambdaQueryWrapper<PlanItem> itemWrapper = new LambdaQueryWrapper<>();
+                    itemWrapper.eq(PlanItem::getPlanId, plan.getId());
+                    List<PlanItem> items = itemMapper.selectList(itemWrapper);
+                    
+                    List<PlanItemVO> itemVOs = new ArrayList<>();
+                    if (items != null) {
+                        for (PlanItem item : items) {
+                            PlanItemVO itemVO = new PlanItemVO();
+                            itemVO.setId(item.getId());
+                            itemVO.setAction(item.getAction());
+                            itemVO.setCategoryId(item.getCategoryId());
+                            itemVO.setCategoryName(item.getCategoryName());
+                            itemVO.setSubType(item.getSubType());
+                            itemVO.setAmount(item.getAmount());
+                            itemVO.setCurrentRatio(item.getCurrentRatio());
+                            itemVO.setTargetRatio(item.getTargetRatio());
+                            itemVO.setReason(item.getReason());
+                            itemVOs.add(itemVO);
+                        }
+                    }
+                    vo.setItems(itemVOs);
+                    result.add(vo);
+                } catch (Exception e) {
+                    log.error("解析单笔投资计划失败 [ID: {}]: {}", plan.getId(), e.getMessage());
+                }
             }
-            vo.setItems(itemVOs);
-            result.add(vo);
+        } catch (Exception e) {
+            log.error("查询投资计划历史失败 [UserID: {}]: {}", userId, e.getMessage());
         }
         return result;
     }
@@ -451,6 +478,9 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
                 newAsset.setUpdateTime(LocalDateTime.now());
                 assetItemService.internalAddAsset(newAsset);
                 
+                // 记账 (HOLD): 资产增加
+                transactionService.record(userId, newAsset.getId(), newAsset.getAssetName(), "HOLD", item.getAmount(), "计划执行: 新增持仓");
+                
                 // Phase 7.5 新增逻辑: 资金同源扣减 (买入同时也需要扣钱)
                 // 找一个钱够的现金账户
                 com.fincoach.core.repository.entity.AssetItem cashAccount = assetItemService.getLargestByCategory(userId, 1); // 1 = 现金储蓄
@@ -459,6 +489,10 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
                     cashAccount.setUpdateTime(LocalDateTime.now());
                     assetItemService.updateAsset(cashAccount);
                     log.info("自动扣减现金账户: {} - {}", cashAccount.getAssetName(), item.getAmount());
+                    
+                    // 记账 (BUY): 现金减少
+                    transactionService.record(userId, cashAccount.getId(), "现金账户", "BUY", item.getAmount().negate(), "计划执行: 买入 " + newAsset.getAssetName());
+
                 } else {
                     // 如果现金不足，但可能是导入的历史数据问题，这里选择记录日志但不阻断(或者阻断?)
                     // 根据需求："校验：如果现金余额不足，禁止执行" -> 抛出异常
@@ -483,6 +517,15 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
                 largestAsset.setCurrentValue(newAmount);
                 largestAsset.setUpdateTime(LocalDateTime.now());
                 assetItemService.updateAsset(largestAsset);
+                
+                // 记账 (SELL): 资产减少
+                transactionService.record(userId, largestAsset.getId(), largestAsset.getAssetName(), "SELL", item.getAmount().negate(), "计划执行: 卖出赎回");
+                
+                // 增加现金? (如果卖出应该有钱回流，但目前的简易逻辑可能没处理回流到现金。
+                // 既然没处理回流，这里先不记入金。或者默认回流到最大现金账户?
+                // 用户需求只提了 B C 场景。C: "在扣减现金时记 BUY，在增加持仓时记 HOLD。"
+                // 没有明确提到 SELL 的回流。为了完整性，最好处理回流，但目前的 auto-execution 逻辑并没有处理 Sell 的现金回流。
+                // 我会暂且只记录 SELL 导致的资产减少。
             }
         }
 

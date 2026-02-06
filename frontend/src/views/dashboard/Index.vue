@@ -33,16 +33,19 @@
       </div>
     </div>
 
-    <!-- Phase 8: 自适应面板 -->
-    <div class="adaptive-panel-row" v-if="summary.personaTag">
-        <component 
-            :is="summary.liquidityGap > 0 ? 'NovicePanel' : 'InvestorPanel'"
-            :safety-threshold="summary.safetyThreshold"
-            :liquidity-gap="summary.liquidityGap"
-            :safety-progress="summary.safetyProgress"
-            :persona-tag="summary.personaTag"
+    <!-- Phase 9: 智能看板 -->
+    <div class="adaptive-panel-row">
+      <transition name="el-zoom-in-top" mode="out-in">
+        <SafetyGoalPanel 
+            v-if="healthStore.report?.userType === 'NOVICE'" 
+            :current-cash="summary.categoryDistribution['1'] || 0"
             @add-cash="openAddCashDialog"
         />
+        <InvestorOverview 
+            v-else 
+            :total-assets="summary.totalAmount"
+        />
+      </transition>
     </div>
 
     <!-- 资产健康度卡片 -->
@@ -82,6 +85,10 @@
           搜索
         </el-button>
       </div>
+      <el-button plain class="trans-btn" @click="showTransactionDrawer = true">
+          <FileText class="icon" />
+          资金流水
+      </el-button>
       <el-button type="primary" class="add-btn" @click="showDialog = true">
         <Plus class="icon" />
         新增资产
@@ -182,29 +189,38 @@
     
     <!-- 调仓计划抽屉 -->
     <PlanDrawer v-model="showPlanDrawer" @success="refreshData" />
+
+    <!-- 资金流水抽屉 -->
+    <TransactionDrawer v-model="showTransactionDrawer" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onActivated } from 'vue';
 import { useRouter } from 'vue-router';
-import { Plus, Search, Trash2 } from 'lucide-vue-next';
+import { Plus, Search, Trash2, FileText } from 'lucide-vue-next';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { getAssetList, getAssetSummary, getCategories, deleteAssets, type AssetItem, type PortfolioSummary, type AssetCategory } from '@/api/asset';
 import { getLatestResult, type RiskAssessmentResult } from '@/api/risk';
 import { useHealthStore } from '@/store/modules/health';
+import { useAssetStore } from '@/store/modules/asset';
 import AssetInputDialog from '../portfolio/components/AssetInputDialog.vue';
 import HealthScoreCard from '@/components/HealthScoreCard.vue';
 import PlanDrawer from '@/components/PlanDrawer.vue';
-import NovicePanel from './components/NovicePanel.vue';
-import InvestorPanel from './components/InvestorPanel.vue';
+import SafetyGoalPanel from './components/SafetyGoalPanel.vue';
+import InvestorOverview from './components/InvestorOverview.vue';
+import TransactionDrawer from './components/TransactionDrawer.vue';
+import { storeToRefs } from 'pinia';
 
 const router = useRouter();
 const healthStore = useHealthStore();
+const assetStore = useAssetStore();
+const { assets, summary, loading, total: totalCount } = storeToRefs(assetStore);
+
 const showDialog = ref(false);
 const showPlanDrawer = ref(false);
-const loading = ref(false);
-const assets = ref<AssetItem[]>([]);
+const showTransactionDrawer = ref(false);
+// const assets = ref<AssetItem[]>([]); // Removed
 const categories = ref<AssetCategory[]>([]);
 const searchKeyword = ref('');
 const riskResult = ref<RiskAssessmentResult | null>(null);
@@ -212,13 +228,7 @@ const selectedCategory = ref<number | undefined>(undefined);
 const selectedIds = ref<number[]>([]);
 const currentPage = ref(1);
 const pageSize = ref(10);
-const totalCount = ref(0);
-
-const summary = ref<PortfolioSummary>({
-  totalAmount: 0,
-  categoryDistribution: {},
-  investmentLimit: 0
-});
+// const totalCount = ref(0); // Removed
 
 const formatNumber = (num: number) => {
   return (num || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -258,10 +268,8 @@ const getProfitText = (row: AssetItem) => {
 };
 
 const fetchAssets = async () => {
-  loading.value = true;
-  try {
     // 使用后端筛选
-    const params: { categoryId?: number; assetName?: string } = {};
+    const params: { categoryId?: number; assetName?: string; page?: number; size?: number } = {};
     if (selectedCategory.value) {
       params.categoryId = selectedCategory.value;
     }
@@ -269,31 +277,15 @@ const fetchAssets = async () => {
       params.assetName = searchKeyword.value;
     }
     
-    const res: any = await getAssetList(params);
-    if (res.code === 200) {
-      const data = res.data || [];
-      totalCount.value = data.length;
-      
-      // 前端分页
-      const start = (currentPage.value - 1) * pageSize.value;
-      assets.value = data.slice(start, start + pageSize.value);
-    }
-  } catch (error) {
-    console.error('获取资产列表失败:', error);
-  } finally {
-    loading.value = false;
-  }
+    // 如果后端支持分页，直接传参
+    // params.page = currentPage.value;
+    // params.size = pageSize.value;
+    
+    await assetStore.getList(params);
 };
 
 const fetchSummary = async () => {
-  try {
-    const res: any = await getAssetSummary();
-    if (res.code === 200) {
-      summary.value = res.data;
-    }
-  } catch (error) {
-    console.error('获取统计失败:', error);
-  }
+  await assetStore.getSummary();
 };
 
 const fetchCategories = async () => {
@@ -317,6 +309,7 @@ const handlePageChange = () => {
 };
 
 const refreshData = async () => {
+  console.log('🔄 刷新资产数据...');
   // 并行请求优化性能
   await Promise.all([
     fetchAssets(),
@@ -436,8 +429,8 @@ const openAddCashDialog = () => {
 <script lang="ts">
 export default {
     components: {
-        NovicePanel,
-        InvestorPanel
+        SafetyGoalPanel,
+        InvestorOverview
     }
 }
 </script>
@@ -642,6 +635,29 @@ export default {
     width: 16px;
     height: 16px;
     margin-right: 6px;
+  }
+}
+
+.trans-btn {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  margin-right: 12px;
+  font-weight: 600;
+
+  .icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
   }
 }
 

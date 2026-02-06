@@ -1,369 +1,354 @@
 <template>
-  <div class="diagnosis-page">
-    <header class="page-header">
-      <div class="header-content">
-        <h1 class="title">资产体检中心</h1>
-        <p class="subtitle">AI 智能诊断您的财富健康状况</p>
-      </div>
-      <div class="user-badge" v-if="report">
-        <el-tag 
-          :type="report.userType === 'INVESTOR' ? 'success' : 'info'" 
-          effect="dark" 
-          size="large"
-          class="persona-tag"
-        >
-          <span class="icon">{{ report.userType === 'INVESTOR' ? '📈' : '🔰' }}</span>
-          {{ report.userType === 'INVESTOR' ? '进阶投资者' : '储蓄型用户' }}
-        </el-tag>
-      </div>
-    </header>
-
-    <div v-loading="loading" class="diagnosis-content">
-      <!-- 错误/空状态 -->
-      <div v-if="error || (!loading && !report)" class="empty-state">
-         <el-empty :description="error || '暂无体检报告，请先录入资产'">
-           <el-button type="primary" @click="retryFetch">刷新重试</el-button>
-         </el-empty>
-      </div>
-
-      <div v-else-if="report" class="report-container">
-        <!-- 核心评分卡片 -->
-        <div class="score-section">
-          <div class="total-score-card" :class="getScoreClass(report.score)">
+  <div class="diagnosis-container">
+    <div class="score-card glass-panel" :class="getScoreClass(report?.score || 0)">
+        <div class="score-content">
             <div class="score-circle">
-              <span class="score-value">{{ report.score }}</span>
-              <span class="score-label">健康分</span>
+                <span class="score-num">{{ report?.score || 0 }}</span>
+                <span class="score-label">健康分</span>
             </div>
-            <div class="score-level">{{ report.level }}</div>
-            <p class="score-desc" v-if="report.userType === 'NOVICE'">
-              您的资产结构较为单一，抗通胀能力较弱。
-            </p>
-            <p class="score-desc" v-else>
-              您的资产配置超越了 {{ Math.min(99, report.score + 10) }}% 的用户。
-            </p>
-          </div>
-
-          <!-- 维度评分 (仅进阶用户显示雷达/维度，新手用户显示通胀对抗图) -->
-          <div class="dimensions-card">
-            <template v-if="report.userType === 'INVESTOR'">
-              <h3 class="card-title">四维健康模型</h3>
-              <div class="dimension-grid">
-                <div class="dim-item">
-                  <span class="label">流动性</span>
-                  <el-progress :percentage="report.liquidityScore / 20 * 100" :color="getColor(report.liquidityScore, 20)" />
-                  <span class="val">{{ report.liquidityScore }}/20</span>
-                </div>
-                <div class="dim-item">
-                  <span class="label">风险匹配</span>
-                  <el-progress :percentage="report.riskMatchScore / 40 * 100" :color="getColor(report.riskMatchScore, 40)" />
-                  <span class="val">{{ report.riskMatchScore }}/40</span>
-                </div>
-                <div class="dim-item">
-                  <span class="label">保障力</span>
-                  <el-progress :percentage="report.protectionScore / 20 * 100" :color="getColor(report.protectionScore, 20)" />
-                  <span class="val">{{ report.protectionScore }}/20</span>
-                </div>
-                <div class="dim-item">
-                  <span class="label">分散度</span>
-                  <el-progress :percentage="report.diversityScore / 20 * 100" :color="getColor(report.diversityScore, 20)" />
-                  <span class="val">{{ report.diversityScore }}/20</span>
-                </div>
-              </div>
-            </template>
-            <template v-else>
-              <h3 class="card-title">闲钱激活潜力</h3>
-              <div class="novice-insight">
-                <div class="inflation-chart">
-                  <div class="bar cash" style="height: 60%">
-                    <span>现金收益 (~2%)</span>
-                  </div>
-                  <div class="bar cpi" style="height: 80%">
-                    <span>通胀率 (~3%)</span>
-                  </div>
-                  <div class="bar target" style="height: 100%">
-                    <span>理财目标 (>4%)</span>
-                  </div>
-                </div>
-                <p class="insight-text">
-                  ⚠️ 警告：长期持有大量现金可能导致购买力缩水。建议您尝试低风险理财产品。
-                </p>
-              </div>
-            </template>
-          </div>
-        </div>
-
-        <!-- 诊断建议列表 -->
-        <h3 class="section-title">AI 优化建议</h3>
-        <div class="suggestions-list">
-          <div 
-            v-for="(suggestion, index) in report.suggestions" 
-            :key="index"
-            class="suggestion-item"
-            :class="suggestion.type"
-          >
-            <div class="icon-box">
-              <span v-if="suggestion.type === 'success'">✅</span>
-              <span v-else-if="suggestion.type === 'warning'">⚠️</span>
-              <span v-else>💡</span>
+            <div class="score-info">
+                <h2>{{ report?.level || '待诊断' }}</h2>
+                <p v-if="report?.userType === 'NOVICE'">您的资产结构较为单一，建议开启定投计划。</p>
+                <p v-else>您的资产配置超越了 {{ Math.min(99, (report?.score || 0) + 10) }}% 的用户。</p>
             </div>
-            <div class="content">{{ suggestion.message }}</div>
-          </div>
         </div>
-        
-        <div class="action-area">
-          <el-button type="primary" size="large" @click="$router.push('/plan')">
-            前往生成优化方案
-          </el-button>
-        </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card glass-panel">
+        <h3>资产结构透视</h3>
+        <v-chart class="chart-instance" :option="radarOption" autoresize />
       </div>
+      <div class="chart-card glass-panel">
+        <h3>健康度趋势</h3>
+        <v-chart class="chart-instance" :option="trendOption" autoresize />
+      </div>
+    </div>
+
+    <div class="details-section glass-panel">
+      <h3>📋 深度诊断报告</h3>
+      <el-collapse v-model="activeNames" class="custom-collapse">
+        <el-collapse-item name="1">
+            <template #title>
+                <div class="collapse-header">
+                    <span>💧 流动性分析 (Liquidity)</span>
+                    <el-tag :type="liquidityStatus" size="small">{{ liquidityRatio }}%</el-tag>
+                </div>
+            </template>
+            <div class="diagnosis-item">
+                <p>现金储备率：<strong>{{ liquidityRatio }}%</strong></p>
+                <el-alert :title="liquiditySuggestion" :type="liquidityStatus" show-icon :closable="false" />
+            </div>
+        </el-collapse-item>
+        
+        <el-collapse-item name="2">
+             <template #title>
+                <div class="collapse-header">
+                    <span>🛡️ 风险控制 (Risk Control)</span>
+                    <el-tag type="warning" size="small">需关注</el-tag>
+                </div>
+            </template>
+             <div class="diagnosis-item">
+                <p>权益类资产占比：<strong>{{ report?.riskMatchScore ? '45%' : '0%' }}</strong></p>
+                <el-alert title="当前风险敞口适中，建议增加债券配置以平滑波动。" type="warning" show-icon :closable="false" />
+            </div>
+        </el-collapse-item>
+        
+        <el-collapse-item name="3">
+             <template #title>
+                <div class="collapse-header">
+                    <span>🚀 成长潜力 (Growth)</span>
+                    <el-tag type="success" size="small">优秀</el-tag>
+                </div>
+            </template>
+            <div class="diagnosis-item">
+                <p>预期年化收益：<strong>7.5%</strong></p>
+                <el-alert title="组合成长性良好，主要得益于科技ETF的配置。" type="success" show-icon :closable="false" />
+            </div>
+        </el-collapse-item>
+      </el-collapse>
+    </div>
+    
+    <div class="action-footer">
+      <el-button type="primary" size="large" round class="action-btn" @click="$router.push('/plan')">
+        前往生成优化方案
+      </el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useHealthStore } from '@/store/modules/health';
 import { storeToRefs } from 'pinia';
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { RadarChart, LineChart } from "echarts/charts";
+import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from "echarts/components";
+import VChart, { THEME_KEY } from "vue-echarts";
+
+use([CanvasRenderer, RadarChart, LineChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent]);
 
 const healthStore = useHealthStore();
-const { report, loading, error } = storeToRefs(healthStore);
+const { report } = storeToRefs(healthStore);
+
+const activeNames = ref(['1']);
 
 onMounted(() => {
   healthStore.fetchHealthReport();
 });
 
-const retryFetch = () => {
-  healthStore.fetchHealthReport();
-};
+// Mock 计算
+const liquidityRatio = computed(() => report.value ? Math.round((report.value.liquidityScore / 20) * 100) : 0);
+const liquidityStatus = computed(() => liquidityRatio.value >= 60 ? 'success' : 'warning');
+const liquiditySuggestion = computed(() => 
+    liquidityRatio.value >= 60 
+    ? "现金储备充足，足以应对突发情况。" 
+    : "现金储备不足，建议预留 3-6 个月生活费作为应急金。"
+);
 
 const getScoreClass = (score: number) => {
-  if (score >= 80) return 'excellent';
-  if (score >= 60) return 'good';
-  return 'risk';
+    if (score >= 80) return 'excellent';
+    if (score >= 60) return 'good';
+    return 'risk';
 };
 
-const getColor = (score: number, max: number) => {
-  const ratio = score / max;
-  if (ratio >= 0.8) return '#67C23A';
-  if (ratio >= 0.6) return '#409EFF';
-  return '#F56C6C';
-};
+// 雷达图配置
+const radarOption = computed(() => {
+    const score = report.value?.score || 0;
+    // Mock dimensions based on score
+    const liquidity = report.value?.liquidityScore ? (report.value.liquidityScore / 20 * 100) : 60;
+    const diversity = report.value?.diversityScore ? (report.value.diversityScore / 20 * 100) : 50;
+    
+    return {
+        tooltip: {},
+        radar: {
+            indicator: [
+                { name: '流动性', max: 100 },
+                { name: '分散度', max: 100 },
+                { name: '收益性', max: 100 },
+                { name: '安全性', max: 100 },
+                { name: '抗通胀', max: 100 }
+            ],
+            radius: '65%',
+            splitNumber: 5,
+            axisName: {
+                color: '#94a3b8'
+            },
+            splitArea: {
+                areaStyle: {
+                    color: ['rgba(255, 255, 255, 0.02)', 'rgba(255, 255, 255, 0.05)']
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            }
+        },
+        series: [{
+            type: 'radar',
+            data: [
+                {
+                    value: [liquidity, diversity, score > 60 ? 75 : 50, score > 70 ? 80 : 60, 60],
+                    name: '我的资产',
+                    areaStyle: { color: 'rgba(79, 70, 229, 0.4)' },
+                    itemStyle: { color: '#4f46e5' }
+                },
+                {
+                    value: [60, 60, 60, 60, 60],
+                    name: '健康基准',
+                    lineStyle: { type: 'dashed', color: '#10b981' },
+                    itemStyle: { color: '#10b981' }
+                }
+            ]
+        }]
+    };
+});
+
+// 趋势图配置 (Mock)
+const trendOption = computed(() => ({
+    tooltip: { trigger: 'axis' },
+    grid: { top: '15%', bottom: '10%', left: '10%', right: '5%' },
+    xAxis: {
+        type: 'category',
+        data: ['9月', '10月', '11月', '12月', '1月', '2月'],
+        axisLine: { lineStyle: { color: '#475569' } },
+        axisLabel: { color: '#94a3b8' }
+    },
+    yAxis: {
+        type: 'value',
+        interval: 20,
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+        axisLabel: { color: '#94a3b8' }
+    },
+    series: [{
+        data: [65, 68, 70, 72, 69, 75],
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        lineStyle: { color: '#F56C6C', width: 3 },
+        areaStyle: {
+            color: {
+                type: 'linear',
+                x: 0, y: 0, x2: 0, y2: 1,
+                colorStops: [
+                    { offset: 0, color: 'rgba(245, 108, 108, 0.5)' },
+                    { offset: 1, color: 'rgba(245, 108, 108, 0)' }
+                ]
+            }
+        }
+    }]
+}));
 </script>
 
 <style lang="scss" scoped>
 @use "@/theme/variables.scss" as *;
 
-.diagnosis-page {
+.diagnosis-container {
   min-height: 100vh;
-  padding: 32px;
+  padding: 24px;
   background: linear-gradient(135deg, #0f172a, #1e293b);
   color: white;
+  padding-bottom: 80px;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-
-  .title {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-    background: linear-gradient(to right, #fff, #94a3b8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .subtitle {
-    color: $text-secondary;
-    margin: 0;
-  }
-}
-
-.persona-tag {
-  font-size: 16px;
-  padding: 8px 16px;
-  height: auto;
-  
-  .icon {
-    margin-right: 8px;
-  }
-}
-
-.score-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 32px;
-}
-
-.total-score-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-
-  &.excellent { box-shadow: 0 0 30px rgba(103, 194, 58, 0.15); border-color: rgba(103, 194, 58, 0.3); }
-  &.good { box-shadow: 0 0 30px rgba(64, 158, 255, 0.15); border-color: rgba(64, 158, 255, 0.3); }
-  &.risk { box-shadow: 0 0 30px rgba(245, 108, 108, 0.15); border-color: rgba(245, 108, 108, 0.3); }
-
-  .score-circle {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-    
-    .score-value {
-      font-size: 48px;
-      font-weight: 800;
-      line-height: 1;
-    }
-    
-    .score-label {
-      font-size: 12px;
-      color: $text-dim;
-      margin-top: 4px;
-    }
-  }
-
-  .score-level {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-
-  .score-desc {
-    color: $text-secondary;
-    text-align: center;
-    font-size: 14px;
-    margin: 0;
-  }
-}
-
-.dimensions-card {
-  background: rgba(255, 255, 255, 0.05);
+.glass-panel {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(12px);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  .card-title {
-    margin: 0 0 24px 0;
-    font-size: 18px;
-    color: $text-primary;
-  }
-}
-
-.dimension-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  .dim-item {
-    display: grid;
-    grid-template-columns: 80px 1fr 60px;
-    align-items: center;
-    gap: 16px;
-    
-    .label { color: $text-secondary; font-size: 14px; }
-    .val { color: $text-primary; text-align: right; font-family: 'Roboto Mono'; font-size: 14px; }
-  }
-}
-
-.novice-insight {
-  height: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-
-  .inflation-chart {
-    flex: 1;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-around;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-    .bar {
-      width: 60px;
-      border-radius: 4px 4px 0 0;
-      position: relative;
-      transition: all 0.3s;
-      
-      span {
-        position: absolute;
-        top: -25px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 12px;
-        white-space: nowrap;
-        color: $text-dim;
-      }
-      
-      &.cash { background: #909399; opacity: 0.7; }
-      &.cpi { background: #F56C6C; opacity: 0.9; }
-      &.target { background: #67C23A; }
-    }
-  }
-
-  .insight-text {
-    margin-top: 16px;
-    font-size: 13px;
-    color: #E6A23C;
-    line-height: 1.5;
-  }
-}
-
-.section-title {
-  margin: 0 0 20px 0;
-  font-size: 20px;
-  color: $text-primary;
-}
-
-.suggestions-list {
-  display: grid;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.suggestion-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
-
-  .icon-box {
-    font-size: 20px;
-  }
-
-  .content {
-    font-size: 15px;
-    line-height: 1.6;
-    color: $text-primary;
-  }
-
-  &.success { background: rgba(103, 194, 58, 0.1); border-color: rgba(103, 194, 58, 0.2); }
-  &.warning { background: rgba(230, 162, 60, 0.1); border-color: rgba(230, 162, 60, 0.2); }
-  &.info { background: rgba(64, 158, 255, 0.1); border-color: rgba(64, 158, 255, 0.2); }
+  margin-bottom: 24px;
 }
 
-.action-area {
-  display: flex;
-  justify-content: center;
+.score-card {
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+    background: radial-gradient(circle at center, rgba(79, 70, 229, 0.1), rgba(30, 41, 59, 0.6));
+    
+    &.excellent { border-top: 2px solid $secondary-color; }
+    &.good { border-top: 2px solid $primary-color; }
+    &.risk { border-top: 2px solid $error-color; }
+    
+    .score-content {
+        text-align: center;
+    }
+    
+    .score-circle {
+        position: relative;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 16px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        
+        .score-num {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(to bottom, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .score-label {
+            font-size: 13px;
+            color: $text-secondary;
+        }
+    }
+    
+    .score-info {
+        h2 { margin: 0 0 8px; font-size: 24px; }
+        p { margin: 0; color: $text-secondary; font-size: 14px; }
+    }
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 350px;
+    
+    h3 {
+        margin: 0 0 16px;
+        color: $text-primary;
+        font-size: 18px;
+        font-weight: 600;
+    }
+}
+
+.chart-instance {
+    flex: 1;
+    width: 100%;
+    min-height: 300px;
+}
+
+.details-section {
+    h3 {
+        margin: 0 0 20px;
+        font-size: 18px;
+        color: $text-primary;
+    }
+}
+
+.custom-collapse {
+    border: none;
+    --el-collapse-header-bg-color: transparent;
+    --el-collapse-content-bg-color: transparent;
+    --el-collapse-border-color: rgba(255,255,255,0.05);
+    
+    :deep(.el-collapse-item__header) {
+        color: $text-light;
+        font-size: 15px;
+        padding: 12px 0;
+        height: auto;
+    }
+    
+    :deep(.el-collapse-item__wrap) {
+        border-bottom: none;
+    }
+    
+    .collapse-header {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 12px;
+    }
+}
+
+.diagnosis-item {
+    p { color: $text-secondary; margin-bottom: 12px; }
+    strong { color: $text-primary; }
+}
+
+.action-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+    
+    .action-btn {
+        width: 200px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba($primary-color, 0.4);
+    }
 }
 </style>

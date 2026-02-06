@@ -175,6 +175,13 @@ const visible = computed({
   set: (val) => emit('update:modelValue', val)
 });
 
+// Fix: Define form before computed properties
+const form = ref({
+  planName: '',
+  investMoney: 0,
+  planType: 'CONTRIBUTION'
+});
+
 // ... (省略中间代码)
 
 const fetchUserRisk = async () => {
@@ -189,17 +196,37 @@ const fetchUserRisk = async () => {
     }
 };
 
+// 引入 API
+import { generateInvestmentPlan } from '@/api/plan';
+
 const handleGenerate = async () => {
+  // 校验金额
+  if (!form.value.investMoney || form.value.investMoney <= 0) {
+    ElMessage.warning('请输入有效的投入金额');
+    return;
+  }
+  
   generating.value = true;
   try {
-    const res = await store.generateDraft(form.value.investMoney, form.value.planType as any);
-    if (res) {
-      draft.value = res;
-      step.value = 2;
-      // 默认名称
-      const typeStr = form.value.planType === 'CONTRIBUTION' ? '增量计划' : '调仓计划';
-      planName.value = `${dayjs().format('MM-DD')} ${typeStr}`;
+    console.log('🚀 开始生成计划:', form.value);
+    // 调用后端接口
+    const res: any = await generateInvestmentPlan({
+      planType: form.value.planType, // 'CONTRIBUTION' | 'REBALANCE'
+      investMoney: Number(form.value.investMoney)
+    });
+
+    if (res.code === 200) {
+      ElMessage.success('智能计划生成成功！');
+      // 关键：通知父组件刷新列表
+      emit('success'); 
+      // 关闭弹窗
+      handleClose();
+    } else {
+      ElMessage.error(res.message || '生成失败');
     }
+  } catch (error) {
+    console.error('生成计划异常:', error);
+    ElMessage.error('系统繁忙，请稍后重试');
   } finally {
     generating.value = false;
   }

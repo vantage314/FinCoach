@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import {
     generatePlan,
     savePlan,
-    getHistory,
+    getPlanList,
     executePlan,
     type InvestmentPlanVO
 } from '@/api/plan';
@@ -14,22 +14,24 @@ export const useInvestmentPlanStore = defineStore('investmentPlan', () => {
     const loading = ref(false);
     const currentDraft = ref<InvestmentPlanVO | null>(null);
 
-    // 获取历史计划
+    // 获取计划列表
     const fetchHistory = async () => {
         loading.value = true;
         try {
-            const { data } = await getHistory();
+            const { data } = await getPlanList();
             if (data.code === 200) {
-                plans.value = data.data;
+                // 兼容分页
+                const raw = data.data;
+                plans.value = Array.isArray(raw) ? raw : (raw as any)?.records || [];
             }
         } catch (error) {
-            console.error('Fetch history failed:', error);
+            console.error('Fetch plans failed:', error);
         } finally {
             loading.value = false;
         }
     };
 
-    // 生成计划草稿
+    // 生成计划
     const generateDraft = async (amount: number, mode: 'CONTRIBUTION' | 'REBALANCE') => {
         loading.value = true;
         try {
@@ -39,7 +41,7 @@ export const useInvestmentPlanStore = defineStore('investmentPlan', () => {
                 return data.data;
             }
         } catch (error) {
-            console.error('Generate draft failed:', error);
+            console.error('Generate failed:', error);
             ElMessage.error('生成建议失败，请稍后重试');
             return null;
         } finally {
@@ -75,8 +77,11 @@ export const useInvestmentPlanStore = defineStore('investmentPlan', () => {
                 ElMessage.success('执行成功！资产已自动更新');
                 await fetchHistory(); // 刷新列表状态
                 return true;
+            } else {
+                ElMessage.error(data.msg || '执行失败');
+                return false;
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Execution failed:', error);
             ElMessage.error(error.message || '执行失败');
             return false;

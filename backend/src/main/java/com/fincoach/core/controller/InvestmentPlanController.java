@@ -52,21 +52,24 @@ public class InvestmentPlanController {
         return Result.success(planId);
     }
 
-    @GetMapping("/history")
-    @Operation(summary = "获取历史计划", description = "获取用户历史调仓计划列表")
-    public Result<List<InvestmentPlanVO>> getHistory(HttpServletRequest request) {
+    @GetMapping("/list")
+    @Operation(summary = "查询计划列表", description = "获取用户历史调仓计划列表")
+    public Result<List<InvestmentPlanVO>> list(HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
-        
-        List<InvestmentPlanVO> history = planService.getHistory(userId);
-        return Result.success(history);
+        try {
+            List<InvestmentPlanVO> history = planService.getHistory(userId);
+            return Result.success(history);
+        } catch (Exception e) {
+            return Result.error(500, "Service Error: " + e.getMessage());
+        }
     }
 
-    @PostMapping("/execute/{planId}")
-    @Operation(summary = "一键执行调仓计划", description = "将建议转化为真实的资产记录")
-    public Result<Void> executePlan(HttpServletRequest request, @PathVariable Long planId) {
+    @PostMapping("/execute")
+    @Operation(summary = "执行计划", description = "根据ID执行指定的调仓计划")
+    public Result<Void> executePlan(HttpServletRequest request, @RequestParam Long planId) {
         Long userId = (Long) request.getAttribute("userId");
         if (userId == null) {
             return Result.error(401, "请先登录");

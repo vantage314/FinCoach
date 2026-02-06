@@ -44,8 +44,9 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: '/market',
                 name: 'Market',
-                component: () => import('../views/market/Index.vue'),
-                meta: { requiresAuth: true, title: '市场中心 - FinCoach' }
+                // 使用 @ 别名，指向 src 目录，确保 Index.vue 首字母大写
+                component: () => import('@/views/market/Index.vue'),
+                meta: { title: '市场中心', requiresAuth: true }
             },
             {
                 path: '/market/security/:id',
@@ -64,6 +65,12 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'Plan',
                 component: () => import('../views/plan/Index.vue'),
                 meta: { requiresAuth: true, title: '投资计划 - FinCoach' }
+            },
+            {
+                path: '/user/profile',
+                name: 'UserProfile',
+                component: () => import('../views/user/Profile.vue'),
+                meta: { requiresAuth: true, title: '个人中心 - FinCoach' }
             }
         ]
     },

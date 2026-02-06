@@ -1,620 +1,283 @@
 <template>
-  <div class="market-page">
-    <!-- 核心指数区 -->
-    <section class="indices-section">
-      <div class="section-header">
-        <h2 class="section-title">市场行情</h2>
-        <span class="update-time">更新于 {{ currentTime }}</span>
+  <div class="market-dashboard">
+    <div class="header-indices">
+      <div class="page-title">
+        <h2>市场行情</h2>
+        <span class="refresh-time">更新于 {{ currentTime }}</span>
       </div>
+      
       <div class="indices-grid">
-        <div 
-          v-for="index in marketStore.indices" 
-          :key="index.code"
-          class="index-card"
-          :class="{ 'is-up': index.changePercent > 0, 'is-down': index.changePercent < 0 }"
-        >
-          <div class="index-header">
-            <span class="index-icon">{{ index.icon }}</span>
-            <span class="index-name">{{ index.name }}</span>
+        <div class="index-card up">
+          <div class="card-header">
+            <span class="icon">📈</span>
+            <span class="name">上证指数</span>
           </div>
-          <div class="index-value">{{ formatPrice(index.value) }}</div>
-          <div class="index-change" :class="getChangeClass(index.changePercent)">
-            {{ formatChange(index.changePercent) }}
+          <div class="card-value">3,089.26</div>
+          <div class="card-change">+0.85%</div>
+        </div>
+
+        <div class="index-card up">
+          <div class="card-header">
+            <span class="icon">🇺🇸</span>
+            <span class="name">US 纳斯达克</span>
           </div>
+          <div class="card-value">16,892.35</div>
+          <div class="card-change">+1.23%</div>
+        </div>
+
+        <div class="index-card down">
+          <div class="card-header">
+            <span class="icon">🥇</span>
+            <span class="name">黄金现货</span>
+          </div>
+          <div class="card-value">2,035.80</div>
+          <div class="card-change">-0.32%</div>
+        </div>
+
+        <div class="index-card down">
+          <div class="card-header">
+            <span class="icon">🇭🇰</span>
+            <span class="name">HK 恒生指数</span>
+          </div>
+          <div class="card-value">16,589.45</div>
+          <div class="card-change">-0.58%</div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- 资讯滚动条 -->
-    <section class="news-section">
-      <div class="news-ticker">
-        <span class="news-icon">📢</span>
-        <el-carousel 
-          direction="vertical" 
-          :autoplay="true" 
-          :interval="4000"
-          indicator-position="none"
-          height="32px"
-          class="news-carousel"
-        >
-          <el-carousel-item v-for="item in marketStore.news" :key="item.id">
-            <div class="news-item" @click="openNews(item)">
-              <span class="news-time">{{ item.publishTime }}</span>
-              <span class="news-title">{{ item.title }}</span>
-              <span class="news-source">{{ item.source }}</span>
-            </div>
-          </el-carousel-item>
-        </el-carousel>
+    <div class="news-ticker">
+      <div class="ticker-content">
+        <span class="volume-icon">📢</span>
+        <span class="ticker-text">08:00 美联储会议纪要释放鸽派信号，美股期指上涨；宁德时代发布新一代神行电池...</span>
       </div>
-    </section>
+      <a class="source-link">华尔街见闻</a>
+    </div>
 
-    <!-- 行情列表 -->
-    <section class="quotation-section">
-      <div class="quotation-header">
-        <el-tabs v-model="activeTab" class="market-tabs" @tab-change="handleTabChange">
-          <el-tab-pane label="全部" name="all" />
-          <el-tab-pane label="股票" name="stock" />
-          <el-tab-pane label="基金" name="fund" />
-          <el-tab-pane label="债券" name="bond" />
-        </el-tabs>
-
-        <div class="search-bar">
-          <el-input 
-            v-model="searchKeyword" 
-            placeholder="输入代码 / 名称" 
-            clearable 
-            class="market-search"
-            @clear="handleSearch" 
-            @keyup.enter="handleSearch"
+    <div class="market-table-section">
+      <div class="filter-bar">
+        <div class="tabs">
+          <span 
+            v-for="tab in tabs" 
+            :key="tab.key"
+            :class="['tab-item', { active: activeTab === tab.key }]"
+            @click="handleTabChange(tab.key)"
           >
-            <template #append>
-              <el-button :icon="Search" @click="handleSearch" />
-            </template>
-          </el-input>
+            {{ tab.name }}
+          </span>
+          <div class="active-line" :style="activeLineStyle"></div>
+        </div>
+        
+        <div class="search-box">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="输入代码 / 名称"
+            :prefix-icon="Search"
+            @keyup.enter="handleSearch"
+            class="dark-input"
+          />
         </div>
       </div>
 
-      <div class="table-wrapper">
-        <el-table 
-          :data="marketStore.securities" 
-          v-loading="marketStore.loading"
-          class="market-table"
-          :header-cell-style="{ background: 'rgba(0,0,0,0.3)', color: '#94a3b8' }"
-          :row-style="{ background: 'transparent' }"
-        >
-          <el-table-column label="名称/代码" min-width="180">
-            <template #default="{ row }">
-              <div class="security-info cursor-pointer" @click="goToDetail(row.id)">
-                <span class="security-name link-text">{{ row.name }}</span>
-                <span class="security-code">{{ row.code }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          
-          <el-table-column label="最新价" width="140" align="right">
-            <template #default="{ row }">
-              <span class="price" :class="getChangeClass(row.changePercent)">
-                {{ formatPrice(row.currentPrice) }}
-              </span>
-            </template>
-          </el-table-column>
-          
-          <el-table-column label="涨跌幅" width="120" align="right">
-            <template #default="{ row }">
-              <span class="change-badge" :class="getChangeClass(row.changePercent)">
-                {{ formatChange(row.changePercent) }}
-              </span>
-            </template>
-          </el-table-column>
-          
-          <el-table-column label="风险等级" width="100" align="center">
-            <template #default="{ row }">
-              <el-tooltip placement="top" :content="getRiskDesc(row.riskLevel)">
-                <el-tag :type="getRiskTagType(row.riskLevel)" size="small" style="cursor: help">
-                  {{ row.riskLevel }}
-                </el-tag>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-          
-          <el-table-column label="板块" width="120">
-            <template #default="{ row }">
-              <span class="sector-tag">{{ row.sector }}</span>
-            </template>
-          </el-table-column>
-          
-          <el-table-column label="操作" width="100" align="center">
-            <template #default="{ row }">
-              <el-button 
-                type="primary" 
-                link 
-                @click="goToDetail(row.id)"
-              >
-                详情
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
+      <el-table 
+        v-loading="marketStore.loading"
+        :data="marketStore.securities" 
+        style="width: 100%"
+        class="dark-table"
+        :header-cell-style="{ background: '#1d212b', color: '#909399', borderBottom: '1px solid #363636' }"
+        :row-style="{ background: 'transparent', color: '#fff' }"
+      >
+        <el-table-column label="名称/代码" min-width="180">
+          <template #default="{ row }">
+            <div class="name-cell">
+              <span class="stock-name">{{ row.name }}</span>
+              <span class="stock-code">{{ row.code }}</span>
+            </div>
+          </template>
+        </el-table-column>
 
-      <!-- 分页器 -->
+        <el-table-column prop="currentPrice" label="最新价" align="right">
+          <template #default="{ row }">
+            <span class="price">¥{{ row.currentPrice }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="changePercent" label="涨跌幅" align="right">
+          <template #default="{ row }">
+             <span :class="getChangeClass(row.changePercent)">
+               {{ row.changePercent > 0 ? '+' : '' }}{{ row.changePercent }}%
+             </span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="风险等级" align="center">
+          <template #default="{ row }">
+            <el-tag size="small" :type="getRiskTagType(row.riskLevel)" effect="dark">
+              {{ row.riskLevel || 'R3' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="sector" label="板块" align="center">
+           <template #default="{ row }">
+             <span class="sector-tag">{{ row.sector || '综合' }}</span>
+           </template>
+        </el-table-column>
+
+        <el-table-column label="操作" width="100" align="center">
+           <template #default>
+             <el-button link type="primary" class="op-btn">加自选</el-button>
+           </template>
+        </el-table-column>
+      </el-table>
+
       <div class="pagination-wrapper">
         <el-pagination
-          background
-          layout="prev, pager, next"
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
           :total="marketStore.total"
-          :page-size="marketStore.pageSize"
-          :current-page="marketStore.currentPage"
-          @current-change="handlePageChange"
+          layout="prev, pager, next"
+          class="dark-pagination"
+          @current-change="loadData"
         />
       </div>
-    </section>
-
-    <!-- 新闻详情弹窗 -->
-    <el-dialog
-      v-model="newsDialogVisible"
-      :title="currentNews.title"
-      width="600px"
-      append-to-body
-      class="news-dialog"
-    >
-      <div class="news-content">
-        {{ currentNews.content || currentNews.title }}
-      </div>
-      <template #footer>
-        <div class="news-footer">
-          <span class="news-source">来源：{{ currentNews.source }}</span>
-          <span class="news-time">发布时间：{{ currentNews.publishTime }}</span>
-        </div>
-      </template>
-    </el-dialog>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { Search } from '@element-plus/icons-vue';
+import { ref, onMounted, onActivated, computed } from 'vue';
 import { useMarketStore } from '@/store/modules/market';
-import type { MarketNews } from '@/api/market';
+import { Search } from '@element-plus/icons-vue';
+import dayjs from 'dayjs';
 
-const router = useRouter();
 const marketStore = useMarketStore();
-const activeTab = ref('all');
 const searchKeyword = ref('');
-const newsDialogVisible = ref(false);
-const currentNews = ref<MarketNews>({} as MarketNews);
+const activeTab = ref('all');
+const currentPage = ref(1);
+const pageSize = ref(10);
+const currentTime = ref(dayjs().format('HH:mm'));
 
-// 当前时间
-const currentTime = computed(() => {
-  const now = new Date();
-  return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+const tabs = [
+  { name: '全部', key: 'all' },
+  { name: '股票', key: 'STOCK' },
+  { name: '基金', key: 'FUND' },
+  { name: '债券', key: 'BOND' }
+];
+
+// 计算 Tabs 下划线位置 (简化版)
+const activeLineStyle = computed(() => {
+  const index = tabs.findIndex(t => t.key === activeTab.value);
+  return { left: `${index * 60}px` }; // 假设每个 tab 宽 60px
 });
 
-// 格式化价格
-const formatPrice = (price: number) => {
-  if (price >= 1000) {
-    return price.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-  return price.toFixed(price >= 100 ? 2 : 4);
-};
-
-// 格式化涨跌幅
-const formatChange = (change: number) => {
-  const prefix = change > 0 ? '+' : '';
-  return `${prefix}${change.toFixed(2)}%`;
-};
-
-// 获取涨跌样式类
-const getChangeClass = (change: number) => {
-  if (change > 0) return 'text-up';
-  if (change < 0) return 'text-down';
-  return '';
-};
-
-// 获取风险等级描述
-const getRiskDesc = (level: string) => {
-  const map: Record<string, string> = {
-    'R1': 'R1 (保守型) - 本金安全，收益稳定，风险极低',
-    'R2': 'R2 (稳健型) - 风险较低，收益相对稳定',
-    'R3': 'R3 (平衡型) - 风险适中，追求稳健增值',
-    'R4': 'R4 (进取型) - 风险较高，追求高收益',
-    'R5': 'R5 (激进型) - 高风险高收益，适合有经验的投资者'
-  };
-  return map[level] || '未知风险等级';
-};
-
-// 获取风险等级颜色
-const getRiskTagType = (level: string): '' | 'success' | 'warning' | 'danger' | 'info' => {
-  const types: Record<string, '' | 'success' | 'warning' | 'danger' | 'info'> = {
-    'R1': 'success',
-    'R2': 'success',
-    'R3': 'warning',
-    'R4': 'danger',
-    'R5': 'danger'
-  };
-  return types[level] || 'info';
-};
-
-// 分页处理
-const handlePageChange = (page: number) => {
+const loadData = () => {
   marketStore.fetchSecurities({
-    type: activeTab.value,
-    keyword: searchKeyword.value,
-    page: page
-  });
-};
-
-// 切换 Tab
-const handleTabChange = () => {
-  handleSearch();
-};
-
-// 搜索处理
-const handleSearch = () => {
-  marketStore.fetchSecurities({
-    type: activeTab.value,
+    page: currentPage.value,
+    size: pageSize.value,
+    type: activeTab.value === 'all' ? undefined : activeTab.value,
     keyword: searchKeyword.value
   });
 };
 
-// 跳转详情页
-const goToDetail = (id: number) => {
-  router.push(`/market/security/${id}`);
+const handleTabChange = (key: string) => {
+  activeTab.value = key;
+  currentPage.value = 1;
+  loadData();
 };
 
-// 打开新闻详情
-const openNews = (news: MarketNews) => {
-  currentNews.value = news;
-  newsDialogVisible.value = true;
+const handleSearch = () => {
+  currentPage.value = 1;
+  loadData();
 };
 
-// 初始化加载
-onMounted(async () => {
-  await Promise.all([
-    marketStore.fetchIndices(),
-    marketStore.fetchNews(),
-    marketStore.fetchSecurities()
-  ]);
-});
+const getChangeClass = (val: number) => {
+  if (val > 0) return 'text-red';
+  if (val < 0) return 'text-green';
+  return 'text-gray';
+};
+
+const getRiskTagType = (level: string) => {
+  if (level === 'R5' || level === 'R4') return 'danger';
+  if (level === 'R3') return 'warning';
+  return 'success';
+};
+
+onMounted(() => loadData());
+onActivated(() => loadData());
 </script>
 
-<style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
-.market-page {
-  min-height: calc(100vh - 112px);
-  padding: 24px;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+<style scoped>
+/* 全局暗色背景适配 */
+.market-dashboard {
+  background-color: #14161a; /* 深色背景 */
+  min-height: 100%;
+  padding: 20px;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* 指数区 */
-.indices-section {
-  margin-bottom: 24px;
-}
+/* 1. 顶部指数卡片 */
+.header-indices { margin-bottom: 24px; }
+.page-title { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+.page-title h2 { margin: 0; font-size: 20px; font-weight: 600; }
+.refresh-time { font-size: 12px; color: #606266; }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  background: linear-gradient(to right, #fff, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.update-time {
-  font-size: 12px;
-  color: #64748b;
-}
-
-.indices-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
+.indices-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .index-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  }
-  
-  &.is-up {
-    border-color: rgba(245, 108, 108, 0.3);
-    background: linear-gradient(135deg, rgba(245, 108, 108, 0.08), rgba(255, 255, 255, 0.03));
-  }
-  
-  &.is-down {
-    border-color: rgba(103, 194, 58, 0.3);
-    background: linear-gradient(135deg, rgba(103, 194, 58, 0.08), rgba(255, 255, 255, 0.03));
-  }
+  background: #1d212b;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #2c3038;
 }
+.index-card .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #909399; font-size: 13px; }
+.index-card .card-value { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+.index-card .card-change { font-size: 14px; font-weight: 500; }
+.index-card.up .card-change, .index-card.up .card-value { color: #f56c6c; }
+.index-card.down .card-change, .index-card.down .card-value { color: #67c23a; }
 
-.index-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.index-icon {
-  font-size: 20px;
-}
-
-.index-name {
-  font-size: 14px;
-  color: #94a3b8;
-}
-
-.index-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: white;
-  font-variant-numeric: tabular-nums;
-  margin-bottom: 4px;
-}
-
-.index-change {
-  font-size: 16px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-/* 资讯滚动条 */
-.news-section {
-  margin-bottom: 24px;
-}
-
+/* 2. 新闻跑马灯 */
 .news-ticker {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  border-radius: 12px;
-  padding: 8px 16px;
-}
-
-.news-icon {
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.news-carousel {
-  flex: 1;
-  
-  :deep(.el-carousel__container) {
-    height: 32px !important;
-  }
-}
-
-.news-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 32px;
-  line-height: 32px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-.news-time {
-  color: #06b6d4;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.news-title {
-  color: white;
-  font-size: 14px;
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.news-source {
-  color: #64748b;
-  font-size: 12px;
-}
-
-/* 行情列表 */
-.quotation-section {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px;
-}
-
-.quotation-header {
+  background: rgba(43, 48, 60, 0.5);
+  border-radius: 4px;
+  padding: 10px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 24px;
+  border-left: 4px solid #f56c6c;
 }
+.ticker-content { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #dcdfe6; }
+.source-link { font-size: 12px; color: #909399; cursor: pointer; }
 
-.market-tabs {
-  :deep(.el-tabs__header) {
-    margin-bottom: 0;
-    border-bottom: none;
-  }
-  
-  :deep(.el-tabs__item) {
-    color: #64748b;
-    font-weight: 500;
-    padding-bottom: 15px;
-    
-    &.is-active {
-      color: #06b6d4;
-    }
-    
-    &:hover {
-      color: #06b6d4;
-    }
-  }
-  
-  :deep(.el-tabs__active-bar) {
-    background-color: #06b6d4;
-  }
-}
+/* 3. 过滤器与表格 */
+.market-table-section { background: #1d212b; padding: 20px; border-radius: 8px; }
+.filter-bar { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #363636; padding-bottom: 10px; }
+.tabs { display: flex; gap: 30px; position: relative; }
+.tab-item { cursor: pointer; color: #909399; padding-bottom: 10px; transition: color 0.3s; }
+.tab-item.active { color: #409eff; font-weight: 600; }
+.active-line { position: absolute; bottom: -11px; height: 2px; width: 30px; background: #409eff; transition: left 0.3s; }
 
-.search-bar {
-  width: 280px;
-  padding-bottom: 10px;
-}
+/* 暗黑输入框 */
+:deep(.dark-input .el-input__wrapper) { background-color: #2b303c; box-shadow: none; border: 1px solid #4c4d4f; }
+:deep(.dark-input .el-input__inner) { color: #fff; }
 
-.market-search {
-  :deep(.el-input__wrapper) {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
-    border-radius: 12px 0 0 12px;
-  }
-  
-  :deep(.el-input__inner) {
-    color: #ffffff !important;
-  }
-  
-  :deep(.el-input-group__append) {
-    background-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-    color: #64748b;
-    border-radius: 0 12px 12px 0;
-  }
-}
+/* 暗黑表格强制覆盖 */
+.dark-table { --el-table-border-color: #363636; --el-table-bg-color: #1d212b; --el-table-tr-bg-color: #1d212b; --el-table-header-bg-color: #1d212b; }
+:deep(.el-table__inner-wrapper::before) { display: none; } /* 去掉底部白线 */
+:deep(.el-table td.el-table__cell), :deep(.el-table th.el-table__cell.is-leaf) { border-bottom: 1px solid #363636; }
+:deep(.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell) { background-color: #2b303c !important; }
 
-.table-wrapper {
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 16px;
-}
+.name-cell { display: flex; flex-direction: column; }
+.stock-name { font-size: 14px; font-weight: bold; color: #fff; }
+.stock-code { font-size: 12px; color: #909399; }
+.text-red { color: #f56c6c; }
+.text-green { color: #67c23a; }
+.sector-tag { background: #2b303c; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #b1b3b8; }
+.op-btn { color: #409eff; }
 
-.pagination-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 16px;
-}
-
-.market-table {
-  background: transparent !important;
-  
-  :deep(.el-table__body-wrapper) {
-    background: transparent;
-  }
-  
-  :deep(.el-table__row) {
-    background: transparent !important;
-    
-    &:hover > td {
-      background: rgba(255, 255, 255, 0.05) !important;
-    }
-  }
-  
-  :deep(td) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-    color: white;
-  }
-  
-  :deep(th) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
-}
-
-.security-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  
-  &.cursor-pointer {
-    cursor: pointer;
-    
-    &:hover .link-text {
-      color: #06b6d4;
-      text-decoration: underline;
-    }
-  }
-}
-
-.security-name {
-  font-weight: 600;
-  color: white;
-  transition: color 0.2s ease;
-}
-
-.security-code {
-  font-size: 12px;
-  color: #64748b;
-}
-
-.price {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.change-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-  
-  &.text-up {
-    background: rgba(245, 108, 108, 0.15);
-  }
-  
-  &.text-down {
-    background: rgba(103, 194, 58, 0.15);
-  }
-}
-
-.sector-tag {
-  color: #94a3b8;
-  font-size: 13px;
-}
-
-/* 新闻内容弹窗 */
-.news-content {
-  line-height: 1.8;
-  color: #334155;
-  font-size: 15px;
-  padding: 10px 0;
-}
-
-.news-footer {
-  display: flex;
-  justify-content: space-between;
-  color: #94a3b8;
-  font-size: 12px;
-  border-top: 1px solid #e2e8f0;
-  padding-top: 12px;
-}
-
-/* 金融色定义 */
-.text-up {
-  color: #F56C6C;
-}
-
-.text-down {
-  color: #67C23A;
-}
+/* 暗黑分页 */
+.pagination-wrapper { display: flex; justify-content: flex-end; margin-top: 20px; }
+:deep(.dark-pagination button) { background: transparent !important; color: #fff; }
+:deep(.dark-pagination .el-pager li) { background: transparent !important; color: #909399; }
+:deep(.dark-pagination .el-pager li.is-active) { color: #409eff; font-weight: bold; }
 </style>

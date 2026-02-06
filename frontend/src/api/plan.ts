@@ -25,24 +25,28 @@ export interface InvestmentPlanVO {
     items: PlanItemVO[];
 }
 
-// 生成调仓计划
-export const generatePlan = (planType: string, investMoney?: number) => {
-    return request.post<any, { code: number; data: InvestmentPlanVO }>('/plan/generate', null, {
-        params: { planType, investMoney }
-    });
+// 生成投资计划 [关键修复]
+export const generateInvestmentPlan = (data: { planType: string; investMoney: number }) => {
+    return request.post<any, { code: number; data: InvestmentPlanVO }>('/plan/generate', data);
 };
 
-// 保存调仓计划
+// 执行投资计划 [关键修复]
+export const executePlan = (planId: number) => {
+    return request.post<any, { code: number; msg: string }>(`/plan/execute?planId=${planId}`);
+};
+
+// 获取投资计划列表
+export const getPlanList = (params?: any) => {
+    return request.get<any, { code: number; data: InvestmentPlanVO[] }>('/plan/list', { params });
+};
+
+// 获取计划详情
+export const getPlanDetail = (planId: number) => {
+    return request.get<any, { code: number; data: InvestmentPlanVO }>(`/plan/detail/${planId}`);
+};
+
+// 兼容旧代码的别名导出（如果需要）
+export const generatePlan = generateInvestmentPlan;
 export const savePlan = (plan: InvestmentPlanVO) => {
     return request.post<any, { code: number; data: number }>('/plan/save', plan);
-};
-
-// 获取历史计划
-export const getHistory = () => {
-    return request.get<any, { code: number; data: InvestmentPlanVO[] }>('/plan/history');
-};
-
-// 一键执行调仓计划
-export const executePlan = (planId: number) => {
-    return request.post<any, { code: number; msg: string }>('/plan/execute/' + planId);
 };

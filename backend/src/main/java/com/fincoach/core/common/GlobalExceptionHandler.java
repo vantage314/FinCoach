@@ -17,6 +17,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result<String> handleException(Exception e) {
         log.error("系统未知错误: ", e);
-        return Result.error(500, "系统繁忙，请稍后再试");
+        return Result.error(500, "Debug Error: " + e.getClass().getName() + " - " + e.getMessage());
     }
 }
