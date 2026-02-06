@@ -17,7 +17,14 @@
       >
         <el-menu-item index="/market">市场中心</el-menu-item>
         <el-menu-item index="/dashboard">资产管理</el-menu-item>
-        <el-menu-item index="/diagnosis">资产体检</el-menu-item>
+        <el-menu-item index="/diagnosis">
+           <el-icon><FirstAidKit /></el-icon>
+           <span>资产体检</span>
+        </el-menu-item>
+        <el-menu-item index="/investment">
+          <el-icon><TrendCharts /></el-icon>
+          <span>智能投资</span>
+        </el-menu-item>
         <el-menu-item index="/plan">投资计划</el-menu-item>
         <el-menu-item index="/ai" disabled>AI 咨询</el-menu-item>
       </el-menu>
@@ -61,7 +68,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Monitor, ArrowDown } from '@element-plus/icons-vue';
+import { Monitor, ArrowDown, TrendCharts, FirstAidKit } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '@/store/modules/user';
 

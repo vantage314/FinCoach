@@ -73,6 +73,13 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('../views/plan/Index.vue'),
                 meta: { requiresAuth: true, title: '投资计划 - FinCoach' }
             },
+            // 🔥 新增：智能投资驾驶舱
+            {
+                path: '/investment',
+                name: 'Investment',
+                component: () => import('@/views/investment/Index.vue'),
+                meta: { title: '智能投资驾驶舱', requiresAuth: true }
+            },
             {
                 path: '/user/profile',
                 name: 'UserProfile',
