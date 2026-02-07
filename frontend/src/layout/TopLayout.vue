@@ -4,7 +4,7 @@
       <!-- Logo 区域 -->
       <div class="logo-area" @click="router.push('/dashboard')">
         <el-icon :size="28" class="logo-icon"><Monitor /></el-icon>
-        <span class="brand-text">FinCoach</span>
+        <span class="brand-text">白领人士个人资产诊断与投资建议系统</span>
       </div>
 
       <!-- 导航菜单 -->
@@ -26,7 +26,7 @@
           <span>智能投资</span>
         </el-menu-item>
         <el-menu-item index="/plan">投资计划</el-menu-item>
-        <el-menu-item index="/ai" disabled>AI 咨询</el-menu-item>
+        <el-menu-item index="/chat">AI 咨询</el-menu-item>
       </el-menu>
 
       <!-- 用户区域 -->

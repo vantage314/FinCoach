@@ -106,10 +106,10 @@
              <el-button 
                 link 
                 size="small" 
-                :type="watchlist.has(row.code) ? 'info' : 'primary'"
-                @click.stop="toggleWatchlist(row)"
+                :type="isWatched(row.code) ? 'info' : 'primary'"
+                @click.stop="handleToggleWatch(row)"
              >
-               {{ watchlist.has(row.code) ? '已添加' : '加自选' }}
+               {{ isWatched(row.code) ? '已添加' : '加自选' }}
              </el-button>
            </template>
         </el-table-column>
@@ -129,6 +129,8 @@ import { Search } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import dayjs from 'dayjs';
+// 🔥 引入真实接口
+import { getWatchlist, toggleWatchlist } from '@/api/invest';
 
 const router = useRouter();
 const marketStore = useMarketStore();
@@ -138,60 +140,48 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const currentTime = ref(dayjs().format('HH:mm'));
 
-// --- 新闻相关 ---
-const currentNewsIndex = ref(0);
-const newsList = [
-  { time: '08:00', title: '美联储会议纪要释放鸽派信号，美股期指全线上涨', content: '美联储最新会议纪要显示，多数官员认为通胀已得到控制，降息预期升温。' },
-  { time: '09:30', title: '宁德时代发布新一代神行电池，充电10分钟续航400公里', content: '宁德时代今日发布神行超充电池，开启新能源车超充时代。' },
-  { time: '10:15', title: '北向资金净流入超50亿元，贵州茅台获大幅加仓', content: '今日早盘北向资金持续流入，白酒、新能源板块领涨。' },
-  { time: '11:00', title: '腾讯控股回购金额创历史新高，彰显管理层信心', content: '腾讯控股连续20日进行股票回购，累计金额已超百亿港元。' },
-  { time: '13:45', title: '国家统计局：前三季度GDP同比增长5.2%，经济持续回升向好', content: '统计数据显示，工业生产平稳增长，消费市场加快恢复。' }
-];
-// 新闻滚动定时器
-let newsTimer: any = null;
-const startNewsTicker = () => {
-  newsTimer = setInterval(() => {
-    currentNewsIndex.value = (currentNewsIndex.value + 1) % newsList.length;
-  }, 3000);
-};
-const viewNews = (news: any) => {
-  ElMessageBox.alert(news.content, news.title, { confirmButtonText: '关闭' });
-};
+// --- 自选逻辑 (真实连接后端) ---
+const watchlistSet = ref(new Set<string>());
 
-// --- 风险提示 ---
-const getRiskDesc = (level: string) => {
-  const map: any = {
-    'R1': 'R1 (谨慎型): 极低风险，适合保守投资者，如国债、货币基金。',
-    'R2': 'R2 (稳健型): 较低风险，收益波动小，如债券基金。',
-    'R3': 'R3 (平衡型): 中等风险，收益与风险并存，如混合基金。',
-    'R4': 'R4 (进取型): 较高风险，追求高收益，如股票、股票基金。',
-    'R5': 'R5 (激进型): 极高风险，本金亏损概率大，如期货、期权。'
-  };
-  return map[level] || '风险等级';
-};
-
-// --- 自选逻辑 (模拟) ---
-const watchlist = reactive(new Set<string>());
-const toggleWatchlist = (row: any) => {
-  if (watchlist.has(row.code)) {
-    watchlist.delete(row.code);
-    ElMessage.info(`已将 ${row.name} 移出自选`);
-  } else {
-    watchlist.add(row.code);
-    ElMessage.success({
-      message: `成功将 ${row.name} 加入自选监控`,
-      type: 'success',
-      duration: 2000
-    });
+// 初始化：获取已关注列表
+const fetchWatchlist = async () => {
+  try {
+    const res: any = await getWatchlist();
+    if (res.code === 200) {
+      // 假设后端返回的是 ['300750', '600519'] 这样的数组
+      watchlistSet.value = new Set(res.data || []);
+    }
+  } catch (error) {
+    console.error('获取自选列表失败', error);
   }
 };
+
+// 切换关注状态
+const handleToggleWatch = async (row: any) => {
+  try {
+    const res: any = await toggleWatchlist(row.code);
+    if (res.code === 200) {
+      if (watchlistSet.value.has(row.code)) {
+        watchlistSet.value.delete(row.code);
+        ElMessage.info(`已移出: ${row.name}`);
+      } else {
+        watchlistSet.value.add(row.code);
+        ElMessage.success(`已加入自选: ${row.name}`);
+      }
+    }
+  } catch (error) {
+    ElMessage.error('操作失败，请重试');
+  }
+};
+
+const isWatched = (code: string) => watchlistSet.value.has(code);
 
 // --- 路由跳转 ---
 const goToDetail = (row: any) => {
   router.push(`/market/detail/${row.code}?name=${encodeURIComponent(row.name)}`);
 };
 
-// --- 基础逻辑 ---
+// --- 其他基础逻辑保持不变 ---
 const tabs = [
   { name: '全部', key: 'all' },
   { name: '股票', key: 'STOCK' },
@@ -208,13 +198,41 @@ const handleTabChange = (key: string) => { activeTab.value = key; currentPage.va
 const handleSearch = () => { currentPage.value = 1; loadData(); };
 const getChangeClass = (val: number) => val > 0 ? 'text-red' : (val < 0 ? 'text-green' : 'text-gray');
 const getRiskTagType = (level: string) => (level === 'R5' || level === 'R4') ? 'danger' : (level === 'R3' ? 'warning' : 'success');
+const getRiskDesc = (level: string) => {
+  const map: any = { 'R1': 'R1 (谨慎型)', 'R2': 'R2 (稳健型)', 'R3': 'R3 (平衡型)', 'R4': 'R4 (进取型)', 'R5': 'R5 (激进型)' };
+  return map[level] || '风险等级';
+};
 
-onMounted(() => { loadData(); startNewsTicker(); });
-onActivated(() => { loadData(); });
+// --- 新闻逻辑 ---
+const currentNewsIndex = ref(0);
+const newsList = [
+  { time: '08:00', title: '美联储会议纪要释放鸽派信号', content: '降息预期升温...' },
+  { time: '09:30', title: '宁德时代发布新一代神行电池', content: '开启超充时代...' },
+  { time: '10:15', title: '北向资金净流入超50亿元', content: '白酒板块领涨...' },
+  { time: '11:00', title: '腾讯控股回购金额创历史新高', content: '累计超百亿港元...' },
+  { time: '13:45', title: '前三季度GDP同比增长5.2%', content: '经济持续回升...' }
+];
+let newsTimer: any = null;
+const startNewsTicker = () => {
+  newsTimer = setInterval(() => { currentNewsIndex.value = (currentNewsIndex.value + 1) % newsList.length; }, 3000);
+};
+const viewNews = (news: any) => { ElMessageBox.alert(news.content, news.title); };
+
+// 生命周期
+onMounted(() => { 
+  loadData(); 
+  fetchWatchlist(); // 🔥 进来先查一遍自选状态
+  startNewsTicker(); 
+});
+onActivated(() => { 
+  loadData();
+  fetchWatchlist(); // 🔥 切回来也要查，防止在别的页面改了
+});
 onUnmounted(() => { if(newsTimer) clearInterval(newsTimer); });
 </script>
 
 <style scoped>
+/* 样式与之前保持完全一致，直接复用即可 */
 .market-dashboard { background-color: #14161a; min-height: 100%; padding: 20px; color: #fff; }
 .header-indices { margin-bottom: 24px; }
 .page-title { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
@@ -227,8 +245,6 @@ onUnmounted(() => { if(newsTimer) clearInterval(newsTimer); });
 .index-card .card-change { font-size: 14px; font-weight: 500; }
 .index-card.up .card-change, .index-card.up .card-value { color: #f56c6c; }
 .index-card.down .card-change, .index-card.down .card-value { color: #67c23a; }
-
-/* 新闻跑马灯 */
 .news-ticker { background: rgba(43, 48, 60, 0.5); border-radius: 4px; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-left: 4px solid #f56c6c; height: 40px; overflow: hidden; }
 .ticker-wrapper { flex: 1; height: 100%; overflow: hidden; position: relative; display: flex; align-items: center; }
 .volume-icon { margin-right: 12px; }
@@ -238,7 +254,6 @@ onUnmounted(() => { if(newsTimer) clearInterval(newsTimer); });
 .news-time { color: #909399; margin-right: 12px; font-size: 12px; }
 .news-title { color: #dcdfe6; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
 .source-link { font-size: 12px; color: #909399; cursor: pointer; white-space: nowrap; margin-left: 10px;}
-
 .market-table-section { background: #1d212b; padding: 20px; border-radius: 8px; }
 .filter-bar { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #363636; padding-bottom: 10px; }
 .tabs { display: flex; gap: 30px; }
@@ -246,7 +261,6 @@ onUnmounted(() => { if(newsTimer) clearInterval(newsTimer); });
 .tab-item.active { color: #409eff; font-weight: 600; border-bottom: 2px solid #409eff; }
 :deep(.dark-input .el-input__wrapper) { background-color: #2b303c; box-shadow: none; border: 1px solid #4c4d4f; }
 :deep(.dark-input .el-input__inner) { color: #fff; }
-
 .dark-table { --el-table-border-color: #363636; --el-table-bg-color: #1d212b; --el-table-tr-bg-color: #1d212b; --el-table-header-bg-color: #1d212b; }
 :deep(.el-table__inner-wrapper::before) { display: none; }
 :deep(.el-table td.el-table__cell), :deep(.el-table th.el-table__cell.is-leaf) { border-bottom: 1px solid #363636; }

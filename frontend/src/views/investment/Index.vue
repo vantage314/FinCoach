@@ -63,6 +63,23 @@
         </div>
       </div>
 
+      <!-- 新闻快讯区 -->
+      <div class="news-section">
+        <div class="section-title">📰 财经快讯</div>
+        <div class="news-list-wrapper">
+          <div 
+            v-for="news in newsList" 
+            :key="news.id" 
+            class="news-row"
+            @click="viewNews(news)"
+          >
+            <span class="news-time">{{ news.publishTime }}</span>
+            <span class="news-title">{{ news.title }}</span>
+          </div>
+          <el-empty v-if="newsList.length === 0" description="暂无快讯" :image-size="60" />
+        </div>
+      </div>
+
       <div class="smart-pool">
         <div class="section-title">🚀 今日潜力机会 (系统推荐)</div>
         <el-table 
@@ -102,20 +119,53 @@
         </el-table>
       </div>
     </div>
+
+    <!-- 新闻详情抽屉 -->
+    <el-drawer
+      v-model="showNewsDrawer"
+      title="财经快讯"
+      direction="rtl"
+      size="40%"
+      :before-close="handleCloseNews"
+    >
+      <div class="news-detail-content" v-if="currentNews">
+        <h2 class="detail-title">{{ currentNews.title }}</h2>
+        <div class="detail-meta">
+          <span class="source">{{ currentNews.source || 'FinCoach' }}</span>
+          <span class="time">{{ currentNews.publishTime }}</span>
+        </div>
+        <div class="detail-body">
+          <p>{{ currentNews.content }}</p>
+        </div>
+        
+        <div class="related-stock" v-if="currentNews.relatedCode">
+          <div class="stock-card" @click="goToDetail({ code: currentNews.relatedCode, name: '关联股票' })">
+            <span class="label">相关标的：</span>
+            <span class="code">{{ currentNews.relatedCode }}</span>
+            <el-icon><ArrowRight /></el-icon>
+          </div>
+        </div>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { Delete } from '@element-plus/icons-vue';
-import { getWatchlist, toggleWatchlist } from '@/api/invest';
-import { getMarketSecurities } from '@/api/market'; // 复用市场接口获取行情
+import { Delete, ArrowRight } from '@element-plus/icons-vue';
+import { getWatchlist, toggleWatchlist, getNewsList } from '@/api/invest';
+import { getMarketSecurities } from '@/api/market';
 import { ElMessage } from 'element-plus';
 
 const router = useRouter();
 const watchlistCodes = ref<string[]>([]);
 const allSecurities = ref<any[]>([]);
+
+// 新闻相关状态
+const newsList = ref<any[]>([]);
+const showNewsDrawer = ref(false);
+const currentNews = ref<any>(null);
 
 // 计算属性：匹配自选股的详细行情
 const watchlistData = computed(() => {
@@ -126,23 +176,21 @@ const watchlistData = computed(() => {
 const opportunityList = computed(() => {
   return allSecurities.value
     .filter(s => s.changePercent > 0)
-    .sort((a, b) => b.changePercent - a.changePercent) // 涨幅降序
-    .slice(0, 5); // 取前5
+    .sort((a, b) => b.changePercent - a.changePercent)
+    .slice(0, 5);
 });
 
 const loadData = async () => {
   try {
-    // 1. 并行获取自选列表和市场行情
     const [watchRes, marketRes] = await Promise.all([
       getWatchlist(),
-      getMarketSecurities({ size: 100 }) // 获取足够多的数据用于筛选
+      getMarketSecurities({ size: 100 })
     ]);
 
     if (watchRes.code === 200) {
       watchlistCodes.value = watchRes.data || [];
     }
     
-    // 解析市场数据 (兼容之前的逻辑)
     const raw = marketRes.data;
     if (raw?.records) {
       allSecurities.value = raw.records;
@@ -152,6 +200,28 @@ const loadData = async () => {
   } catch (error) {
     console.error('加载投资数据失败', error);
   }
+};
+
+// 获取新闻列表
+const fetchNews = async () => {
+  try {
+    const res: any = await getNewsList({ limit: 10 });
+    if (res.code === 200) {
+      newsList.value = res.data || [];
+    }
+  } catch (error) {
+    console.error('获取新闻失败', error);
+  }
+};
+
+// 打开新闻详情
+const viewNews = (news: any) => {
+  currentNews.value = news;
+  showNewsDrawer.value = true;
+};
+
+const handleCloseNews = () => {
+  showNewsDrawer.value = false;
 };
 
 const goToDetail = (row: any) => {
@@ -175,13 +245,14 @@ const getChangeClass = (val: number) => val > 0 ? 'text-red' : (val < 0 ? 'text-
 
 onMounted(() => {
   loadData();
+  fetchNews();
 });
 </script>
 
 <style scoped>
 .invest-dashboard {
   display: flex;
-  height: calc(100vh - 80px); /* 减去顶部导航高度 */
+  height: calc(100vh - 80px);
   background: #14161a;
   color: #fff;
   gap: 20px;
@@ -236,6 +307,22 @@ onMounted(() => {
 .sector-card.down .sec-val { color: #67c23a; }
 .sector-card .desc { font-size: 12px; color: #606266; }
 
+/* 新闻区 */
+.news-section { background: #1d212b; padding: 20px; border-radius: 8px; }
+.news-list-wrapper { max-height: 180px; overflow-y: auto; }
+.news-row { 
+  display: flex; 
+  align-items: center; 
+  padding: 10px 0; 
+  border-bottom: 1px solid #2c3038; 
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.news-row:hover { background: #2b303c; }
+.news-time { color: #909399; font-size: 12px; margin-right: 15px; font-family: monospace; }
+.news-title { font-size: 14px; color: #dcdfe6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.news-row:hover .news-title { color: #409eff; }
+
 .smart-pool { background: #1d212b; padding: 20px; border-radius: 8px; flex: 1; }
 .recommend-name { cursor: pointer; font-weight: bold; }
 .recommend-name:hover { color: #409eff; text-decoration: underline; }
@@ -244,4 +331,15 @@ onMounted(() => {
 .dark-table { --el-table-border-color: #363636; --el-table-bg-color: #1d212b; --el-table-tr-bg-color: #1d212b; --el-table-header-bg-color: #1d212b; }
 :deep(.el-table td.el-table__cell), :deep(.el-table th.el-table__cell.is-leaf) { border-bottom: 1px solid #363636; }
 :deep(.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell) { background-color: #2b303c !important; }
+
+/* 新闻详情样式 */
+.news-detail-content { padding: 0 10px; }
+.detail-title { font-size: 20px; font-weight: bold; color: #303133; margin-bottom: 15px; line-height: 1.4; }
+.detail-meta { display: flex; gap: 15px; color: #909399; font-size: 13px; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+.detail-body { font-size: 16px; line-height: 1.8; color: #606266; white-space: pre-wrap; }
+.related-stock { margin-top: 30px; border-top: 1px dashed #ddd; padding-top: 20px; }
+.stock-card { background: #f5f7fa; padding: 15px; border-radius: 8px; display: flex; align-items: center; cursor: pointer; transition: all 0.2s; }
+.stock-card:hover { background: #ecf5ff; }
+.stock-card .label { font-weight: bold; color: #303133; }
+.stock-card .code { color: #409eff; font-family: monospace; margin: 0 10px; font-weight: bold; }
 </style>

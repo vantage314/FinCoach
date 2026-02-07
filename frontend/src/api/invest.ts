@@ -24,3 +24,13 @@ export const getWatchlist = () => {
 export const toggleWatchlist = (code: string) => {
     return request.post('/invest/watchlist/toggle', { code });
 };
+
+// 6. 获取公司财务报表
+export const getFinancialReports = (code: string) => {
+    return request.get(`/invest/finance/${code}`);
+};
+
+// 7. 获取公司公告列表
+export const getCompanyNotices = (code: string) => {
+    return request.get(`/invest/notice/${code}`);
+};

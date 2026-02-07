@@ -4,6 +4,8 @@ import com.fincoach.core.common.Result;
 import com.fincoach.core.common.UserContext;
 import com.fincoach.core.repository.entity.CompanyProfile;
 import com.fincoach.core.repository.entity.FinancialNews;
+import com.fincoach.core.repository.entity.FinancialReport;
+import com.fincoach.core.repository.entity.CompanyNotice;
 import com.fincoach.core.service.InvestmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,4 +59,17 @@ public class InvestmentController {
         boolean isAdded = investmentService.toggleWatchlist(userId, code);
         return Result.success(isAdded); // true=已添加, false=已移除
     }
+
+    @Operation(summary = "获取公司财务报表")
+    @GetMapping("/finance/{code}")
+    public Result<List<FinancialReport>> getFinancialReports(@PathVariable String code) {
+        return Result.success(investmentService.getFinancialReports(code));
+    }
+
+    @Operation(summary = "获取公司公告列表")
+    @GetMapping("/notice/{code}")
+    public Result<List<CompanyNotice>> getCompanyNotices(@PathVariable String code) {
+        return Result.success(investmentService.getCompanyNotices(code));
+    }
 }
+

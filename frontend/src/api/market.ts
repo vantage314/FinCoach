@@ -1,58 +1,14 @@
-import request from './request';
+import request from '@/utils/request';
 
-// 证券类型
-export interface Security {
-    id: number;
-    name: string;
-    code: string;
-    type: 'stock' | 'fund' | 'bond';
-    currentPrice: number;
-    changePercent: number;
-    riskLevel: 'R1' | 'R2' | 'R3' | 'R4' | 'R5';
-    sector?: string;
-    description?: string;
-    // 扩展字段
-    marketCap?: string;   // 市值
-    peRatio?: number;     // 市盈率
-    volume?: string;      // 成交量
-    high52w?: number;     // 52周最高
-    low52w?: number;      // 52周最低
-}
-
-// 市场新闻
-export interface MarketNews {
-    id: number;
-    title: string;
-    source: string;
-    publishTime: string;
-    content?: string;
-}
-
-// 市场指数
-export interface MarketIndex {
-    name: string;
-    code: string;
-    value: number;
-    changePercent: number;
-    icon?: string;
-}
-
-// 获取证券列表
-export const getSecurities = (params?: { page?: number; size?: number; type?: string; keyword?: string }) => {
+// 1. 获取市场证券列表 (标准命名)
+export const getMarketSecurities = (params?: any) => {
     return request.get('/market/securities', { params });
 };
 
-// 获取证券详情
-export const getSecurityDetail = (id: number) => {
-    return request.get(`/market/securities/${id}`);
-};
+// 🔥 修复点：添加别名导出，兼容旧代码调用的 'getSecurities'
+export const getSecurities = getMarketSecurities;
 
-// 获取市场新闻
-export const getMarketNews = () => {
-    return request.get('/market/news');
-};
-
-// 获取市场指数
-export const getMarketIndices = () => {
-    return request.get('/market/indices');
+// 2. 获取单个证券详情 (为 Phase 12.3 做准备)
+export const getSecurityDetail = (code: string) => {
+    return request.get(`/market/detail/${code}`);
 };

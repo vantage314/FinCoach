@@ -36,3 +36,11 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# AI 配置
+ai:
+  # 使用 DeepSeek 的 API 地址 (兼容 OpenAI 格式)
+  base-url: https://api.deepseek.com
+  # 🔥 你提供的真实 Key
+  api-key: sk-76e2124dca984a649f203ee469896247
+  model: deepseek-chat

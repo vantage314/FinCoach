@@ -81,6 +81,12 @@ const routes: Array<RouteRecordRaw> = [
                 meta: { title: '智能投资驾驶舱', requiresAuth: true }
             },
             {
+                path: '/chat',
+                name: 'AiChat',
+                component: () => import('@/views/chat/Index.vue'),
+                meta: { title: 'AI 咨询', requiresAuth: true }
+            },
+            {
                 path: '/user/profile',
                 name: 'UserProfile',
                 component: () => import('../views/user/Profile.vue'),

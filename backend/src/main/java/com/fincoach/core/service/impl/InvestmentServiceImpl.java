@@ -3,9 +3,13 @@ package com.fincoach.core.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fincoach.core.repository.entity.CompanyProfile;
 import com.fincoach.core.repository.entity.FinancialNews;
+import com.fincoach.core.repository.entity.FinancialReport;
+import com.fincoach.core.repository.entity.CompanyNotice;
 import com.fincoach.core.repository.entity.UserWatchlist;
 import com.fincoach.core.repository.mapper.CompanyProfileMapper;
 import com.fincoach.core.repository.mapper.FinancialNewsMapper;
+import com.fincoach.core.repository.mapper.FinancialReportMapper;
+import com.fincoach.core.repository.mapper.CompanyNoticeMapper;
 import com.fincoach.core.repository.mapper.UserWatchlistMapper;
 import com.fincoach.core.service.InvestmentService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,8 @@ public class InvestmentServiceImpl implements InvestmentService {
     private final FinancialNewsMapper financialNewsMapper;
     private final CompanyProfileMapper companyProfileMapper;
     private final UserWatchlistMapper userWatchlistMapper;
+    private final FinancialReportMapper financialReportMapper;
+    private final CompanyNoticeMapper companyNoticeMapper;
 
     @Override
     public List<FinancialNews> getLatestNews(int limit) {
@@ -69,4 +75,23 @@ public class InvestmentServiceImpl implements InvestmentService {
             return true; // Added
         }
     }
+
+    @Override
+    public List<FinancialReport> getFinancialReports(String code) {
+        return financialReportMapper.selectList(
+            new LambdaQueryWrapper<FinancialReport>()
+                .eq(FinancialReport::getStockCode, code)
+                .orderByDesc(FinancialReport::getReportName)
+        );
+    }
+
+    @Override
+    public List<CompanyNotice> getCompanyNotices(String code) {
+        return companyNoticeMapper.selectList(
+            new LambdaQueryWrapper<CompanyNotice>()
+                .eq(CompanyNotice::getStockCode, code)
+                .orderByDesc(CompanyNotice::getPublishDate)
+        );
+    }
 }
+
