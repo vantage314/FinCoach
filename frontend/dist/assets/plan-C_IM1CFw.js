@@ -1,1 +1,0 @@
-import{r as t}from"./index-Dfz-eYiy.js";const n=(e,a)=>t.post("/plan/generate",null,{params:{planType:e,investMoney:a}}),r=e=>t.post("/plan/save",e),o=()=>t.get("/plan/history"),p=e=>t.post("/plan/execute/"+e);export{o as a,p as e,n as g,r as s};

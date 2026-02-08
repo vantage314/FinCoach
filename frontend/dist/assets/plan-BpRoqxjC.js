@@ -1,0 +1,1 @@
+import{r as t}from"./index-CVkBc_J1.js";const n=e=>t.post("/plan/generate",e),s=e=>t.post(`/plan/execute?planId=${e}`),r=e=>t.get("/plan/list",{params:e}),l=n,o=e=>t.post("/plan/save",e);export{r as a,n as b,s as e,l as g,o as s};
