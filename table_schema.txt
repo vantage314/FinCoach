@@ -1,0 +1,7 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Table	Create Table
+company_profile	CREATE TABLE `company_profile` (\n  `stock_code` varchar(20) NOT NULL COMMENT '鑲＄エ浠ｇ爜',\n  `company_name` varchar(100) DEFAULT NULL COMMENT '鍏?徃鍏ㄧО',\n  `establishment_date` date DEFAULT NULL COMMENT '鎴愮珛鏃ユ湡',\n  `listing_date` date DEFAULT NULL COMMENT '涓婂競鏃ユ湡',\n  `chairman` varchar(50) DEFAULT NULL COMMENT '钁ｄ簨闀?娉曚汉',\n  `website` varchar(255) DEFAULT NULL COMMENT '鍏?徃瀹樼綉',\n  `business_scope` text COMMENT '涓昏惀涓氬姟',\n  `main_competitors` varchar(255) DEFAULT NULL COMMENT '涓昏?绔炰簤瀵规墜',\n  `employees` int DEFAULT NULL COMMENT '鍛樺伐浜烘暟',\n  PRIMARY KEY (`stock_code`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+Table	Create Table
+company_notice	CREATE TABLE `company_notice` (\n  `id` bigint NOT NULL AUTO_INCREMENT,\n  `stock_code` varchar(20) NOT NULL,\n  `title` varchar(255) NOT NULL,\n  `type` varchar(20) DEFAULT NULL COMMENT '类型',\n  `publish_date` date DEFAULT NULL,\n  `link` varchar(255) DEFAULT NULL COMMENT '链接',\n  PRIMARY KEY (`id`),\n  KEY `idx_code` (`stock_code`)\n) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+COUNT(*)
+0
