@@ -162,8 +162,11 @@ export const useMarketStore = defineStore('market', () => {
     }
 
     // 获取证券列表（支持类型、关键词搜索和分页）
-    const fetchSecurities = async (params: any) => {
-        loading.value = true;
+    const fetchSecurities = async (params: any, silent: boolean = false) => {
+        // 只有非静默模式才显示 Loading
+        if (!silent) {
+            loading.value = true;
+        }
         try {
             const res: any = await getSecurities(params);
 
@@ -211,7 +214,10 @@ export const useMarketStore = defineStore('market', () => {
             console.error('❌ 获取市场数据崩溃:', error);
             securities.value = [];
         } finally {
-            loading.value = false;
+            // 无论是否静默，最后都要把 loading 关掉（但只在非静默模式下才设为 false）
+            if (!silent) {
+                loading.value = false;
+            }
         }
     };
 

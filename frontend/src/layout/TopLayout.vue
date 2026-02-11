@@ -16,10 +16,30 @@
         :ellipsis="false"
       >
         <el-menu-item index="/market">市场中心</el-menu-item>
-        <el-menu-item index="/dashboard">资产管理</el-menu-item>
+        
+        <!-- 🔥 Phase 14.8: 资产相关功能合并为子菜单 -->
+        <el-sub-menu index="assets">
+          <template #title>
+            <el-icon><Wallet /></el-icon>
+            <span>我的资产</span>
+          </template>
+          <el-menu-item index="/asset/analysis">
+            <el-icon><DataLine /></el-icon>
+            <span>资产全景 & 体检</span>
+          </el-menu-item>
+          <el-menu-item index="/asset/manage">
+            <el-icon><EditPen /></el-icon>
+            <span>账本管理 (记一笔)</span>
+          </el-menu-item>
+          <el-menu-item index="/dashboard">
+            <el-icon><PieChart /></el-icon>
+            <span>资产总览</span>
+          </el-menu-item>
+        </el-sub-menu>
+        
         <el-menu-item index="/diagnosis">
            <el-icon><FirstAidKit /></el-icon>
-           <span>资产体检</span>
+           <span>智能诊断</span>
         </el-menu-item>
         <el-menu-item index="/investment">
           <el-icon><TrendCharts /></el-icon>
@@ -68,7 +88,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Monitor, ArrowDown, TrendCharts, FirstAidKit } from '@element-plus/icons-vue';
+import { Monitor, ArrowDown, TrendCharts, FirstAidKit, Wallet, DataLine, EditPen, PieChart } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '@/store/modules/user';
 

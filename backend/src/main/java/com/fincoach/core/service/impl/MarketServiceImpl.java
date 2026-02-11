@@ -37,4 +37,53 @@ public class MarketServiceImpl implements MarketService {
         
         return marketSecurityMapper.selectPage(page, queryWrapper);
     }
+
+    @Override
+    public MarketSecurity getSecurityByCode(String code) {
+        LambdaQueryWrapper<MarketSecurity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(MarketSecurity::getCode, code);
+        return marketSecurityMapper.selectOne(wrapper);
+    }
+
+    @Autowired
+    private com.fincoach.core.repository.mapper.CompanyProfileMapper companyProfileMapper;
+    @Autowired
+    private com.fincoach.core.repository.mapper.CompanyNoticeMapper companyNoticeMapper;
+    @Autowired
+    private com.fincoach.core.repository.mapper.FinancialReportMapper financialReportMapper;
+    @Autowired
+    private com.fincoach.core.repository.mapper.FinancialNewsMapper financialNewsMapper;
+
+    @Override
+    public Object getCompanyProfile(String code) {
+        LambdaQueryWrapper<com.fincoach.core.repository.entity.CompanyProfile> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(com.fincoach.core.repository.entity.CompanyProfile::getStockCode, code);
+        return companyProfileMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public Object getCompanyNotices(String code) {
+        LambdaQueryWrapper<com.fincoach.core.repository.entity.CompanyNotice> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(com.fincoach.core.repository.entity.CompanyNotice::getStockCode, code)
+               .orderByDesc(com.fincoach.core.repository.entity.CompanyNotice::getPublishDate)
+               .last("LIMIT 10");
+        return companyNoticeMapper.selectList(wrapper);
+    }
+
+    @Override
+    public Object getFinancialReports(String code) {
+        LambdaQueryWrapper<com.fincoach.core.repository.entity.FinancialReport> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(com.fincoach.core.repository.entity.FinancialReport::getStockCode, code)
+               .orderByDesc(com.fincoach.core.repository.entity.FinancialReport::getId)
+               .last("LIMIT 5");
+        return financialReportMapper.selectList(wrapper);
+    }
+
+    @Override
+    public Object getNewsList(Integer limit) {
+        LambdaQueryWrapper<com.fincoach.core.repository.entity.FinancialNews> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(com.fincoach.core.repository.entity.FinancialNews::getPublishTime)
+               .last("LIMIT " + (limit != null ? limit : 20));
+        return financialNewsMapper.selectList(wrapper);
+    }
 }

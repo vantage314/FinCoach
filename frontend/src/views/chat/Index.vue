@@ -22,7 +22,7 @@
     <div class="chat-main">
       <div class="chat-header">
         <span class="title">FinCoach AI 智能投顾</span>
-        <span class="model-tag">Model: GPT-4o-Mini (Powered by API)</span>
+        <!-- <span class="model-tag">Model: GPT-4o-Mini (Powered by API)</span> -->
       </div>
 
       <div class="messages-area" ref="scrollRef">

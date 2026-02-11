@@ -86,6 +86,20 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/chat/Index.vue'),
                 meta: { title: 'AI 咨询', requiresAuth: true }
             },
+            // Phase 14: 资产分析与健康体检
+            {
+                path: '/asset/analysis',
+                name: 'AssetAnalysis',
+                component: () => import('@/views/asset/Analysis.vue'),
+                meta: { title: '资产分析 - FinCoach', requiresAuth: true }
+            },
+            // Phase 14.5: 资产管理
+            {
+                path: '/asset/manage',
+                name: 'AssetManage',
+                component: () => import('@/views/asset/Index.vue'),
+                meta: { title: '资产管理 - FinCoach', requiresAuth: true }
+            },
             {
                 path: '/user/profile',
                 name: 'UserProfile',
@@ -118,11 +132,23 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
 
+    // 设置页面标题
     if (to.meta.title) {
         document.title = to.meta.title as string;
     }
 
-    if (to.meta.requiresAuth && !token) {
+    // 白名单路径 (无需登录)
+    const whiteList = ['/login', '/register'];
+
+    if (whiteList.includes(to.path)) {
+        // 已登录用户访问登录/注册页，重定向到首页
+        if (token) {
+            next('/dashboard');
+        } else {
+            next();
+        }
+    } else if (to.meta.requiresAuth && !token) {
+        // 需要认证但未登录，跳转登录页
         next('/login');
     } else {
         next();

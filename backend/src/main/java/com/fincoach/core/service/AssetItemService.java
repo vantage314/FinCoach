@@ -2,6 +2,7 @@ package com.fincoach.core.service;
 
 import com.fincoach.core.controller.dto.AssetItemDTO;
 import com.fincoach.core.controller.dto.AssetQueryDTO;
+import com.fincoach.core.controller.vo.AssetAnalysisVO;
 import com.fincoach.core.controller.vo.PortfolioSummaryVO;
 import com.fincoach.core.repository.entity.AssetItem;
 
@@ -42,4 +43,9 @@ public interface AssetItemService {
      * 内部使用的实体添加方法
      */
     void internalAddAsset(AssetItem item);
+    
+    /**
+     * Phase 14: 资产全景分析与健康体检
+     */
+    AssetAnalysisVO analyze(Long userId);
 }

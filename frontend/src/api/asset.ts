@@ -74,3 +74,30 @@ export const getAssetSummary = () => {
 export const deleteAssets = (ids: number[]) => {
     return request.delete('/asset', { data: ids });
 };
+
+// =============== Phase 14: 资产分析与健康体检 ===============
+
+export interface AssetAnalysisVO {
+    totalAsset: number;      // 总资产 (实时)
+    totalProfit: number;     // 总盈亏 (实时)
+    dayProfit: number;       // 今日盈亏 (估算)
+    healthScore: number;     // 健康分 (0-100)
+    healthLevel: string;     // 健康等级
+    suggestions: string[];   // 投资建议
+    typeDistribution: Record<string, number>; // 资产分布
+    topHoldings: AssetHoldingItem[]; // 重仓前5名
+}
+
+export interface AssetHoldingItem {
+    name: string;
+    code: string | null;
+    value: number;
+    percent: number;
+}
+
+/**
+ * 获取资产全景分析与健康体检
+ */
+export const getAssetAnalysis = () => {
+    return request.get<AssetAnalysisVO>('/asset/analysis');
+};

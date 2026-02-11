@@ -83,4 +83,14 @@ public class AssetItemController {
         int rows = assetItemService.deleteAssets(userId, ids);
         return Result.success("成功删除 " + rows + " 笔资产");
     }
+
+    @GetMapping("/analysis")
+    @Operation(summary = "资产全景分析与健康体检", description = "返回实时估值、盈亏、健康分和投资建议")
+    public Result<com.fincoach.core.controller.vo.AssetAnalysisVO> getAnalysis(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
+        return Result.success(assetItemService.analyze(userId));
+    }
 }

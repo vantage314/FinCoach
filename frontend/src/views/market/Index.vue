@@ -76,13 +76,17 @@
         </el-table-column>
 
         <el-table-column prop="currentPrice" label="最新价" align="right">
-          <template #default="{ row }"><span class="price">¥{{ row.currentPrice }}</span></template>
+          <template #default="{ row }">
+            <span :class="getPriceClass(row)">
+              {{ formatPrice(row.currentPrice) }}
+            </span>
+          </template>
         </el-table-column>
 
         <el-table-column prop="changePercent" label="涨跌幅" align="right">
           <template #default="{ row }">
              <span :class="getChangeClass(row.changePercent)">
-               {{ row.changePercent > 0 ? '+' : '' }}{{ row.changePercent }}%
+               {{ formatChange(row) }}
              </span>
           </template>
         </el-table-column>
@@ -130,7 +134,7 @@ import { useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import dayjs from 'dayjs';
 // 🔥 引入真实接口
-import { getWatchlist, toggleWatchlist } from '@/api/invest';
+import { getWatchlist, toggleWatchlist, getNewsList } from '@/api/invest';
 
 const router = useRouter();
 const marketStore = useMarketStore();
@@ -139,6 +143,9 @@ const activeTab = ref('all');
 const currentPage = ref(1);
 const pageSize = ref(10);
 const currentTime = ref(dayjs().format('HH:mm'));
+
+// 🔥 定时器变量（轮询用）
+let pollingTimer: any = null;
 
 // --- 自选逻辑 (真实连接后端) ---
 const watchlistSet = ref(new Set<string>());
@@ -189,46 +196,96 @@ const tabs = [
   { name: '债券', key: 'BOND' }
 ];
 
-const loadData = () => {
+const loadData = (silent: boolean = false) => {
   marketStore.fetchSecurities({
     page: currentPage.value, size: pageSize.value, type: activeTab.value === 'all' ? undefined : activeTab.value, keyword: searchKeyword.value
-  });
+  }, silent);
 };
 const handleTabChange = (key: string) => { activeTab.value = key; currentPage.value = 1; loadData(); };
 const handleSearch = () => { currentPage.value = 1; loadData(); };
-const getChangeClass = (val: number) => val > 0 ? 'text-red' : (val < 0 ? 'text-green' : 'text-gray');
+
+// 🔥 涨跌色彩逻辑 (A股规范: 红涨绿跌)
+const getChangeClass = (val: number) => {
+  if (val === 0 || val === null || val === undefined) return 'text-gray';
+  return val > 0 ? 'text-red' : 'text-green';
+};
+
+// 🔥 价格显示：停牌/休市特殊处理
+const formatPrice = (price: number) => {
+  if (!price || price === 0) return '停牌';
+  return '¥' + Number(price).toFixed(2);
+};
+const getPriceClass = (row: any) => {
+  if (!row.currentPrice || row.currentPrice === 0) return 'text-gray';
+  return getChangeClass(row.changePercent);
+};
+// 🔥 涨跌幅格式化
+const formatChange = (row: any) => {
+  if (!row.currentPrice || row.currentPrice === 0) return '停牌';
+  if (row.changePercent === 0 || row.changePercent === null) return '0.00%';
+  const sign = row.changePercent > 0 ? '+' : '';
+  return sign + Number(row.changePercent).toFixed(2) + '%';
+};
+
 const getRiskTagType = (level: string) => (level === 'R5' || level === 'R4') ? 'danger' : (level === 'R3' ? 'warning' : 'success');
 const getRiskDesc = (level: string) => {
   const map: any = { 'R1': 'R1 (谨慎型)', 'R2': 'R2 (稳健型)', 'R3': 'R3 (平衡型)', 'R4': 'R4 (进取型)', 'R5': 'R5 (激进型)' };
   return map[level] || '风险等级';
 };
 
-// --- 新闻逻辑 ---
+// --- 新闻逻辑 (真实数据) ---
 const currentNewsIndex = ref(0);
-const newsList = [
-  { time: '08:00', title: '美联储会议纪要释放鸽派信号', content: '降息预期升温...' },
-  { time: '09:30', title: '宁德时代发布新一代神行电池', content: '开启超充时代...' },
-  { time: '10:15', title: '北向资金净流入超50亿元', content: '白酒板块领涨...' },
-  { time: '11:00', title: '腾讯控股回购金额创历史新高', content: '累计超百亿港元...' },
-  { time: '13:45', title: '前三季度GDP同比增长5.2%', content: '经济持续回升...' }
-];
+const newsList = ref<any[]>([
+  { time: '--:--', title: '正在加载新闻...', content: '' }
+]);
 let newsTimer: any = null;
-const startNewsTicker = () => {
-  newsTimer = setInterval(() => { currentNewsIndex.value = (currentNewsIndex.value + 1) % newsList.length; }, 3000);
+
+// 🔥 从后端获取真实新闻
+const fetchNews = async () => {
+  try {
+    const res: any = await getNewsList({ limit: 10 });
+    if (res.code === 200 && res.data && res.data.length > 0) {
+      newsList.value = res.data.map((n: any) => ({
+        time: n.publishTime ? dayjs(n.publishTime).format('HH:mm') : '--:--',
+        title: n.title || '无标题',
+        content: n.content || n.summary || n.title || ''
+      }));
+    }
+  } catch (e) {
+    console.warn('新闻获取失败，使用默认数据');
+  }
 };
-const viewNews = (news: any) => { ElMessageBox.alert(news.content, news.title); };
+
+const startNewsTicker = () => {
+  newsTimer = setInterval(() => { currentNewsIndex.value = (currentNewsIndex.value + 1) % newsList.value.length; }, 3000);
+};
+const viewNews = (news: any) => { ElMessageBox.alert(news.content || '暂无详情', news.title); };
 
 // 生命周期
 onMounted(() => { 
-  loadData(); 
+  // 1. 首次加载 (显示 Loading)
+  loadData(false); 
   fetchWatchlist(); // 🔥 进来先查一遍自选状态
-  startNewsTicker(); 
+  fetchNews();     // 🔥 获取真实新闻
+  startNewsTicker();
+  
+  // 2. 启动轮询 (每 3 秒一次，静默刷新)
+  pollingTimer = setInterval(() => {
+    loadData(true); // 静默刷新，不显示 Loading
+  }, 3000);
+  
+  // 3. 新闻每 120 秒刷新一次
+  setInterval(() => { fetchNews(); }, 120000);
 });
 onActivated(() => { 
   loadData();
   fetchWatchlist(); // 🔥 切回来也要查，防止在别的页面改了
 });
-onUnmounted(() => { if(newsTimer) clearInterval(newsTimer); });
+onUnmounted(() => { 
+  if (newsTimer) clearInterval(newsTimer);
+  // 🔥 清除轮询定时器（防止切换页面后还在请求）
+  if (pollingTimer) clearInterval(pollingTimer);
+});
 </script>
 
 <style scoped>
@@ -269,7 +326,8 @@ onUnmounted(() => { if(newsTimer) clearInterval(newsTimer); });
 .stock-name { font-size: 14px; font-weight: bold; color: #fff; }
 .stock-name.hover-link:hover { color: #409eff; text-decoration: underline; }
 .stock-code { font-size: 12px; color: #909399; }
-.text-red { color: #f56c6c; } .text-green { color: #67c23a; } .text-gray { color: #909399; }
+.text-red { color: #f56c6c; font-weight: 600; } .text-green { color: #67c23a; font-weight: 600; } .text-gray { color: #909399; }
+.price { font-family: 'Courier New', monospace; }
 .sector-tag { background: #2b303c; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #b1b3b8; }
 .pagination-wrapper { display: flex; justify-content: flex-end; margin-top: 20px; }
 :deep(.dark-pagination button), :deep(.dark-pagination .el-pager li) { background: transparent !important; color: #909399; }

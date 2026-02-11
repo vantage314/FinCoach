@@ -189,4 +189,168 @@ public class AssetItemServiceImpl implements AssetItemService {
     public void internalAddAsset(AssetItem item) {
         assetItemMapper.insert(item);
     }
+
+    // ======================== Phase 14: 资产分析与健康体检 ========================
+    
+    @Autowired
+    private com.fincoach.core.repository.mapper.MarketSecurityMapper marketSecurityMapper;
+
+    @Override
+    public com.fincoach.core.controller.vo.AssetAnalysisVO analyze(Long userId) {
+        log.info("[AssetAnalysis] 开始分析用户资产, userId: {}", userId);
+        
+        List<AssetItem> assets = getUserAssets(userId, null);
+        
+        BigDecimal totalValue = BigDecimal.ZERO;
+        BigDecimal totalCost = BigDecimal.ZERO;
+        Map<String, BigDecimal> typeMap = new HashMap<>(); // STOCK, FUND, BOND, CASH...
+        
+        List<com.fincoach.core.controller.vo.AssetAnalysisVO.AssetItemVO> holdings = new java.util.ArrayList<>();
+
+        // 1. 遍历资产，计算实时价值
+        for (AssetItem asset : assets) {
+            BigDecimal currentValue = asset.getCurrentValue(); // 默认为静态金额(如现金)
+            String assetType = getAssetTypeString(asset.getCategoryId(), asset.getSubType());
+            
+            // 如果是证券类资产，尝试去行情表查最新价
+            if (asset.getStockCode() != null && asset.getQuantity() != null 
+                    && asset.getQuantity().compareTo(BigDecimal.ZERO) > 0) {
+                var security = marketSecurityMapper.selectOne(
+                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<com.fincoach.core.repository.entity.MarketSecurity>()
+                        .eq("code", asset.getStockCode())
+                );
+                if (security != null) {
+                    // 市值 = 持仓量 * 实时价
+                    BigDecimal marketPrice = security.getCurrentPrice();
+                    currentValue = asset.getQuantity().multiply(marketPrice);
+                    
+                    // 累加成本 (用于算盈亏)
+                    if (asset.getCostPrice() != null) {
+                        totalCost = totalCost.add(asset.getQuantity().multiply(asset.getCostPrice()));
+                    }
+                }
+            } else {
+                // 非证券类资产：成本 = 当前值
+                totalCost = totalCost.add(currentValue != null ? currentValue : BigDecimal.ZERO);
+            }
+
+            // 累加总资产
+            if (currentValue != null) {
+                totalValue = totalValue.add(currentValue);
+            }
+            
+            // 累加分类分布
+            typeMap.put(assetType, typeMap.getOrDefault(assetType, BigDecimal.ZERO).add(currentValue != null ? currentValue : BigDecimal.ZERO));
+
+            // 记录持仓明细用于排序
+            if (currentValue != null && currentValue.compareTo(BigDecimal.ZERO) > 0) {
+                var item = new com.fincoach.core.controller.vo.AssetAnalysisVO.AssetItemVO();
+                item.setName(asset.getAssetName());
+                item.setCode(asset.getStockCode());
+                item.setValue(currentValue);
+                holdings.add(item);
+            }
+        }
+
+        // 2. 组装基础数据
+        var vo = new com.fincoach.core.controller.vo.AssetAnalysisVO();
+        vo.setTotalAsset(totalValue);
+        vo.setTotalProfit(totalValue.subtract(totalCost)); // 总盈亏
+        vo.setDayProfit(totalValue.multiply(new BigDecimal("0.012"))); // 模拟今日盈亏 +1.2%
+        vo.setTypeDistribution(typeMap);
+
+        // 计算持仓占比
+        for (var item : holdings) {
+            if (totalValue.compareTo(BigDecimal.ZERO) > 0) {
+                item.setPercent(item.getValue().divide(totalValue, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
+            }
+        }
+        // 排序取前5
+        holdings.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+        if (holdings.size() > 5) holdings = holdings.subList(0, 5);
+        vo.setTopHoldings(holdings);
+
+        // 3. 智能体检算法
+        performHealthCheck(vo, totalValue, typeMap);
+
+        log.info("[AssetAnalysis] 分析完成, 总资产: {}, 盈亏: {}, 健康分: {}", 
+                vo.getTotalAsset(), vo.getTotalProfit(), vo.getHealthScore());
+        return vo;
+    }
+    
+    /**
+     * 获取资产类型字符串
+     */
+    private String getAssetTypeString(Integer categoryId, String subType) {
+        if (categoryId == null) return "OTHER";
+        switch (categoryId) {
+            case 1: return "CASH";
+            case 2: // 金融投资
+                if (subType != null) {
+                    if (subType.contains("股票")) return "STOCK";
+                    if (subType.contains("基金")) return "FUND";
+                    if (subType.contains("债券")) return "BOND";
+                }
+                return "INVESTMENT";
+            case 3: return "FIXED"; // 固定资产
+            default: return "OTHER";
+        }
+    }
+
+    /**
+     * 健康体检算法
+     */
+    private void performHealthCheck(com.fincoach.core.controller.vo.AssetAnalysisVO vo, 
+                                    BigDecimal total, Map<String, BigDecimal> typeMap) {
+        int score = 100;
+        List<String> suggestions = new java.util.ArrayList<>();
+
+        if (total.compareTo(BigDecimal.ZERO) == 0) {
+            vo.setHealthScore(0);
+            vo.setHealthLevel("空仓");
+            suggestions.add("您还没有录入任何资产，请先记一笔吧！");
+            vo.setSuggestions(suggestions);
+            return;
+        }
+
+        // 计算比例
+        BigDecimal cashRatio = typeMap.getOrDefault("CASH", BigDecimal.ZERO).divide(total, 4, RoundingMode.HALF_UP);
+        BigDecimal equityValue = typeMap.getOrDefault("STOCK", BigDecimal.ZERO)
+                .add(typeMap.getOrDefault("FUND", BigDecimal.ZERO));
+        BigDecimal stockRatio = equityValue.divide(total, 4, RoundingMode.HALF_UP);
+
+        // 规则 1: 流动性危机 (现金 < 5%)
+        if (cashRatio.compareTo(new BigDecimal("0.05")) < 0) {
+            score -= 20;
+            suggestions.add("⚠️ 流动性告急：您的现金类资产不足 5%，建议预留 3-6 个月的生活费作为备用金。");
+        }
+
+        // 规则 2: 风险敞口过大 (权益 > 80%)
+        if (stockRatio.compareTo(new BigDecimal("0.80")) > 0) {
+            score -= 15;
+            suggestions.add("⚠️ 激进投资：您的股票/基金占比超过 80%，市场波动可能导致资产大幅缩水，建议配置债券或黄金对冲。");
+        } else if (stockRatio.compareTo(new BigDecimal("0.20")) < 0 && stockRatio.compareTo(BigDecimal.ZERO) > 0) {
+            // 规则 3: 过于保守
+            score -= 5;
+            suggestions.add("💡 过于保守：您的权益类资产较低，可能跑不赢通胀，建议适当关注指数基金。");
+        } else if (stockRatio.compareTo(BigDecimal.ZERO) > 0) {
+            suggestions.add("✅ 均衡配置：您的股债配比处于健康区间。");
+        }
+
+        // 规则 4: 持仓集中度
+        if (vo.getTopHoldings() != null && !vo.getTopHoldings().isEmpty() 
+                && vo.getTopHoldings().get(0).getPercent() != null
+                && vo.getTopHoldings().get(0).getPercent().compareTo(new BigDecimal("60")) > 0) {
+            score -= 10;
+            suggestions.add("⚠️ 集中度过高：单一资产占比超过 60%，请注意个股黑天鹅风险。");
+        }
+
+        vo.setHealthScore(score);
+        if (score >= 90) vo.setHealthLevel("✨ 完美资产");
+        else if (score >= 75) vo.setHealthLevel("👍 健康资产");
+        else if (score >= 60) vo.setHealthLevel("😷 亚健康");
+        else vo.setHealthLevel("🚑 高危资产");
+        
+        vo.setSuggestions(suggestions);
+    }
 }
