@@ -8,10 +8,19 @@
 - 失败: 3 | 阻塞: 0 | 部分通过: 1
 
 ## Top 5 问题
-- P1 TC06 资产列表/统计（asset list/summary）: 资产新增失败: code=500, message=Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] 
+- P1 TC06 资产列表/统计（asset list/summary）: locator.click: Error: strict mode violation: locator('.el-dialog').locator('.el-select') resolved to 2 elements:
+    1) <div class="el-select" data-v-813c081a="">…</div> aka locator('div').filter({ hasText: /^股票$/ }).nth(1)
+    2) <div class="el-select" data-v-813c081a="">…</div> aka locator('div').filter({ hasText: /^输入代码或名称搜索$/ }).nth(1)
+
+Call log:
+[2m  - waiting for locator('.el-dialog').locator('.el-select')[22m
+
 - P2 TC07 风险测评 -> 体检闭环（risk->health）: 未跳转至体检页，当前 URL=http://localhost:5173/risk/assessment; 体检页未显示健康分数
-- P1 TC08 计划生成/执行闭环（plan generate/execute）: 定位失败: 计划投入金额输入框; Case timeout 120000ms
-- P1 TC09 AI 咨询（/api/ai/chat）: AI 请求未返回 200（可能超时或失败）; AI 回复异常: ❌ 网络请求失败，请检查后端服务。
+- P1 TC08 计划生成/执行闭环（plan generate/execute）: 定位失败: 计划投入金额输入框; locator.fill: Test timeout of 1800000ms exceeded.
+Call log:
+[2m  - waiting for locator('.el-dialog').locator('.el-input-number input').first()[22m
+
+- P1 TC09 AI 咨询（/api/ai/chat）: page.goto: Target page, context or browser has been closed
 
 ## 用例明细
 ### TC01 首页（未登录）
@@ -33,7 +42,7 @@
   - localStorage 写入 token
 - 实际结果:
   - 默认账号 admin/123456 登录失败，尝试注册新账号
-  - 注册新账号成功: qa_user_153965
+  - 注册新账号成功: qa_user_592945
   - 登录成功，token=已写入
 - 截图: doc/qa/screenshots/20260212/TC02_login_success.png
 - Console 错误/警告 (前 10 条):
@@ -46,12 +55,12 @@
     at async handleLogin (http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:32:7)
   - [error] [api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}
 - Network 失败/异常 (前 10 条):
-- api_code_error POST http://localhost:5173/api/auth/login 200 15ms
-- api_code_error GET http://localhost:5173/api/risk/latest 200 51ms
+- api_code_error POST http://localhost:5173/api/auth/login 200 16ms
+- api_code_error GET http://localhost:5173/api/risk/latest 200 44ms
 - 关键接口响应摘要:
-  - GET http://localhost:5173/api/health/check status=200 code=200 body={"code":200,"message":"success","data":{"score":50,"level":"一般","userType":"NOVICE","liquidityScore":50,"riskMatchScore":0,"protectionScore":0,"diversityScore":0,"suggestions":[{"type":"warning","message":"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀"},{"type":"info","message":"💡 建议并在留足3~6个月应急金后，尝试低风险理财"}]}}
   - GET http://localhost:5173/api/asset/list status=200 code=200 body={"code":200,"message":"success","data":[]}
   - GET http://localhost:5173/api/asset/summary status=200 code=200 body={"code":200,"message":"success","data":{"totalAmount":0,"categoryDistribution":{"固定资产":0,"金融投资":0,"现金":0},"investmentLimit":0,"safetyThreshold":30000,"liquidityGap":30000,"safetyProgress":0,"personaTag":"🌱 蓄力期"}}
+  - GET http://localhost:5173/api/health/check status=200 code=200 body={"code":200,"message":"success","data":{"score":50,"level":"一般","userType":"NOVICE","liquidityScore":50,"riskMatchScore":0,"protectionScore":0,"diversityScore":0,"suggestions":[{"type":"warning","message":"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀"},{"type":"info","message":"💡 建议并在留足3~6个月应急金后，尝试低风险理财"}]}}
   - GET http://localhost:5173/api/health/check status=200 code=200 body={"code":200,"message":"success","data":{"score":50,"level":"一般","userType":"NOVICE","liquidityScore":50,"riskMatchScore":0,"protectionScore":0,"diversityScore":0,"suggestions":[{"type":"warning","message":"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀"},{"type":"info","message":"💡 建议并在留足3~6个月应急金后，尝试低风险理财"}]}}
   - GET http://localhost:5173/api/risk/latest status=200 code=404 body={"code":404,"message":"尚未完成风险测评","data":null}
 
@@ -98,9 +107,9 @@
   - 刷新后自选列表数量: 1
 - 截图: doc/qa/screenshots/20260212/TC05_watchlist.png
 - 关键接口响应摘要:
+  - GET http://localhost:5173/api/market/notices/600893 status=200 code=200 body={"code":200,"message":"success","data":[{"title":"关于召开2025年年度股东大会的通知","date":"2026-02-11"},{"title":"2025年第一季度业绩预告","date":"2026-02-07"},{"title":"关于控股股东增持股份计划的进展公告","date":"2026-01-31"},{"title":"关于分配2024年度现金股利的实施公告","date":"2026-01-23"}]}
   - GET http://localhost:5173/api/invest/watchlist status=200 code=200 body={"code":200,"message":"success","data":[]}
   - GET http://localhost:5173/api/market/finance/600893 status=200 code=200 body={"code":200,"message":"success","data":{"profit_growth":"+8.3%","revenue":"22.22 亿","revenue_growth":"+12.5%","eps":1.73,"roe":"15.4%","profit":"4.00 亿"}}
-  - GET http://localhost:5173/api/market/notices/600893 status=200 code=200 body={"code":200,"message":"success","data":[{"title":"关于召开2025年年度股东大会的通知","date":"2026-02-11"},{"title":"2025年第一季度业绩预告","date":"2026-02-07"},{"title":"关于控股股东增持股份计划的进展公告","date":"2026-01-31"},{"title":"关于分配2024年度现金股利的实施公告","date":"2026-01-23"}]}
   - GET http://localhost:5173/api/market/detail/600893 status=200 code=200 body={"code":200,"message":"success","data":{"id":54,"name":"航发动力","code":"600893","type":"STOCK","currentPrice":51.97,"changePercent":5.89,"openPrice":50,"highPrice":50.8,"lowPrice":49,"riskLevel":"R4","sector":"A股","description":"航空发动机唯一上市平台","marketCap":null,"peRatio":null,"volume":31931788,"turnover":1583258506,"high52w":null,"low52w":null,"bid1Price":49.08,"bid1Vol":58600,"bid2Price":49.07,"bid2Vol":25800,"bid3Price":49.06,"bid3Vol":11500,"bid4Price":49.05,"bid4Vol":14500,"bid5Price":49.04,"bid5Vol":8800,"ask1Price":49.09,"ask1Vol":28700,"ask2Price":49.1,"ask2Vol":1500,"ask3Price":49.11,"ask3Vol":24100,"ask4Price":49.12,"ask4Vol":9600,"ask5Price":49.13,"ask5Vol":1700,"peTtm":null}}
   - GET http://localhost:5173/api/market/kline status=200 code=-- body=[{"day":"2024-11-22","open":"42.300","high":"42.550","low":"41.140","close":"41.180","volume":"16988436"},{"day":"2024-11-25","open":"41.160","high":"41.380","low":"39.650","close":"40.030","volume":"22214509"},{"day":"2024-11-26","open":"40.280","high":"41.180","low":"40.140","close":"40.450","volume":"14282620"},{"day":"2024-11-27","open":"40.070","high":"41.500","low":"39.900","close":"41.290","volume":"17213376"},{"day":"2024-11-28","open":"41.160","high":"42.140","low":"40.900","close":"40.970","volume":"14112388"},{"day":"2024-11-29","open":"40.910","high":"42.110","low":"40.840","close":"41.880","volume":"16754553"},{"day":"2024-12-02","open":"41.950","high":"42.370","low":"41.330","close":"41.800","volume":"26762329"},{"day":"2024-12-03","open":"41.810","high":"41.880","low":"41.130","close":"41.620","volume":"14414080"},{"day":"2024-12-04","open":"41.550","high":"41.700","low":"41.020","close":"41.360","volume":"13410800"},{"day":"2024-12-05","open":"41.170","high":"42.080","l
   - POST http://localhost:5173/api/invest/watchlist/toggle status=200 code=200 body={"code":200,"message":"success","data":true}
@@ -111,29 +120,20 @@
 
 ### TC06 资产列表/统计（asset list/summary）
 - 状态: fail
-- URL: http://localhost:5173/dashboard
+- URL: http://localhost:5173/asset/manage
 - 预期结果:
   - 资产列表可见
   - 新增资产后统计刷新
-- 实际结果:
-  - 资产总览总资产显示: ¥ 0.00
 - 异常/问题:
-  - 资产新增失败: code=500, message=Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] 
-- 截图: doc/qa/screenshots/20260212/TC06_asset.png
-- Console 错误/警告 (前 10 条):
-  - [error] [api] Request failed {method: POST, url: /api/asset/add, status: 200, code: 500, message: Debug Error: org.springframework.web.bind.MethodAr…ssage [categoryId]]; default message [资产分类不能为空]] }
-  - [error] [api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}
-- Network 失败/异常 (前 10 条):
-- api_code_error POST http://localhost:5173/api/asset/add 200 10ms
-- api_code_error GET http://localhost:5173/api/risk/latest 200 45ms
+  - locator.click: Error: strict mode violation: locator('.el-dialog').locator('.el-select') resolved to 2 elements:
+    1) <div class="el-select" data-v-813c081a="">…</div> aka locator('div').filter({ hasText: /^股票$/ }).nth(1)
+    2) <div class="el-select" data-v-813c081a="">…</div> aka locator('div').filter({ hasText: /^输入代码或名称搜索$/ }).nth(1)
+
+Call log:
+[2m  - waiting for locator('.el-dialog').locator('.el-select')[22m
+
 - 关键接口响应摘要:
   - GET http://localhost:5173/api/asset/list status=200 code=200 body={"code":200,"message":"success","data":[]}
-  - POST http://localhost:5173/api/asset/add status=200 code=500 body={"code":500,"message":"Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] ","data":null}
-  - GET http://localhost:5173/api/asset/list status=200 code=200 body={"code":200,"message":"success","data":[]}
-  - GET http://localhost:5173/api/health/check status=200 code=200 body={"code":200,"message":"success","data":{"score":50,"level":"一般","userType":"NOVICE","liquidityScore":50,"riskMatchScore":0,"protectionScore":0,"diversityScore":0,"suggestions":[{"type":"warning","message":"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀"},{"type":"info","message":"💡 建议并在留足3~6个月应急金后，尝试低风险理财"}]}}
-  - GET http://localhost:5173/api/asset/summary status=200 code=200 body={"code":200,"message":"success","data":{"totalAmount":0,"categoryDistribution":{"固定资产":0,"金融投资":0,"现金":0},"investmentLimit":0,"safetyThreshold":30000,"liquidityGap":30000,"safetyProgress":0,"personaTag":"🌱 蓄力期"}}
-  - GET http://localhost:5173/api/health/check status=200 code=200 body={"code":200,"message":"success","data":{"score":50,"level":"一般","userType":"NOVICE","liquidityScore":50,"riskMatchScore":0,"protectionScore":0,"diversityScore":0,"suggestions":[{"type":"warning","message":"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀"},{"type":"info","message":"💡 建议并在留足3~6个月应急金后，尝试低风险理财"}]}}
-  - GET http://localhost:5173/api/risk/latest status=200 code=404 body={"code":404,"message":"尚未完成风险测评","data":null}
 
 ### TC07 风险测评 -> 体检闭环（risk->health）
 - 状态: partial
@@ -154,8 +154,10 @@
   - 资产统计刷新
 - 异常/问题:
   - 定位失败: 计划投入金额输入框
-  - Case timeout 120000ms
-- 截图: doc/qa/screenshots/20260212/TC08_auto.png
+  - locator.fill: Test timeout of 1800000ms exceeded.
+Call log:
+[2m  - waiting for locator('.el-dialog').locator('.el-input-number input').first()[22m
+
 - Console 错误/警告 (前 10 条):
   - [warning] [Vue warn]: Property "Plus" was accessed during render but is not defined on instance. 
   at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > key="/plan" > 
@@ -310,26 +312,23 @@
 
 ### TC09 AI 咨询（/api/ai/chat）
 - 状态: fail
-- URL: http://localhost:5173/chat
+- URL: http://localhost:5173/plan
 - 预期结果:
   - AI 返回 Markdown 文本
   - Network 200，无前端报错
 - 异常/问题:
-  - AI 请求未返回 200（可能超时或失败）
-  - AI 回复异常: ❌ 网络请求失败，请检查后端服务。
-- 截图: doc/qa/screenshots/20260212/TC09_ai.png
-- Console 错误/警告 (前 10 条):
-  - [error] [api] Request error: POST /api/ai/chat -> NO_STATUS: timeout of 10000ms exceeded {message: timeout of 10000ms exceeded, code: ECONNABORTED, method: POST, url: /api/ai/chat, baseURL: /api}
-- Network 失败/异常 (前 10 条):
-- requestfailed POST http://localhost:5173/api/ai/chat  10008ms
+  - page.goto: Target page, context or browser has been closed
 
 ## Bug 清单 (P0/P1/P2)
 - P1 | TC06 资产列表/统计（asset list/summary）
   - 复现步骤: 见 TC06 用例执行流程
-  - 证据: doc/qa/screenshots/20260212/TC06_asset.png
-  - Console: [api] Request failed {method: POST, url: /api/asset/add, status: 200, code: 500, message: Debug Error: org.springframework.web.bind.MethodAr…ssage [categoryId]]; default message [资产分类不能为空]] } | [api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}
-  - Network: POST http://localhost:5173/api/asset/add 200 | GET http://localhost:5173/api/risk/latest 200
-  - 疑似根因: 资产新增失败: code=500, message=Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] 
+  - 疑似根因: locator.click: Error: strict mode violation: locator('.el-dialog').locator('.el-select') resolved to 2 elements:
+    1) <div class="el-select" data-v-813c081a="">…</div> aka locator('div').filter({ hasText: /^股票$/ }).nth(1)
+    2) <div class="el-select" data-v-813c081a="">…</div> aka locator('div').filter({ hasText: /^输入代码或名称搜索$/ }).nth(1)
+
+Call log:
+[2m  - waiting for locator('.el-dialog').locator('.el-select')[22m
+
   - 建议修复点: 检查前后端对应接口/页面渲染逻辑与权限校验
 - P2 | TC07 风险测评 -> 体检闭环（risk->health）
   - 复现步骤: 见 TC07 用例执行流程
@@ -338,7 +337,6 @@
   - 建议修复点: 检查前后端对应接口/页面渲染逻辑与权限校验
 - P1 | TC08 计划生成/执行闭环（plan generate/execute）
   - 复现步骤: 见 TC08 用例执行流程
-  - 证据: doc/qa/screenshots/20260212/TC08_auto.png
   - Console: [Vue warn]: Property "Plus" was accessed during render but is not defined on instance. 
   at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > key="/plan" > 
   at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
@@ -358,23 +356,20 @@
   at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > 
   at <RouterView> 
   at <App>
-  - 疑似根因: 定位失败: 计划投入金额输入框; Case timeout 120000ms
+  - 疑似根因: 定位失败: 计划投入金额输入框; locator.fill: Test timeout of 1800000ms exceeded.
+Call log:
+[2m  - waiting for locator('.el-dialog').locator('.el-input-number input').first()[22m
+
   - 建议修复点: 检查前后端对应接口/页面渲染逻辑与权限校验
 - P1 | TC09 AI 咨询（/api/ai/chat）
   - 复现步骤: 见 TC09 用例执行流程
-  - 证据: doc/qa/screenshots/20260212/TC09_ai.png
-  - Console: [api] Request error: POST /api/ai/chat -> NO_STATUS: timeout of 10000ms exceeded {message: timeout of 10000ms exceeded, code: ECONNABORTED, method: POST, url: /api/ai/chat, baseURL: /api}
-  - Network: POST http://localhost:5173/api/ai/chat 
-  - 疑似根因: AI 请求未返回 200（可能超时或失败）; AI 回复异常: ❌ 网络请求失败，请检查后端服务。
+  - 疑似根因: page.goto: Target page, context or browser has been closed
   - 建议修复点: 检查前后端对应接口/页面渲染逻辑与权限校验
 
 ## 附录
 ### 失败请求表 (status>=400 或 requestfailed)
-- api_code_error POST http://localhost:5173/api/auth/login status=200 duration=15ms
-- api_code_error GET http://localhost:5173/api/risk/latest status=200 duration=51ms
-- api_code_error POST http://localhost:5173/api/asset/add status=200 duration=10ms
-- api_code_error GET http://localhost:5173/api/risk/latest status=200 duration=45ms
-- requestfailed POST http://localhost:5173/api/ai/chat status=-- duration=10008ms
+- api_code_error POST http://localhost:5173/api/auth/login status=200 duration=16ms
+- api_code_error GET http://localhost:5173/api/risk/latest status=200 duration=44ms
 
 ### Console 错误表
 - [error] [api] Request failed {method: POST, url: /api/auth/login, status: 200, code: 500, message: 用户名或密码错误}
@@ -384,8 +379,6 @@
     at async http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:36:25
     at async validateField (http://localhost:5173/node_modules/.vite/deps/element-plus.js?v=3f0c2f8a:39633:11)
     at async handleLogin (http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:32:7)
-- [error] [api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}
-- [error] [api] Request failed {method: POST, url: /api/asset/add, status: 200, code: 500, message: Debug Error: org.springframework.web.bind.MethodAr…ssage [categoryId]]; default message [资产分类不能为空]] }
 - [error] [api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}
 - [warning] [Vue warn]: Property "Plus" was accessed during render but is not defined on instance. 
   at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > key="/plan" > 
@@ -571,7 +564,6 @@
   at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > 
   at <RouterView> 
   at <App>
-- [error] [api] Request error: POST /api/ai/chat -> NO_STATUS: timeout of 10000ms exceeded {message: timeout of 10000ms exceeded, code: ECONNABORTED, method: POST, url: /api/ai/chat, baseURL: /api}
 
 ### 截图清单
 - TC01: doc/qa/screenshots/20260212/TC01_home.png
@@ -579,7 +571,4 @@
 - TC03: doc/qa/screenshots/20260212/TC03_market.png
 - TC04: doc/qa/screenshots/20260212/TC04_kline.png
 - TC05: doc/qa/screenshots/20260212/TC05_watchlist.png
-- TC06: doc/qa/screenshots/20260212/TC06_asset.png
 - TC07: doc/qa/screenshots/20260212/TC07_risk_health.png
-- TC08: doc/qa/screenshots/20260212/TC08_auto.png
-- TC09: doc/qa/screenshots/20260212/TC09_ai.png

@@ -12,7 +12,7 @@
     {
       "id": "TC01",
       "title": "首页（未登录）",
-      "startAt": "2026-02-12T11:35:44.043Z",
+      "startAt": "2026-02-12T11:09:42.994Z",
       "status": "pass",
       "expected": [
         "未登录访问首页自动跳转登录页或展示访客态",
@@ -29,13 +29,13 @@
       "network": [],
       "keyResponses": [],
       "screenshot": "TC01_home.png",
-      "endAt": "2026-02-12T11:35:45.613Z",
+      "endAt": "2026-02-12T11:09:44.588Z",
       "url": "http://localhost:5173/login"
     },
     {
       "id": "TC02",
       "title": "登录",
-      "startAt": "2026-02-12T11:35:45.614Z",
+      "startAt": "2026-02-12T11:09:44.590Z",
       "status": "pass",
       "expected": [
         "登录成功进入首页 /dashboard",
@@ -43,7 +43,7 @@
       ],
       "actual": [
         "默认账号 admin/123456 登录失败，尝试注册新账号",
-        "注册新账号成功: qa_user_153965",
+        "注册新账号成功: qa_user_592945",
         "登录成功，token=已写入"
       ],
       "notes": [],
@@ -62,21 +62,21 @@
       ],
       "console": [
         {
-          "ts": "2026-02-12T11:35:45.959Z",
+          "ts": "2026-02-12T11:09:44.938Z",
           "level": "error",
           "text": "[api] Request failed {method: POST, url: /api/auth/login, status: 200, code: 500, message: 用户名或密码错误}",
           "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:30",
           "caseId": "TC02"
         },
         {
-          "ts": "2026-02-12T11:35:45.964Z",
+          "ts": "2026-02-12T11:09:44.941Z",
           "level": "error",
           "text": "登录异常: Error: 用户名或密码错误\n    at request.interceptors.response.use.response (http://localhost:5173/src/api/request.ts?t=1770886739646:40:31)\n    at async Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=3f0c2f8a:2229:14)\n    at async http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:36:25\n    at async validateField (http://localhost:5173/node_modules/.vite/deps/element-plus.js?v=3f0c2f8a:39633:11)\n    at async handleLogin (http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:32:7)",
           "location": "http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:44",
           "caseId": "TC02"
         },
         {
-          "ts": "2026-02-12T11:35:55.260Z",
+          "ts": "2026-02-12T11:09:54.262Z",
           "level": "error",
           "text": "[api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}",
           "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:30",
@@ -85,36 +85,29 @@
       ],
       "network": [
         {
-          "ts": "2026-02-12T11:35:45.974Z",
+          "ts": "2026-02-12T11:09:44.948Z",
           "caseId": "TC02",
           "type": "api_code_error",
           "method": "POST",
           "url": "http://localhost:5173/api/auth/login",
           "status": 200,
-          "durationMs": 15,
+          "durationMs": 16,
           "code": 500,
           "responseSnippet": "{\"code\":500,\"message\":\"用户名或密码错误\",\"data\":null}"
         },
         {
-          "ts": "2026-02-12T11:35:55.269Z",
+          "ts": "2026-02-12T11:09:54.277Z",
           "caseId": "TC02",
           "type": "api_code_error",
           "method": "GET",
           "url": "http://localhost:5173/api/risk/latest",
           "status": 200,
-          "durationMs": 51,
+          "durationMs": 44,
           "code": 404,
           "responseSnippet": "{\"code\":404,\"message\":\"尚未完成风险测评\",\"data\":null}"
         }
       ],
       "keyResponses": [
-        {
-          "url": "http://localhost:5173/api/health/check",
-          "method": "GET",
-          "status": 200,
-          "code": 200,
-          "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":{\"score\":50,\"level\":\"一般\",\"userType\":\"NOVICE\",\"liquidityScore\":50,\"riskMatchScore\":0,\"protectionScore\":0,\"diversityScore\":0,\"suggestions\":[{\"type\":\"warning\",\"message\":\"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀\"},{\"type\":\"info\",\"message\":\"💡 建议并在留足3~6个月应急金后，尝试低风险理财\"}]}}"
-        },
         {
           "url": "http://localhost:5173/api/asset/list",
           "method": "GET",
@@ -137,6 +130,13 @@
           "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":{\"score\":50,\"level\":\"一般\",\"userType\":\"NOVICE\",\"liquidityScore\":50,\"riskMatchScore\":0,\"protectionScore\":0,\"diversityScore\":0,\"suggestions\":[{\"type\":\"warning\",\"message\":\"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀\"},{\"type\":\"info\",\"message\":\"💡 建议并在留足3~6个月应急金后，尝试低风险理财\"}]}}"
         },
         {
+          "url": "http://localhost:5173/api/health/check",
+          "method": "GET",
+          "status": 200,
+          "code": 200,
+          "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":{\"score\":50,\"level\":\"一般\",\"userType\":\"NOVICE\",\"liquidityScore\":50,\"riskMatchScore\":0,\"protectionScore\":0,\"diversityScore\":0,\"suggestions\":[{\"type\":\"warning\",\"message\":\"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀\"},{\"type\":\"info\",\"message\":\"💡 建议并在留足3~6个月应急金后，尝试低风险理财\"}]}}"
+        },
+        {
           "url": "http://localhost:5173/api/risk/latest",
           "method": "GET",
           "status": 200,
@@ -145,13 +145,13 @@
         }
       ],
       "screenshot": "TC02_login_success.png",
-      "endAt": "2026-02-12T11:35:55.614Z",
+      "endAt": "2026-02-12T11:09:54.616Z",
       "url": "http://localhost:5173/dashboard"
     },
     {
       "id": "TC03",
       "title": "市场列表（securities）",
-      "startAt": "2026-02-12T11:35:55.615Z",
+      "startAt": "2026-02-12T11:09:54.617Z",
       "status": "pass",
       "expected": [
         "市场列表可加载，分页可用"
@@ -184,13 +184,13 @@
         }
       ],
       "screenshot": "TC03_market.png",
-      "endAt": "2026-02-12T11:35:57.903Z",
+      "endAt": "2026-02-12T11:09:57.152Z",
       "url": "http://localhost:5173/market"
     },
     {
       "id": "TC04",
       "title": "股票详情 + K线（kline/initChart）",
-      "startAt": "2026-02-12T11:35:57.904Z",
+      "startAt": "2026-02-12T11:09:57.152Z",
       "status": "pass",
       "expected": [
         "进入证券详情页",
@@ -258,13 +258,13 @@
         }
       ],
       "screenshot": "TC04_kline.png",
-      "endAt": "2026-02-12T11:36:01.074Z",
+      "endAt": "2026-02-12T11:10:00.375Z",
       "url": "http://localhost:5173/market/detail/600893?name=%E8%88%AA%E5%8F%91%E5%8A%A8%E5%8A%9B"
     },
     {
       "id": "TC05",
       "title": "自选（watchlist 增删查）",
-      "startAt": "2026-02-12T11:36:01.076Z",
+      "startAt": "2026-02-12T11:10:00.376Z",
       "status": "pass",
       "expected": [
         "标的可加入自选并在自选列表中可见",
@@ -284,6 +284,13 @@
       "network": [],
       "keyResponses": [
         {
+          "url": "http://localhost:5173/api/market/notices/600893",
+          "method": "GET",
+          "status": 200,
+          "code": 200,
+          "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":[{\"title\":\"关于召开2025年年度股东大会的通知\",\"date\":\"2026-02-11\"},{\"title\":\"2025年第一季度业绩预告\",\"date\":\"2026-02-07\"},{\"title\":\"关于控股股东增持股份计划的进展公告\",\"date\":\"2026-01-31\"},{\"title\":\"关于分配2024年度现金股利的实施公告\",\"date\":\"2026-01-23\"}]}"
+        },
+        {
           "url": "http://localhost:5173/api/invest/watchlist",
           "method": "GET",
           "status": 200,
@@ -296,13 +303,6 @@
           "status": 200,
           "code": 200,
           "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":{\"profit_growth\":\"+8.3%\",\"revenue\":\"22.22 亿\",\"revenue_growth\":\"+12.5%\",\"eps\":1.73,\"roe\":\"15.4%\",\"profit\":\"4.00 亿\"}}"
-        },
-        {
-          "url": "http://localhost:5173/api/market/notices/600893",
-          "method": "GET",
-          "status": 200,
-          "code": 200,
-          "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":[{\"title\":\"关于召开2025年年度股东大会的通知\",\"date\":\"2026-02-11\"},{\"title\":\"2025年第一季度业绩预告\",\"date\":\"2026-02-07\"},{\"title\":\"关于控股股东增持股份计划的进展公告\",\"date\":\"2026-01-31\"},{\"title\":\"关于分配2024年度现金股利的实施公告\",\"date\":\"2026-01-23\"}]}"
         },
         {
           "url": "http://localhost:5173/api/market/detail/600893",
@@ -354,72 +354,29 @@
         }
       ],
       "screenshot": "TC05_watchlist.png",
-      "endAt": "2026-02-12T11:36:06.708Z",
+      "endAt": "2026-02-12T11:10:06.022Z",
       "url": "http://localhost:5173/investment"
     },
     {
       "id": "TC06",
       "title": "资产列表/统计（asset list/summary）",
-      "startAt": "2026-02-12T11:36:06.709Z",
+      "startAt": "2026-02-12T11:10:06.024Z",
       "status": "fail",
       "expected": [
         "资产列表可见",
         "新增资产后统计刷新"
       ],
-      "actual": [
-        "资产总览总资产显示: ¥ 0.00"
-      ],
+      "actual": [],
       "notes": [],
       "errors": [
-        "资产新增失败: code=500, message=Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] "
+        "locator.click: Error: strict mode violation: locator('.el-dialog').locator('.el-select') resolved to 2 elements:\n    1) <div class=\"el-select\" data-v-813c081a=\"\">…</div> aka locator('div').filter({ hasText: /^股票$/ }).nth(1)\n    2) <div class=\"el-select\" data-v-813c081a=\"\">…</div> aka locator('div').filter({ hasText: /^输入代码或名称搜索$/ }).nth(1)\n\nCall log:\n\u001b[2m  - waiting for locator('.el-dialog').locator('.el-select')\u001b[22m\n"
       ],
       "selectors": [
         "资产管理: 记一笔按钮",
-        "资产管理: 新增资产弹窗",
-        "资产类型: 现金/存款",
-        "资产名称输入框",
-        "资产金额输入框"
+        "资产管理: 新增资产弹窗"
       ],
-      "console": [
-        {
-          "ts": "2026-02-12T11:36:07.639Z",
-          "level": "error",
-          "text": "[api] Request failed {method: POST, url: /api/asset/add, status: 200, code: 500, message: Debug Error: org.springframework.web.bind.MethodAr…ssage [categoryId]]; default message [资产分类不能为空]] }",
-          "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:30",
-          "caseId": "TC06"
-        },
-        {
-          "ts": "2026-02-12T11:36:09.575Z",
-          "level": "error",
-          "text": "[api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}",
-          "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:30",
-          "caseId": "TC06"
-        }
-      ],
-      "network": [
-        {
-          "ts": "2026-02-12T11:36:07.641Z",
-          "caseId": "TC06",
-          "type": "api_code_error",
-          "method": "POST",
-          "url": "http://localhost:5173/api/asset/add",
-          "status": 200,
-          "durationMs": 10,
-          "code": 500,
-          "responseSnippet": "{\"code\":500,\"message\":\"Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] \",\"data\":null}"
-        },
-        {
-          "ts": "2026-02-12T11:36:09.581Z",
-          "caseId": "TC06",
-          "type": "api_code_error",
-          "method": "GET",
-          "url": "http://localhost:5173/api/risk/latest",
-          "status": 200,
-          "durationMs": 45,
-          "code": 404,
-          "responseSnippet": "{\"code\":404,\"message\":\"尚未完成风险测评\",\"data\":null}"
-        }
-      ],
+      "console": [],
+      "network": [],
       "keyResponses": [
         {
           "url": "http://localhost:5173/api/asset/list",
@@ -427,58 +384,15 @@
           "status": 200,
           "code": 200,
           "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":[]}"
-        },
-        {
-          "url": "http://localhost:5173/api/asset/add",
-          "method": "POST",
-          "status": 200,
-          "code": 500,
-          "bodySnippet": "{\"code\":500,\"message\":\"Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] \",\"data\":null}"
-        },
-        {
-          "url": "http://localhost:5173/api/asset/list",
-          "method": "GET",
-          "status": 200,
-          "code": 200,
-          "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":[]}"
-        },
-        {
-          "url": "http://localhost:5173/api/health/check",
-          "method": "GET",
-          "status": 200,
-          "code": 200,
-          "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":{\"score\":50,\"level\":\"一般\",\"userType\":\"NOVICE\",\"liquidityScore\":50,\"riskMatchScore\":0,\"protectionScore\":0,\"diversityScore\":0,\"suggestions\":[{\"type\":\"warning\",\"message\":\"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀\"},{\"type\":\"info\",\"message\":\"💡 建议并在留足3~6个月应急金后，尝试低风险理财\"}]}}"
-        },
-        {
-          "url": "http://localhost:5173/api/asset/summary",
-          "method": "GET",
-          "status": 200,
-          "code": 200,
-          "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":{\"totalAmount\":0,\"categoryDistribution\":{\"固定资产\":0,\"金融投资\":0,\"现金\":0},\"investmentLimit\":0,\"safetyThreshold\":30000,\"liquidityGap\":30000,\"safetyProgress\":0,\"personaTag\":\"🌱 蓄力期\"}}"
-        },
-        {
-          "url": "http://localhost:5173/api/health/check",
-          "method": "GET",
-          "status": 200,
-          "code": 200,
-          "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":{\"score\":50,\"level\":\"一般\",\"userType\":\"NOVICE\",\"liquidityScore\":50,\"riskMatchScore\":0,\"protectionScore\":0,\"diversityScore\":0,\"suggestions\":[{\"type\":\"warning\",\"message\":\"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀\"},{\"type\":\"info\",\"message\":\"💡 建议并在留足3~6个月应急金后，尝试低风险理财\"}]}}"
-        },
-        {
-          "url": "http://localhost:5173/api/risk/latest",
-          "method": "GET",
-          "status": 200,
-          "code": 404,
-          "bodySnippet": "{\"code\":404,\"message\":\"尚未完成风险测评\",\"data\":null}"
         }
       ],
-      "screenshot": "TC06_asset.png",
-      "endAt": "2026-02-12T11:36:11.093Z",
-      "url": "http://localhost:5173/dashboard"
+      "endAt": "2026-02-12T11:10:06.471Z",
+      "url": "http://localhost:5173/asset/manage"
     },
     {
       "id": "TC07",
       "title": "风险测评 -> 体检闭环（risk->health）",
-      "startAt": "2026-02-12T11:36:11.094Z",
+      "startAt": "2026-02-12T11:10:06.472Z",
       "status": "partial",
       "expected": [
         "风险测评提交后跳转体检页",
@@ -495,13 +409,13 @@
       "network": [],
       "keyResponses": [],
       "screenshot": "TC07_risk_health.png",
-      "endAt": "2026-02-12T11:36:25.076Z",
+      "endAt": "2026-02-12T11:10:13.645Z",
       "url": "http://localhost:5173/risk/assessment"
     },
     {
       "id": "TC08",
       "title": "计划生成/执行闭环（plan generate/execute）",
-      "startAt": "2026-02-12T11:36:25.077Z",
+      "startAt": "2026-02-12T11:10:13.646Z",
       "status": "fail",
       "expected": [
         "可生成计划并执行",
@@ -511,7 +425,7 @@
       "notes": [],
       "errors": [
         "定位失败: 计划投入金额输入框",
-        "Case timeout 120000ms"
+        "locator.fill: Test timeout of 1800000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.el-dialog').locator('.el-input-number input').first()\u001b[22m\n"
       ],
       "selectors": [
         "计划页: 生成新计划按钮",
@@ -520,84 +434,84 @@
       ],
       "console": [
         {
-          "ts": "2026-02-12T11:36:25.376Z",
+          "ts": "2026-02-12T11:10:13.956Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"Plus\" was accessed during render but is not defined on instance. \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.396Z",
+          "ts": "2026-02-12T11:10:13.975Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"Plus\" was accessed during render but is not defined on instance. \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.419Z",
+          "ts": "2026-02-12T11:10:14.000Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"Plus\" was accessed during render but is not defined on instance. \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.428Z",
+          "ts": "2026-02-12T11:10:14.039Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"Plus\" was accessed during render but is not defined on instance. \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.437Z",
+          "ts": "2026-02-12T11:10:14.046Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"step\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.450Z",
+          "ts": "2026-02-12T11:10:14.051Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"draft\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.451Z",
+          "ts": "2026-02-12T11:10:14.052Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"draft\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.452Z",
+          "ts": "2026-02-12T11:10:14.053Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"draft\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.453Z",
+          "ts": "2026-02-12T11:10:14.054Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"planName\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.457Z",
+          "ts": "2026-02-12T11:10:14.058Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"step\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.457Z",
+          "ts": "2026-02-12T11:10:14.058Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"step\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
           "caseId": "TC08"
         },
         {
-          "ts": "2026-02-12T11:36:25.458Z",
+          "ts": "2026-02-12T11:10:14.059Z",
           "level": "warning",
           "text": "[Vue warn]: Property \"saving\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
           "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
@@ -614,14 +528,13 @@
           "bodySnippet": "{\"code\":200,\"message\":\"success\",\"data\":[]}"
         }
       ],
-      "endAt": "2026-02-12T11:38:25.085Z",
-      "url": "http://localhost:5173/plan",
-      "screenshot": "TC08_auto.png"
+      "endAt": "2026-02-12T11:39:42.915Z",
+      "url": "http://localhost:5173/plan"
     },
     {
       "id": "TC09",
       "title": "AI 咨询（/api/ai/chat）",
-      "startAt": "2026-02-12T11:38:25.181Z",
+      "startAt": "2026-02-12T11:39:42.918Z",
       "status": "fail",
       "expected": [
         "AI 返回 Markdown 文本",
@@ -630,219 +543,145 @@
       "actual": [],
       "notes": [],
       "errors": [
-        "AI 请求未返回 200（可能超时或失败）",
-        "AI 回复异常: ❌ 网络请求失败，请检查后端服务。"
+        "page.goto: Target page, context or browser has been closed"
       ],
-      "selectors": [
-        "AI 咨询输入框"
-      ],
-      "console": [
-        {
-          "ts": "2026-02-12T11:38:35.512Z",
-          "level": "error",
-          "text": "[api] Request error: POST /api/ai/chat -> NO_STATUS: timeout of 10000ms exceeded {message: timeout of 10000ms exceeded, code: ECONNABORTED, method: POST, url: /api/ai/chat, baseURL: /api}",
-          "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:76",
-          "caseId": "TC09"
-        }
-      ],
-      "network": [
-        {
-          "ts": "2026-02-12T11:38:35.518Z",
-          "caseId": "TC09",
-          "type": "requestfailed",
-          "method": "POST",
-          "url": "http://localhost:5173/api/ai/chat",
-          "durationMs": 10008,
-          "failureText": "net::ERR_ABORTED"
-        }
-      ],
+      "selectors": [],
+      "console": [],
+      "network": [],
       "keyResponses": [],
-      "screenshot": "TC09_ai.png",
-      "endAt": "2026-02-12T11:38:38.626Z",
-      "url": "http://localhost:5173/chat"
+      "endAt": "2026-02-12T11:39:42.931Z",
+      "url": "http://localhost:5173/plan"
     }
   ],
   "console": [
     {
-      "ts": "2026-02-12T11:35:45.959Z",
+      "ts": "2026-02-12T11:09:44.938Z",
       "level": "error",
       "text": "[api] Request failed {method: POST, url: /api/auth/login, status: 200, code: 500, message: 用户名或密码错误}",
       "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:30",
       "caseId": "TC02"
     },
     {
-      "ts": "2026-02-12T11:35:45.964Z",
+      "ts": "2026-02-12T11:09:44.941Z",
       "level": "error",
       "text": "登录异常: Error: 用户名或密码错误\n    at request.interceptors.response.use.response (http://localhost:5173/src/api/request.ts?t=1770886739646:40:31)\n    at async Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=3f0c2f8a:2229:14)\n    at async http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:36:25\n    at async validateField (http://localhost:5173/node_modules/.vite/deps/element-plus.js?v=3f0c2f8a:39633:11)\n    at async handleLogin (http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:32:7)",
       "location": "http://localhost:5173/src/pages/auth/Login.vue?t=1770886739646:44",
       "caseId": "TC02"
     },
     {
-      "ts": "2026-02-12T11:35:55.260Z",
+      "ts": "2026-02-12T11:09:54.262Z",
       "level": "error",
       "text": "[api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}",
       "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:30",
       "caseId": "TC02"
     },
     {
-      "ts": "2026-02-12T11:36:07.639Z",
-      "level": "error",
-      "text": "[api] Request failed {method: POST, url: /api/asset/add, status: 200, code: 500, message: Debug Error: org.springframework.web.bind.MethodAr…ssage [categoryId]]; default message [资产分类不能为空]] }",
-      "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:30",
-      "caseId": "TC06"
-    },
-    {
-      "ts": "2026-02-12T11:36:09.575Z",
-      "level": "error",
-      "text": "[api] Request failed {method: GET, url: /api/risk/latest, status: 200, code: 404, message: 尚未完成风险测评}",
-      "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:30",
-      "caseId": "TC06"
-    },
-    {
-      "ts": "2026-02-12T11:36:25.376Z",
+      "ts": "2026-02-12T11:10:13.956Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"Plus\" was accessed during render but is not defined on instance. \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.396Z",
+      "ts": "2026-02-12T11:10:13.975Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"Plus\" was accessed during render but is not defined on instance. \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.419Z",
+      "ts": "2026-02-12T11:10:14.000Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"Plus\" was accessed during render but is not defined on instance. \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.428Z",
+      "ts": "2026-02-12T11:10:14.039Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"Plus\" was accessed during render but is not defined on instance. \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.437Z",
+      "ts": "2026-02-12T11:10:14.046Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"step\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.450Z",
+      "ts": "2026-02-12T11:10:14.051Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"draft\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.451Z",
+      "ts": "2026-02-12T11:10:14.052Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"draft\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.452Z",
+      "ts": "2026-02-12T11:10:14.053Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"draft\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.453Z",
+      "ts": "2026-02-12T11:10:14.054Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"planName\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.457Z",
+      "ts": "2026-02-12T11:10:14.058Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"step\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.457Z",
+      "ts": "2026-02-12T11:10:14.058Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"step\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
     },
     {
-      "ts": "2026-02-12T11:36:25.458Z",
+      "ts": "2026-02-12T11:10:14.059Z",
       "level": "warning",
       "text": "[Vue warn]: Property \"saving\" was accessed during render but is not defined on instance. \n  at <ElDialogContent key=0 ref_key=\"dialogContentRef\" ref=Ref< undefined >  ... > \n  at <ElFocusTrap loop=\"\" trapped=true focus-start-el=\"container\"  ... > \n  at <ElOverlay custom-mask-event=\"\" mask=true overlay-class= [, el-modal-dialog, ]  ... > \n  at <BaseTransition onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave> onAfterLeave=fn<afterLeave>  ... > \n  at <Transition name=\"dialog-fade\" onAfterEnter=fn<afterEnter> onBeforeLeave=fn<beforeLeave>  ... > \n  at <Teleport to=\"body\" disabled=true > \n  at <ElDialog modelValue=true onUpdate:modelValue=fn title=\"生成投资计划\"  ... > \n  at <CreatePlanDialog modelValue=true onUpdate:modelValue=fn onSuccess=fn<handlePlanCreated> > \n  at <Index onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key=\"/plan\" > \n  at <BaseTransition mode=\"out-in\" appear=false persisted=false  ... > \n  at <Transition name=\"fade-transform\" mode=\"out-in\" > \n  at <RouterView> \n  at <ElMain class=\"main-content\" > \n  at <ElContainer class=\"top-layout\" > \n  at <TopLayout onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > > \n  at <RouterView> \n  at <App>",
       "location": "http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js?v=3f0c2f8a:2194",
       "caseId": "TC08"
-    },
-    {
-      "ts": "2026-02-12T11:38:35.512Z",
-      "level": "error",
-      "text": "[api] Request error: POST /api/ai/chat -> NO_STATUS: timeout of 10000ms exceeded {message: timeout of 10000ms exceeded, code: ECONNABORTED, method: POST, url: /api/ai/chat, baseURL: /api}",
-      "location": "http://localhost:5173/src/api/request.ts?t=1770886739646:76",
-      "caseId": "TC09"
     }
   ],
   "network": [
     {
-      "ts": "2026-02-12T11:35:45.974Z",
+      "ts": "2026-02-12T11:09:44.948Z",
       "caseId": "TC02",
       "type": "api_code_error",
       "method": "POST",
       "url": "http://localhost:5173/api/auth/login",
       "status": 200,
-      "durationMs": 15,
+      "durationMs": 16,
       "code": 500,
       "responseSnippet": "{\"code\":500,\"message\":\"用户名或密码错误\",\"data\":null}"
     },
     {
-      "ts": "2026-02-12T11:35:55.269Z",
+      "ts": "2026-02-12T11:09:54.277Z",
       "caseId": "TC02",
       "type": "api_code_error",
       "method": "GET",
       "url": "http://localhost:5173/api/risk/latest",
       "status": 200,
-      "durationMs": 51,
+      "durationMs": 44,
       "code": 404,
       "responseSnippet": "{\"code\":404,\"message\":\"尚未完成风险测评\",\"data\":null}"
-    },
-    {
-      "ts": "2026-02-12T11:36:07.641Z",
-      "caseId": "TC06",
-      "type": "api_code_error",
-      "method": "POST",
-      "url": "http://localhost:5173/api/asset/add",
-      "status": 200,
-      "durationMs": 10,
-      "code": 500,
-      "responseSnippet": "{\"code\":500,\"message\":\"Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] \",\"data\":null}"
-    },
-    {
-      "ts": "2026-02-12T11:36:09.581Z",
-      "caseId": "TC06",
-      "type": "api_code_error",
-      "method": "GET",
-      "url": "http://localhost:5173/api/risk/latest",
-      "status": 200,
-      "durationMs": 45,
-      "code": 404,
-      "responseSnippet": "{\"code\":404,\"message\":\"尚未完成风险测评\",\"data\":null}"
-    },
-    {
-      "ts": "2026-02-12T11:38:35.518Z",
-      "caseId": "TC09",
-      "type": "requestfailed",
-      "method": "POST",
-      "url": "http://localhost:5173/api/ai/chat",
-      "durationMs": 10008,
-      "failureText": "net::ERR_ABORTED"
     }
   ],
   "summary": {
@@ -856,7 +695,7 @@
         "id": "TC06",
         "title": "资产列表/统计（asset list/summary）",
         "severity": "P1",
-        "reason": "资产新增失败: code=500, message=Debug Error: org.springframework.web.bind.MethodArgumentNotValidException - Validation failed for argument [0] in public com.fincoach.core.common.Result<java.lang.String> com.fincoach.core.controller.AssetItemController.addAsset(com.fincoach.core.controller.dto.AssetItemDTO,jakarta.servlet.http.HttpServletRequest): [Field error in object 'assetItemDTO' on field 'categoryId': rejected value [null]; codes [NotNull.assetItemDTO.categoryId,NotNull.categoryId,NotNull.java.lang.Integer,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [assetItemDTO.categoryId,categoryId]; arguments []; default message [categoryId]]; default message [资产分类不能为空]] "
+        "reason": "locator.click: Error: strict mode violation: locator('.el-dialog').locator('.el-select') resolved to 2 elements:\n    1) <div class=\"el-select\" data-v-813c081a=\"\">…</div> aka locator('div').filter({ hasText: /^股票$/ }).nth(1)\n    2) <div class=\"el-select\" data-v-813c081a=\"\">…</div> aka locator('div').filter({ hasText: /^输入代码或名称搜索$/ }).nth(1)\n\nCall log:\n\u001b[2m  - waiting for locator('.el-dialog').locator('.el-select')\u001b[22m\n"
       },
       {
         "id": "TC07",
@@ -868,127 +707,127 @@
         "id": "TC08",
         "title": "计划生成/执行闭环（plan generate/execute）",
         "severity": "P1",
-        "reason": "定位失败: 计划投入金额输入框; Case timeout 120000ms"
+        "reason": "定位失败: 计划投入金额输入框; locator.fill: Test timeout of 1800000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.el-dialog').locator('.el-input-number input').first()\u001b[22m\n"
       },
       {
         "id": "TC09",
         "title": "AI 咨询（/api/ai/chat）",
         "severity": "P1",
-        "reason": "AI 请求未返回 200（可能超时或失败）; AI 回复异常: ❌ 网络请求失败，请检查后端服务。"
+        "reason": "page.goto: Target page, context or browser has been closed"
       }
     ],
     "repeatedRequests": [
       {
         "key": "GET http://localhost:5173/@vite/client",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/src/main.ts",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/vue.js",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/src/style.css",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/src/App.vue",
-        "count": 28
+        "count": 24
       },
       {
         "key": "GET http://localhost:5173/src/router/index.ts",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/src/store/index.ts",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/element-plus.js",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/element-plus/dist/index.css",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/src/theme/variables.scss",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/src/theme/element-overwrite.scss",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/chunk-H2732BJL.js",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/chunk-DC5AMYBS.js",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/@id/__x00__plugin-vue:export-helper",
-        "count": 14
-      },
-      {
-        "key": "GET http://localhost:5173/node_modules/.vite/deps/vue-router.js",
-        "count": 14
-      },
-      {
-        "key": "GET http://localhost:5173/src/layout/AuthLayout.vue",
-        "count": 28
-      },
-      {
-        "key": "GET http://localhost:5173/src/layout/TopLayout.vue",
-        "count": 28
-      },
-      {
-        "key": "GET http://localhost:5173/src/pages/auth/Login.vue",
-        "count": 28
-      },
-      {
-        "key": "GET http://localhost:5173/src/pages/auth/Register.vue",
-        "count": 28
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/pinia.js",
-        "count": 14
+        "count": 12
       },
       {
-        "key": "GET http://localhost:5173/node_modules/.vite/deps/lucide-vue-next.js",
-        "count": 14
+        "key": "GET http://localhost:5173/node_modules/.vite/deps/vue-router.js",
+        "count": 12
       },
       {
-        "key": "GET http://localhost:5173/src/api/request.ts",
-        "count": 14
+        "key": "GET http://localhost:5173/src/layout/AuthLayout.vue",
+        "count": 24
       },
       {
-        "key": "GET http://localhost:5173/src/store/modules/user.ts",
-        "count": 14
+        "key": "GET http://localhost:5173/src/layout/TopLayout.vue",
+        "count": 24
+      },
+      {
+        "key": "GET http://localhost:5173/src/pages/auth/Login.vue",
+        "count": 24
+      },
+      {
+        "key": "GET http://localhost:5173/src/pages/auth/Register.vue",
+        "count": 24
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/@element-plus_icons-vue.js",
-        "count": 14
+        "count": 12
+      },
+      {
+        "key": "GET http://localhost:5173/src/store/modules/user.ts",
+        "count": 12
+      },
+      {
+        "key": "GET http://localhost:5173/node_modules/.vite/deps/lucide-vue-next.js",
+        "count": 12
+      },
+      {
+        "key": "GET http://localhost:5173/src/api/request.ts",
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/chunk-OP4ZUAFM.js",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/chunk-CM2AK5IQ.js",
-        "count": 14
+        "count": 12
       },
       {
         "key": "GET http://localhost:5173/node_modules/.vite/deps/axios.js",
-        "count": 14
+        "count": 12
       }
     ]
   }
