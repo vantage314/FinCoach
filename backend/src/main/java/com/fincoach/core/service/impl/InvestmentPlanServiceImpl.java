@@ -520,12 +520,27 @@ public class InvestmentPlanServiceImpl implements InvestmentPlanService {
                 
                 // 记账 (SELL): 资产减少
                 transactionService.record(userId, largestAsset.getId(), largestAsset.getAssetName(), "SELL", item.getAmount().negate(), "计划执行: 卖出赎回");
-                
-                // 增加现金? (如果卖出应该有钱回流，但目前的简易逻辑可能没处理回流到现金。
-                // 既然没处理回流，这里先不记入金。或者默认回流到最大现金账户?
-                // 用户需求只提了 B C 场景。C: "在扣减现金时记 BUY，在增加持仓时记 HOLD。"
-                // 没有明确提到 SELL 的回流。为了完整性，最好处理回流，但目前的 auto-execution 逻辑并没有处理 Sell 的现金回流。
-                // 我会暂且只记录 SELL 导致的资产减少。
+
+                // 卖出回款：非现金类资产卖出后回流到现金账户
+                if (!Integer.valueOf(1).equals(item.getCategoryId())) {
+                    com.fincoach.core.repository.entity.AssetItem cashAccount = assetItemService.getLargestByCategory(userId, 1); // 1 = 现金储蓄
+                    if (cashAccount != null) {
+                        cashAccount.setCurrentValue(cashAccount.getCurrentValue().add(item.getAmount()));
+                        cashAccount.setUpdateTime(LocalDateTime.now());
+                        assetItemService.updateAsset(cashAccount);
+                        transactionService.record(userId, cashAccount.getId(), "现金账户", "DEPOSIT", item.getAmount(), "计划执行: 卖出回款");
+                    } else {
+                        com.fincoach.core.repository.entity.AssetItem newCash = new com.fincoach.core.repository.entity.AssetItem();
+                        newCash.setUserId(userId);
+                        newCash.setCategoryId(1);
+                        newCash.setAssetName("现金账户-回流-" + dateSuffix);
+                        newCash.setCurrentValue(item.getAmount());
+                        newCash.setHoldingCost(item.getAmount());
+                        newCash.setUpdateTime(LocalDateTime.now());
+                        assetItemService.internalAddAsset(newCash);
+                        transactionService.record(userId, newCash.getId(), "现金账户", "DEPOSIT", item.getAmount(), "计划执行: 卖出回款");
+                    }
+                }
             }
         }
 
