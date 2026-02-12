@@ -133,6 +133,18 @@ const form = ref<any>({
 });
 
 const isSecurity = computed(() => ['STOCK', 'FUND', 'BOND'].includes(form.value.subType));
+const categoryIdByType: Record<string, number> = {
+  STOCK: 2,
+  FUND: 2,
+  BOND: 2,
+  CASH: 1
+};
+const subTypeLabelByType: Record<string, string | undefined> = {
+  STOCK: '股票',
+  FUND: '基金',
+  BOND: '债券',
+  CASH: undefined
+};
 
 const loadList = async () => {
   loading.value = true;
@@ -193,9 +205,34 @@ const submitForm = async () => {
   if (isSecurity.value && form.value.quantity > 0 && form.value.currentValue === 0) {
     form.value.currentValue = form.value.quantity * form.value.costPrice;
   }
-  
+
+  const categoryId = categoryIdByType[form.value.subType];
+  if (!Number.isInteger(categoryId)) {
+    ElMessage.warning('请选择有效的资产类型');
+    return;
+  }
+
+  if (!form.value.assetName || !String(form.value.assetName).trim()) {
+    ElMessage.warning('请输入资产名称');
+    return;
+  }
+
+  if (!form.value.currentValue || Number(form.value.currentValue) <= 0) {
+    ElMessage.warning('请输入大于 0 的金额');
+    return;
+  }
+
+  const payload = {
+    categoryId,
+    subType: subTypeLabelByType[form.value.subType],
+    assetName: String(form.value.assetName).trim(),
+    currentValue: Number(form.value.currentValue),
+    holdingCost: form.value.costPrice ? Number(form.value.costPrice) : undefined,
+    assetCode: form.value.stockCode || undefined
+  };
+
   try {
-    await request.post('/asset/add', form.value);
+    await request.post('/asset/add', payload);
     ElMessage.success('保存成功');
     dialogVisible.value = false;
     loadList();

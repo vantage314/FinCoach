@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,15 +31,19 @@ public class AssetItemController {
 
     @PostMapping("/add")
     @Operation(summary = "录入新资产", description = "userId 从 Token 中解析，严禁前端传入")
-    public Result<String> addAsset(@Valid @RequestBody AssetItemDTO dto, HttpServletRequest request) {
+    public ResponseEntity<Result<String>> addAsset(@Valid @RequestBody AssetItemDTO dto, HttpServletRequest request) {
         Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             log.warn("资产录入失败：未获取到用户ID");
-            return Result.error(401, "请先登录");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Result.error(401, "请先登录"));
+        }
+
+        if (dto.getCategoryId() == null) {
+            return ResponseEntity.badRequest().body(Result.error(400, "categoryId is required"));
         }
         
         assetItemService.addAsset(userId, dto);
-        return Result.success("资产录入成功");
+        return ResponseEntity.ok(Result.success("资产录入成功"));
     }
 
     @GetMapping("/list")

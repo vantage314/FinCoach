@@ -33,6 +33,10 @@ public class AssetItemServiceImpl implements AssetItemService {
     @Override
     public void addAsset(Long userId, AssetItemDTO dto) {
         log.info("开始录入资产，用户ID: {}, 资产名称: {}, 分类ID: {}", userId, dto.getAssetName(), dto.getCategoryId());
+
+        if (dto.getCategoryId() == null) {
+            throw new IllegalArgumentException("categoryId is required");
+        }
         
         // 金融投资类必须选择子类型
         if (dto.getCategoryId() == 2 && (dto.getSubType() == null || dto.getSubType().isBlank())) {
