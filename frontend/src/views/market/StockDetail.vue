@@ -139,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
+import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import * as echarts from 'echarts';
 import { ElMessage } from 'element-plus';
@@ -263,6 +263,7 @@ const updateOrderBook = (data: any) => {
 const klineChartRef = ref<HTMLElement | null>(null);
 let myChart: echarts.ECharts | null = null;
 let priceTimer: any = null; // 价格轮询定时器
+let resizeHandler: (() => void) | null = null;
 
 // 🔥 从后端获取实时价格和详细行情
 const fetchRealPrice = async () => {
@@ -497,6 +498,7 @@ const initChart = async (period = '日K') => {
       ]
     };
     myChart.setOption(option, true);
+    requestAnimationFrame(() => myChart?.resize());
 
   } catch (e) {
     myChart.hideLoading();
@@ -517,7 +519,13 @@ onMounted(() => {
   loadNotices();
   fetchRealPrice();  // 🔥 立即获取真实价格
   initChart();
-  window.addEventListener('resize', () => myChart?.resize());
+  nextTick(() => {
+    resizeHandler = () => {
+      if (!myChart) return;
+      requestAnimationFrame(() => myChart?.resize());
+    };
+    window.addEventListener('resize', resizeHandler);
+  });
   timer = setInterval(() => { 
     currentTime.value = dayjs().format('HH:mm:ss'); 
     marketStatusTick.value = Date.now();
@@ -527,7 +535,10 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', () => myChart?.resize());
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler);
+    resizeHandler = null;
+  }
   if (timer) clearInterval(timer);
   if (priceTimer) clearInterval(priceTimer);
 });
