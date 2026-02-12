@@ -28,8 +28,12 @@ request.interceptors.response.use(
     const method = (config.method || 'GET').toUpperCase();
     const url = buildUrl(config);
 
+    if (typeof res === 'string') {
+      return res;
+    }
+
     if (res && typeof res.code !== 'undefined') {
-      if (res.code !== 200) {
+      if (Number(res.code) !== 200) {
         const errorMessage = res.message || `Request failed: ${method} ${url}`;
         console.error('[api] Request failed', {
           method,
@@ -61,28 +65,36 @@ request.interceptors.response.use(
         const backendMessage = response?.data?.message;
         const backendCode = response?.data?.code;
         const status = response.status;
-        console.error('[api] Request error', {
+        const errorMessage = error?.message || 'Request failed';
+        const mergedMessage = `${method} ${url} -> ${status || 'NO_STATUS'}: ${backendMessage || errorMessage}`;
+        const dataPreview = previewData(response?.data);
+
+        console.error(`[api] Request error: ${mergedMessage}`, {
+          message: errorMessage,
+          code: error?.code,
           method,
           url,
+          baseURL: config?.baseURL,
           status,
-          code: backendCode,
-          message: backendMessage,
-          data: response?.data,
+          backendCode,
+          dataPreview,
         });
 
-        const parts: string[] = [];
-        if (backendMessage) parts.push(backendMessage);
-        parts.push(`${method} ${url} -> ${status}`);
-        if (typeof backendCode !== 'undefined') parts.push(`code=${backendCode}`);
-        const mergedMessage = parts.join(' | ');
         ElMessage.error(mergedMessage);
         return Promise.reject(new Error(mergedMessage));
       }
 
       const clientMessage = error?.message || 'Network Error';
-      console.error('[api] Request error', { method, url, message: clientMessage });
-      ElMessage.error(clientMessage);
-      return Promise.reject(new Error(clientMessage));
+      const mergedMessage = `${method} ${url} -> NO_STATUS: ${clientMessage}`;
+      console.error(`[api] Request error: ${mergedMessage}`, {
+        message: clientMessage,
+        code: error?.code,
+        method,
+        url,
+        baseURL: config?.baseURL,
+      });
+      ElMessage.error(mergedMessage);
+      return Promise.reject(new Error(mergedMessage));
     }
     return Promise.reject(error);
   }
@@ -117,4 +129,15 @@ const appendParams = (url: string, params: any) => {
   const query = searchParams.toString();
   if (!query) return url;
   return url.includes('?') ? `${url}&${query}` : `${url}?${query}`;
+};
+
+const previewData = (data: any) => {
+  if (typeof data === 'string') {
+    return data.slice(0, 1024);
+  }
+  try {
+    return JSON.stringify(data).slice(0, 1024);
+  } catch {
+    return String(data).slice(0, 1024);
+  }
 };
