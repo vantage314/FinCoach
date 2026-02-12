@@ -1,5 +1,7 @@
 package com.fincoach.core.interceptor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fincoach.core.common.Result;
 import com.fincoach.core.common.UserContext;
 import com.fincoach.core.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +22,9 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 🔥 OPTIONS 预检请求直接放行
@@ -34,9 +39,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.warn("[JwtInterceptor] 未携带 Token: {}", uri);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"message\":\"未登录或 Token 缺失\"}");
+            writeUnauthorized(response, "未登录或 Token 缺失");
             return false;
         }
 
@@ -45,9 +48,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         if (userId == null) {
             log.warn("[JwtInterceptor] Token 无效或已过期: {}", uri);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"message\":\"Token 无效或已过期\"}");
+            writeUnauthorized(response, "Token 无效或已过期");
             return false;
         }
 
@@ -62,5 +63,12 @@ public class JwtInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         UserContext.clear();
         log.debug("[JwtInterceptor] 已清除 UserContext");
+    }
+
+    private void writeUnauthorized(HttpServletResponse response, String message) throws Exception {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        Result<Object> result = Result.error(401, message);
+        response.getWriter().write(objectMapper.writeValueAsString(result));
     }
 }

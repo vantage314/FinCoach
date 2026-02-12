@@ -1,6 +1,7 @@
 package com.fincoach.core.controller;
 
 import com.fincoach.core.common.Result;
+import com.fincoach.core.common.UserContext;
 import com.fincoach.core.controller.vo.InvestmentPlanVO;
 import com.fincoach.core.service.InvestmentPlanService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +32,7 @@ public class InvestmentPlanController {
             HttpServletRequest request,
             @RequestParam(defaultValue = "REBALANCE") String planType,
             @RequestParam(required = false) BigDecimal investMoney) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
@@ -43,7 +44,7 @@ public class InvestmentPlanController {
     @PostMapping("/save")
     @Operation(summary = "保存调仓计划", description = "用户确认后保存计划到数据库")
     public Result<Long> savePlan(HttpServletRequest request, @RequestBody InvestmentPlanVO plan) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
@@ -55,7 +56,7 @@ public class InvestmentPlanController {
     @GetMapping("/list")
     @Operation(summary = "查询计划列表", description = "获取用户历史调仓计划列表")
     public Result<List<InvestmentPlanVO>> list(HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
@@ -70,7 +71,7 @@ public class InvestmentPlanController {
     @PostMapping("/execute")
     @Operation(summary = "执行计划", description = "根据ID执行指定的调仓计划")
     public Result<Void> executePlan(HttpServletRequest request, @RequestParam Long planId) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }

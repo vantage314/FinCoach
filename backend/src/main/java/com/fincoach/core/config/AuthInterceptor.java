@@ -6,11 +6,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class AuthInterceptor implements HandlerInterceptor, WebMvcConfigurer {
+public class AuthInterceptor implements HandlerInterceptor {
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -42,18 +40,4 @@ public class AuthInterceptor implements HandlerInterceptor, WebMvcConfigurer {
         return false;
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(this)
-                .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/api/auth/**", 
-                        "/api/asset/categories",
-                        "/error", 
-                        "/swagger-ui/**", 
-                        "/v3/api-docs/**", 
-                        "/swagger-ui.html", 
-                        "/webjars/**"
-                );
-    }
 }

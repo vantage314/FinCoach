@@ -1,6 +1,7 @@
 package com.fincoach.core.controller;
 
 import com.fincoach.core.common.Result;
+import com.fincoach.core.common.UserContext;
 import com.fincoach.core.controller.vo.HealthReportVO;
 import com.fincoach.core.service.HealthCheckService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ public class HealthCheckController {
     @Operation(summary = "执行资产健康度体检", 
                description = "基于四维模型（流动性、风险匹配、保障力、分散度）计算健康得分")
     public Result<HealthReportVO> checkHealth(HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }

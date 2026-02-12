@@ -1,6 +1,7 @@
 package com.fincoach.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fincoach.core.common.Result;
 import com.fincoach.core.common.UserContext;
 import com.fincoach.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -11,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * JWT 鉴权拦截器
@@ -77,11 +76,8 @@ public class JwtInterceptor implements HandlerInterceptor {
     private void sendUnauthorizedResponse(HttpServletResponse response, String message) throws Exception {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-        
-        Map<String, Object> result = new HashMap<>();
-        result.put("code", 401);
-        result.put("message", message);
-        
+
+        Result<Object> result = Result.error(401, message);
         response.getWriter().write(objectMapper.writeValueAsString(result));
     }
 }

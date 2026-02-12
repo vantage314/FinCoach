@@ -1,6 +1,7 @@
 package com.fincoach.core.controller;
 
 import com.fincoach.core.common.Result;
+import com.fincoach.core.common.UserContext;
 import com.fincoach.core.controller.dto.AssetItemDTO;
 import com.fincoach.core.controller.dto.AssetQueryDTO;
 import com.fincoach.core.controller.vo.PortfolioSummaryVO;
@@ -29,7 +30,7 @@ public class AssetItemController {
     @PostMapping("/add")
     @Operation(summary = "录入新资产", description = "userId 从 Token 中解析，严禁前端传入")
     public Result<String> addAsset(@Valid @RequestBody AssetItemDTO dto, HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             log.warn("资产录入失败：未获取到用户ID");
             return Result.error(401, "请先登录");
@@ -45,7 +46,7 @@ public class AssetItemController {
             @Parameter(description = "资产分类ID (1-现金, 2-金融投资, 3-固定资产)") @RequestParam(required = false) Integer categoryId,
             @Parameter(description = "资产名称关键字") @RequestParam(required = false) String assetName,
             HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
@@ -60,7 +61,7 @@ public class AssetItemController {
     @GetMapping("/summary")
     @Operation(summary = "获取资产组合统计", description = "返回总金额、各分类占比及投资红线")
     public Result<PortfolioSummaryVO> getPortfolioSummary(HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
@@ -71,7 +72,7 @@ public class AssetItemController {
     @DeleteMapping
     @Operation(summary = "批量删除资产", description = "传入 ID 数组，支持单删或多删。带越权防御，只能删除自己的资产。")
     public Result<String> deleteAssets(@RequestBody List<Long> ids, HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
@@ -87,7 +88,7 @@ public class AssetItemController {
     @GetMapping("/analysis")
     @Operation(summary = "资产全景分析与健康体检", description = "返回实时估值、盈亏、健康分和投资建议")
     public Result<com.fincoach.core.controller.vo.AssetAnalysisVO> getAnalysis(HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }

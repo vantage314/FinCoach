@@ -1,6 +1,7 @@
 package com.fincoach.core.controller;
 
 import com.fincoach.core.common.Result;
+import com.fincoach.core.common.UserContext;
 import com.fincoach.core.controller.dto.RiskAssessmentDTO;
 import com.fincoach.core.controller.vo.RiskAssessmentVO;
 import com.fincoach.core.service.RiskAssessmentService;
@@ -28,7 +29,7 @@ public class RiskAssessmentController {
     @Operation(summary = "提交风险测评", description = "基于一票否决+分值映射算法计算风险等级")
     public Result<RiskAssessmentVO> assess(@Valid @RequestBody RiskAssessmentDTO dto,
                                            HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
@@ -40,7 +41,7 @@ public class RiskAssessmentController {
     @GetMapping("/latest")
     @Operation(summary = "获取最新测评结果", description = "返回用户最近一次风险测评结果")
     public Result<RiskAssessmentVO> getLatest(HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = UserContext.getCurrentUserId();
         if (userId == null) {
             return Result.error(401, "请先登录");
         }
