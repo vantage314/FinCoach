@@ -24,27 +24,82 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   (response) => {
     const res = response.data;
-    if (res.code !== 200) {
-      ElMessage.error(res.message || 'Error');
-      return Promise.reject(new Error(res.message || 'Request failed'));
+    const config = response.config || {};
+    const method = (config.method || 'GET').toUpperCase();
+    const url = buildUrl(config);
+
+    if (res && typeof res.code !== 'undefined') {
+      if (res.code !== 200) {
+        const errorMessage = res.message || `Request failed: ${method} ${url}`;
+        console.error('[api] Request failed', {
+          method,
+          url,
+          status: response.status,
+          code: res.code,
+          message: res.message,
+          data: res.data,
+        });
+        ElMessage.error(errorMessage);
+        return Promise.reject(new Error(errorMessage));
+      }
+      return res;
     }
+
     return res;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const response = error?.response;
+    const config = error?.config || {};
+    const method = (config.method || 'GET').toUpperCase();
+    const url = buildUrl(config);
+
+    if (response && response.status === 401) {
       localStorage.removeItem('token');
       window.location.href = '/login';
     } else {
-      const backendMessage = error?.response?.data?.message;
+      if (response) {
+        const backendMessage = response?.data?.message;
+        const backendCode = response?.data?.code;
+        const status = response.status;
+        console.error('[api] Request error', {
+          method,
+          url,
+          status,
+          code: backendCode,
+          message: backendMessage,
+          data: response?.data,
+        });
+
+        const parts: string[] = [];
+        if (backendMessage) parts.push(backendMessage);
+        parts.push(`${method} ${url} -> ${status}`);
+        if (typeof backendCode !== 'undefined') parts.push(`code=${backendCode}`);
+        const mergedMessage = parts.join(' | ');
+        ElMessage.error(mergedMessage);
+        return Promise.reject(new Error(mergedMessage));
+      }
+
       const clientMessage = error?.message || 'Network Error';
-      const mergedMessage = backendMessage
-        ? (backendMessage === clientMessage ? backendMessage : `${backendMessage} (${clientMessage})`)
-        : clientMessage;
-      ElMessage.error(mergedMessage);
-      return Promise.reject(new Error(mergedMessage));
+      console.error('[api] Request error', { method, url, message: clientMessage });
+      ElMessage.error(clientMessage);
+      return Promise.reject(new Error(clientMessage));
     }
     return Promise.reject(error);
   }
 );
 
 export default request;
+
+const buildUrl = (config: any) => {
+  const baseURL = config?.baseURL || '';
+  const url = config?.url || '';
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  if (!baseURL) {
+    return url;
+  }
+  const normalizedBase = baseURL.replace(/\/$/, '');
+  const normalizedUrl = url.replace(/^\//, '');
+  return `${normalizedBase}/${normalizedUrl}`;
+};
