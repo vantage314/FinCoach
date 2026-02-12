@@ -8,6 +8,8 @@ import {
     type InvestmentPlanVO
 } from '@/api/plan';
 import { ElMessage } from 'element-plus';
+import { useAssetStore } from '@/store/modules/asset';
+import { useHealthStore } from '@/store/modules/health';
 
 export const useInvestmentPlanStore = defineStore('investmentPlan', () => {
     const plans = ref<InvestmentPlanVO[]>([]);
@@ -76,6 +78,13 @@ export const useInvestmentPlanStore = defineStore('investmentPlan', () => {
             if (data.code === 200) {
                 ElMessage.success('执行成功！资产已自动更新');
                 await fetchHistory(); // 刷新列表状态
+                const assetStore = useAssetStore();
+                const healthStore = useHealthStore();
+                await Promise.all([
+                    assetStore.getList(),
+                    assetStore.getSummary(),
+                    healthStore.fetchHealthReport()
+                ]);
                 return true;
             } else {
                 ElMessage.error(data.msg || '执行失败');

@@ -167,6 +167,7 @@ import { useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { generatePlan, savePlan, executePlan, type InvestmentPlanVO } from '@/api/plan';
 import { useHealthStore } from '@/store/modules/health';
+import { useAssetStore } from '@/store/modules/asset';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -179,6 +180,7 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const healthStore = useHealthStore();
+const assetStore = useAssetStore();
 const visible = ref(false);
 const loading = ref(false);
 const saving = ref(false);
@@ -286,7 +288,11 @@ const handleExecute = async () => {
       
       // 核心联动：刷新数据
       emit('success');
-      healthStore.fetchHealthReport();
+      await Promise.all([
+        healthStore.fetchHealthReport(),
+        assetStore.getList(),
+        assetStore.getSummary()
+      ]);
       
       router.push('/dashboard');
     } else {
