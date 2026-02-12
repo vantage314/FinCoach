@@ -19,19 +19,44 @@ function Load-EnvFile($path) {
         return
     }
 
+    $loaded = @{}
+
     Get-Content $path | ForEach-Object {
         $line = $_.Trim()
         if ($line.Length -eq 0) { return }
         if ($line.StartsWith('#')) { return }
+        if ($line.StartsWith('export ')) { $line = $line.Substring(7).Trim() }
 
         $idx = $line.IndexOf('=')
         if ($idx -lt 1) { return }
 
         $name = $line.Substring(0, $idx).Trim()
         $value = $line.Substring($idx + 1).Trim()
+        if ($value.StartsWith('"') -and $value.EndsWith('"')) {
+            $value = $value.Substring(1, $value.Length - 2)
+        } elseif ($value.StartsWith("'") -and $value.EndsWith("'")) {
+            $value = $value.Substring(1, $value.Length - 2)
+        }
         if ($name.Length -gt 0) {
             Set-Item -Path "Env:$name" -Value $value
+            $loaded[$name] = $value
         }
+    }
+
+    if ($loaded.Count -gt 0) {
+        $items = @()
+        foreach ($key in $loaded.Keys) {
+            if ($key -eq 'DB_PASSWORD') {
+                if ([string]::IsNullOrWhiteSpace($loaded[$key])) {
+                    $items += "DB_PASSWORD(empty)"
+                } else {
+                    $items += "DB_PASSWORD(set)"
+                }
+            } else {
+                $items += $key
+            }
+        }
+        Write-Info "Loaded env from backend/.env: $($items -join ', ')"
     }
 }
 
