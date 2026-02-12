@@ -1,12 +1,14 @@
 package com.fincoach.core.controller;
 
 import com.fincoach.core.common.Result;
+import com.fincoach.core.common.UserContext;
 import com.fincoach.core.controller.dto.UserDTO;
 import com.fincoach.core.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,16 @@ public class UserController {
     public Result<Void> updateProfile(@RequestBody UserDTO userDTO) {
         userService.updateProfile(userDTO);
         return Result.success(null, "资料更新成功");
+    }
+
+    @GetMapping("/profile")
+    @Operation(summary = "获取个人资料", description = "返回用户名、昵称与邮箱")
+    public Result<UserDTO> getProfile() {
+        Long userId = UserContext.getCurrentUserId();
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
+        return Result.success(userService.getProfile());
     }
 
     @PostMapping("/change-password")

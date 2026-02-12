@@ -39,6 +39,20 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
+    public UserDTO getProfile() {
+        Long userId = UserContext.getCurrentUserId();
+        User user = userMapper.selectById(userId);
+        UserDTO dto = new UserDTO();
+        if (user != null) {
+            dto.setUsername(user.getUsername());
+            dto.setNickname(user.getUsername());
+            dto.setEmail(user.getEmail());
+            dto.setPhone(user.getPhone());
+        }
+        return dto;
+    }
+
+    @Override
     public void updateProfile(UserDTO userDTO) {
         Long userId = UserContext.getCurrentUserId();
         userMapper.update(null, new LambdaUpdateWrapper<User>()

@@ -24,7 +24,7 @@
           <el-tab-pane label="资料设置" name="profile">
             <el-form :model="profileForm" label-position="top" class="setting-form">
               <el-form-item label="昵称">
-                <el-input v-model="profileForm.username" placeholder="请输入昵称" />
+                <el-input v-model="profileForm.nickname" placeholder="请输入昵称" />
               </el-form-item>
               <el-form-item label="邮箱地址">
                 <el-input v-model="profileForm.email" placeholder="example@fincoach.com" />
@@ -84,7 +84,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useUserStore } from '@/store/modules/user';
 import { useHealthStore } from '@/store/modules/health';
-import { resetUserData, updateUserProfile, changePassword } from '@/api/user';
+import { resetUserData, updateUserProfile, changePassword, getUserProfile } from '@/api/user';
 import { ElMessageBox, ElMessage } from 'element-plus';
 
 const userStore = useUserStore();
@@ -95,7 +95,7 @@ const riskLabel = ref('加载中...');
 
 // 表单数据
 const profileForm = reactive({
-  username: '',
+  nickname: '',
   email: ''
 });
 
@@ -113,19 +113,31 @@ onMounted(async () => {
        riskLabel.value = '未测评';
   }
   
-  // Initialize form
-  profileForm.username = userStore.username;
-  profileForm.email = userStore.email || '';
+  try {
+    const res: any = await getUserProfile();
+    if (res.code === 200 && res.data) {
+      profileForm.nickname = res.data.nickname || res.data.username || userStore.username;
+      profileForm.email = res.data.email || '';
+      userStore.username = profileForm.nickname;
+      userStore.email = profileForm.email;
+    } else {
+      profileForm.nickname = userStore.username;
+      profileForm.email = userStore.email || '';
+    }
+  } catch (error) {
+    profileForm.nickname = userStore.username;
+    profileForm.email = userStore.email || '';
+  }
 });
 
 // 处理资料更新
 const handleUpdateProfile = async () => {
-  if (!profileForm.username) return ElMessage.warning('昵称不能为空');
+  if (!profileForm.nickname) return ElMessage.warning('昵称不能为空');
   loading.value = true;
   try {
-    await updateUserProfile(profileForm);
+    await updateUserProfile({ nickname: profileForm.nickname, email: profileForm.email });
     ElMessage.success('资料已更新');
-    userStore.username = profileForm.username; // 更新本地状态
+    userStore.username = profileForm.nickname; // 更新本地状态
     userStore.email = profileForm.email;
   } catch (error: any) {
     console.error(error);
