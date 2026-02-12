@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import request from '@/api/request';
 
 // 1. 获取新闻列表 (对应 MarketController.getNewsList)
 export const getNewsList = (params: { limit?: number }) => {

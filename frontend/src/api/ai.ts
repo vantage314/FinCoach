@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import request from '@/api/request';
 
 // 发送对话请求
 export const sendChatRequest = (data: { message: string }) => {
