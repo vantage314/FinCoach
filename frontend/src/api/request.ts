@@ -97,9 +97,24 @@ const buildUrl = (config: any) => {
     return url;
   }
   if (!baseURL) {
-    return url;
+    return appendParams(url, config?.params);
   }
   const normalizedBase = baseURL.replace(/\/$/, '');
   const normalizedUrl = url.replace(/^\//, '');
-  return `${normalizedBase}/${normalizedUrl}`;
+  const fullUrl = `${normalizedBase}/${normalizedUrl}`;
+  return appendParams(fullUrl, config?.params);
+};
+
+const appendParams = (url: string, params: any) => {
+  if (!params || typeof params !== 'object') {
+    return url;
+  }
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (typeof value === 'undefined' || value === null) return;
+    searchParams.append(key, String(value));
+  });
+  const query = searchParams.toString();
+  if (!query) return url;
+  return url.includes('?') ? `${url}&${query}` : `${url}?${query}`;
 };
