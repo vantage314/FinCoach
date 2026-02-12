@@ -4,6 +4,7 @@ import com.fincoach.core.controller.vo.HealthReportVO;
 import com.fincoach.core.controller.vo.HealthReportVO.HealthSuggestion;
 import com.fincoach.core.controller.vo.PortfolioSummaryVO;
 import com.fincoach.core.controller.vo.RiskAssessmentVO;
+import com.fincoach.core.repository.entity.RiskAssessment;
 import com.fincoach.core.service.AssetItemService;
 import com.fincoach.core.service.HealthCheckService;
 import com.fincoach.core.service.RiskAssessmentService;
@@ -51,25 +52,20 @@ public class HealthCheckServiceImpl implements HealthCheckService {
         
         // 获取风险测评结果
         RiskAssessmentVO riskProfile = riskAssessmentService.getLatest(userId);
+        RiskAssessment latestRisk = toRiskAssessment(riskProfile);
+        int riskMatchScore = calculateRiskMatchScore(latestRisk);
         
         // 1. 判定用户类型
         boolean isInvestor = isInvestorUser(distribution);
         report.setUserType(isInvestor ? "INVESTOR" : "NOVICE");
         
-        int totalScore;
+            int totalScore;
         
         if (!isInvestor) {
             // ===== 小白模式 (Novice Mode) =====
             totalScore = calculateNoviceScore(totalAmount, distribution, suggestions);
             // 填充默认维度分，避免空值
             report.setLiquidityScore(totalScore); 
-            int riskMatchScore = 0;
-            if (riskProfile != null) {
-                riskMatchScore = 10;
-                suggestions.add(new HealthSuggestion("success", "✅ 已完成风险测评，系统将根据偏好给出配置建议"));
-            } else {
-                suggestions.add(new HealthSuggestion("info", "📝 请先完成风险测评以获得更精准建议"));
-            }
             report.setRiskMatchScore(riskMatchScore);
             report.setProtectionScore(0); 
             report.setDiversityScore(0);
@@ -80,7 +76,7 @@ public class HealthCheckServiceImpl implements HealthCheckService {
             report.setLiquidityScore(liquidityScore);
             
             // B. 风险匹配评分 (40分)
-            int riskMatchScore = calculateRiskMatch(totalAmount, distribution, riskProfile, suggestions);
+            calculateRiskMatch(totalAmount, distribution, riskProfile, suggestions);
             report.setRiskMatchScore(riskMatchScore);
             
             // C. 保障力评分 (20分)
@@ -244,5 +240,45 @@ public class HealthCheckServiceImpl implements HealthCheckService {
         if (score >= 60) return "良好";
         if (score >= 40) return "一般";
         return "待优化";
+    }
+
+    private int calculateRiskMatchScore(RiskAssessment latestRisk) {
+        if (latestRisk == null) {
+            return 0;
+        }
+
+        String level = latestRisk.getRiskLevel();
+        Integer totalScore = latestRisk.getTotalScore();
+
+        if (level != null) {
+            switch (level.toLowerCase()) {
+                case "conservative":
+                    return 5;
+                case "steady":
+                    return 10;
+                case "aggressive":
+                    return 15;
+                default:
+                    break;
+            }
+        }
+
+        if (totalScore != null) {
+            if (totalScore <= 20) return 5;
+            if (totalScore <= 35) return 10;
+            return 15;
+        }
+
+        return 0;
+    }
+
+    private RiskAssessment toRiskAssessment(RiskAssessmentVO vo) {
+        if (vo == null) {
+            return null;
+        }
+        RiskAssessment entity = new RiskAssessment();
+        entity.setRiskLevel(vo.getRiskLevel());
+        entity.setTotalScore(vo.getTotalScore());
+        return entity;
     }
 }
