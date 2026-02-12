@@ -1,6 +1,7 @@
 package com.fincoach.core.controller;
 
 import com.fincoach.core.common.Result;
+import com.fincoach.core.common.UserContext;
 import com.fincoach.core.controller.dto.ChatRequest;
 import com.fincoach.core.service.AiService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,8 @@ public class AiController {
         log.info("[AiController] 收到聊天请求: {}", request.getMessage());
         
         // 调用 AI
-        String response = aiService.chat(request.getMessage());
+        Long userId = UserContext.getCurrentUserId();
+        String response = aiService.chat(userId, request.getMessage());
         return Result.success(response);
     }
 }

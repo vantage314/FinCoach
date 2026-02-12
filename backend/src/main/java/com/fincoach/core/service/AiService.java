@@ -1,6 +1,9 @@
 package com.fincoach.core.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fincoach.core.controller.vo.HealthReportVO;
+import com.fincoach.core.controller.vo.PortfolioSummaryVO;
+import com.fincoach.core.controller.vo.RiskAssessmentVO;
 import com.fincoach.core.repository.entity.FinancialNews;
 import com.fincoach.core.repository.entity.MarketSecurity;
 import com.fincoach.core.repository.mapper.FinancialNewsMapper;
@@ -10,7 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AI 智能投顾服务
@@ -28,6 +34,15 @@ public class AiService {
     
     @Autowired
     private OpenAiClient openAiClient;
+    
+    @Autowired
+    private com.fincoach.core.service.AssetItemService assetItemService;
+    
+    @Autowired
+    private com.fincoach.core.service.RiskAssessmentService riskAssessmentService;
+    
+    @Autowired
+    private com.fincoach.core.service.HealthCheckService healthCheckService;
 
     /**
      * 系统提示词 (System Prompt)
@@ -49,7 +64,7 @@ public class AiService {
      * @param userMessage 用户消息
      * @return AI 回复（Markdown 格式）
      */
-    public String chat(String userMessage) {
+    public String chat(Long userId, String userMessage) {
         log.info("[AiService] 收到用户消息: {}", userMessage);
         
         // --- 1. RAG 检索阶段 (Retrieval) ---
@@ -102,6 +117,11 @@ public class AiService {
                 context.append(String.format("  * %s: %s\n", n.getSource(), n.getTitle()));
             }
         }
+        
+        String userSummary = buildUserSummary(userId);
+        if (!userSummary.isEmpty()) {
+            context.append("\n").append(userSummary).append("\n");
+        }
 
         // --- 2. 生成阶段 (Generation) ---
         String finalContext = context.toString();
@@ -117,5 +137,49 @@ public class AiService {
         
         // 调用 DeepSeek
         return openAiClient.callChat(SYSTEM_PROMPT, prompt);
+    }
+    
+    private String buildUserSummary(Long userId) {
+        if (userId == null) {
+            return "";
+        }
+        try {
+            PortfolioSummaryVO summary = assetItemService.getPortfolioSummary(userId);
+            BigDecimal totalAmount = summary != null && summary.getTotalAmount() != null 
+                    ? summary.getTotalAmount() : BigDecimal.ZERO;
+            Map<String, BigDecimal> distribution = summary != null && summary.getCategoryDistribution() != null 
+                    ? summary.getCategoryDistribution() : java.util.Collections.emptyMap();
+            BigDecimal cashBalance = distribution.getOrDefault("现金储蓄", BigDecimal.ZERO);
+            
+            RiskAssessmentVO riskProfile = riskAssessmentService.getLatest(userId);
+            String riskLabel = riskProfile != null ? riskProfile.getLabel() : "未测评";
+            
+            HealthReportVO healthReport = healthCheckService.checkHealth(userId);
+            String healthLevel = healthReport != null && healthReport.getLevel() != null ? healthReport.getLevel() : "未体检";
+            String healthScore = healthReport != null && healthReport.getScore() != null ? healthReport.getScore().toString() : "-";
+            
+            return String.format("""
+                    【用户画像摘要】
+                    - 总资产: %s 元
+                    - 现金余额: %s 元
+                    - 风险等级: %s
+                    - 体检结果: %s (得分 %s)
+                    """,
+                    formatAmount(totalAmount),
+                    formatAmount(cashBalance),
+                    riskLabel,
+                    healthLevel,
+                    healthScore);
+        } catch (Exception e) {
+            log.warn("[AiService] 构建用户画像摘要失败: {}", e.getMessage());
+            return "";
+        }
+    }
+    
+    private String formatAmount(BigDecimal amount) {
+        if (amount == null) {
+            return "0.00";
+        }
+        return amount.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 }
