@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -118,8 +119,11 @@ public class MarketController {
             responseHeaders.setContentType(MediaType.APPLICATION_JSON);
             return new ResponseEntity<>(response.getBody(), responseHeaders, HttpStatus.OK);
 
+        } catch (DataAccessException e) {
+            log.warn("[KLine代理] 数据源不可用，返回空K线: {}", e.getMessage());
+            return new ResponseEntity<>("[]", HttpStatus.OK);
         } catch (Exception e) {
-            log.error("[KLine代理] 请求新浪失败: {}", e.getMessage());
+            log.warn("[KLine代理] 请求失败，返回空K线: {}", e.getMessage());
             return new ResponseEntity<>("[]", HttpStatus.OK);
         }
     }
