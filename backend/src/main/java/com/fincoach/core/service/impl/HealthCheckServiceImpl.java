@@ -63,7 +63,14 @@ public class HealthCheckServiceImpl implements HealthCheckService {
             totalScore = calculateNoviceScore(totalAmount, distribution, suggestions);
             // 填充默认维度分，避免空值
             report.setLiquidityScore(totalScore); 
-            report.setRiskMatchScore(0);
+            int riskMatchScore = 0;
+            if (riskProfile != null) {
+                riskMatchScore = 10;
+                suggestions.add(new HealthSuggestion("success", "✅ 已完成风险测评，系统将根据偏好给出配置建议"));
+            } else {
+                suggestions.add(new HealthSuggestion("info", "📝 请先完成风险测评以获得更精准建议"));
+            }
+            report.setRiskMatchScore(riskMatchScore);
             report.setProtectionScore(0); 
             report.setDiversityScore(0);
         } else {

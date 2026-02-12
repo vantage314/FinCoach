@@ -2,6 +2,7 @@ package com.fincoach.core.controller.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ public class HealthReportVO {
     private List<HealthSuggestion> suggestions;
     
     @Data
+    @NoArgsConstructor
     @Schema(description = "健康建议项")
     public static class HealthSuggestion {
         @Schema(description = "建议类型：success/warning/info")
