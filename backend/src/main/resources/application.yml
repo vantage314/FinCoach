@@ -3,11 +3,13 @@ server:
 
 spring:
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/fincoach?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/fincoach?useSSL=false&serverTimezone=UTC}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:}
+    password: ${DB_PASSWORD:030314}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  
+    hikari:
+      maximum-pool-size: 10
+
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
@@ -38,8 +40,11 @@ logging:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 # AI 配置
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY:sk-29b99ee5073847c89b6ccdabc9e21c27}
+
 ai:
   # 使用 DeepSeek 的 API 地址 (兼容 OpenAI 格式)
   base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
-  api-key: ${DEEPSEEK_API_KEY:}
+  api-key: ${deepseek.api-key}
   model: ${DEEPSEEK_MODEL:deepseek-chat}
