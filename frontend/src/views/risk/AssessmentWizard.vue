@@ -70,8 +70,10 @@ import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { questions, categoryLabels, type Question, type Option } from './questions';
 import { submitAssessment } from '@/api/risk';
+import { useHealthStore } from '@/store/modules/health';
 
 const router = useRouter();
+const healthStore = useHealthStore();
 
 const currentIndex = ref(0);
 const answers = ref<Record<string, number>>({});
@@ -129,7 +131,8 @@ const submitResult = async () => {
     const res: any = await submitAssessment(answers.value);
     if (res.code === 200) {
       ElMessage.success('测评完成！');
-      router.push({ path: '/risk/result', query: { id: res.data.id } });
+      await healthStore.fetchHealthReport();
+      router.push({ path: '/diagnosis' });
     } else {
       ElMessage.error(res.message || '提交失败');
       isSubmitting.value = false;
