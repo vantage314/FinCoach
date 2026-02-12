@@ -58,3 +58,14 @@ Result: success (warnings: Vite CJS deprecation, Sass legacy API, large chunk si
 
 ## Known Limits
 - AI chat requires a valid `DEEPSEEK_API_KEY` to return real responses.
+
+## Troubleshooting
+- Error: `Access denied (using password: NO)`
+  - Cause: `backend/.env` was not loaded or `DB_PASSWORD` is missing.
+  - Fix: copy `backend/.env.example` to `backend/.env` and set `DB_PASSWORD`.
+  - PowerShell (temporary):
+    ```
+    $env:DB_PASSWORD="your_password"
+    $env:DB_USERNAME="root"
+    $env:DB_URL="jdbc:mysql://localhost:3306/fincoach?useSSL=false&serverTimezone=UTC"
+    ```
