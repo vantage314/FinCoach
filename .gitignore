@@ -1,0 +1,25 @@
+# Backend build artifacts
+backend/target/
+**/target/
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+
+# Logs and temp files
+log/
+logs/
+tmp/
+*.log
+*.pid
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
