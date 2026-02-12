@@ -58,6 +58,33 @@
 - Novice 模式存在测评记录时，riskMatchScore 赋值为基础分（10），并增加提示语。
 - 风险评估提交成功后，自动触发体检刷新并跳转到体检页。
 
+### 2.1) 修正 riskMatchScore 映射评分
+旧逻辑问题：
+- Novice 模式固定 `riskMatchScore=10`，无法体现真实测评结果。
+
+新逻辑：
+- 基于最近一次风险测评 `riskLevel` 做映射：
+  - conservative -> 5
+  - steady -> 10
+  - aggressive -> 15
+- 若 `riskLevel` 缺失，使用 `totalScore` 回退：
+  - <=20 -> 5
+  - 21-35 -> 10
+  - >35 -> 15
+
+改动文件：
+- `backend/src/main/java/com/fincoach/core/service/impl/HealthCheckServiceImpl.java`
+
+提交：
+- `8cd96f9d`
+
+验证片段：
+```
+{"code":200,"message":"success","data":{"score":34,"level":"待优化","userType":"INVESTOR","liquidityScore":5,"riskMatchScore":5,"protectionScore":10,"diversityScore":14,"suggestions":[{"type":"warning","message":"⚠️ 流动资金不足，建议补充现金储备"},{"type":"success","message":"✅ 风险配置与偏好完美匹配"},{"type":"info","message":"💡 建议配置固定资产增强保障力"},{"type":"info","message":"💡 可增加资产类别进一步分散风险"}]}}
+{"code":200,"message":"success","data":{"score":39,"level":"待优化","userType":"INVESTOR","liquidityScore":5,"riskMatchScore":10,"protectionScore":10,"diversityScore":14,"suggestions":[{"type":"warning","message":"⚠️ 流动资金不足，建议补充现金储备"},{"type":"warning","message":"⚠️ 配置过于保守，资产可能跑输通胀"},{"type":"info","message":"💡 建议配置固定资产增强保障力"},{"type":"info","message":"💡 可增加资产类别进一步分散风险"}]}}
+{"code":200,"message":"success","data":{"score":44,"level":"一般","userType":"INVESTOR","liquidityScore":5,"riskMatchScore":15,"protectionScore":10,"diversityScore":14,"suggestions":[{"type":"warning","message":"⚠️ 流动资金不足，建议补充现金储备"},{"type":"warning","message":"⚠️ 配置过于保守，资产可能跑输通胀"},{"type":"info","message":"💡 建议配置固定资产增强保障力"},{"type":"info","message":"💡 可增加资产类别进一步分散风险"}]}}
+```
+
 ---
 
 ## 3) 打通链路：执行计划 -> 资产更新 -> 体检刷新
