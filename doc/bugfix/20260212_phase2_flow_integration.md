@@ -121,7 +121,7 @@ POST /api/risk/assess
 ```
 返回：
 ```
-{"code":200,"message":"success","data":{"riskLevel":"steady",...}}
+{"code":200,"message":"success","data":{"id":5,"totalScore":25,"riskLevel":"steady","label":"稳健理财师","description":"稳中求进，追求跑赢通胀","equityLimit":0.25,"createTime":"2026-02-12T12:15:20.1673363","actualRatio":0,"idealRatio":0.25,"gap":-0.25,"diagnosis":"📋 检测到您尚未录入资产，请先完善资产档案后再查看配置建议。"}}
 ```
 
 2) 体检建议结构 (对象数组)
@@ -130,7 +130,7 @@ GET /api/health/check
 ```
 返回：
 ```
-"suggestions":[{"type":"warning","message":"..."},...]
+{"code":200,"message":"success","data":{"score":50,"level":"一般","userType":"NOVICE","liquidityScore":50,"riskMatchScore":10,"protectionScore":0,"diversityScore":0,"suggestions":[{"type":"warning","message":"⚠️ 您目前资产主要集中在储蓄，虽然安全但难以跑赢通胀"},{"type":"info","message":"💡 建议并在留足3~6个月应急金后，尝试低风险理财"},{"type":"success","message":"✅ 已完成风险测评，系统将根据偏好给出配置建议"}]}}
 ```
 
 3) 计划生成 + 执行
@@ -140,6 +140,7 @@ POST /api/plan/execute?planId=13
 ```
 返回：
 ```
+{"code":200,"message":"success","data":{"id":13,"planName":"智能定投计划-02121216","riskLevel":"steady","riskLabel":"稳健理财师","totalAmount":50000.00,"planType":"CONTRIBUTION","investMoney":5000,"status":"draft","createTime":"2026-02-12T12:16:08.0720186","items":[{"id":null,"action":"BUY","categoryId":2,"categoryName":"金融投资","subType":"农业银行","amount":5000.00,"currentRatio":0,"targetRatio":0,"reason":"基础安全垫构建 (强制稳健配置)。优选 R1 级资产【农业银行】，预期年涨幅 0.89%。"}]}}
 {"code":200,"message":"执行成功，资产已更新","data":null}
 ```
 
@@ -149,7 +150,7 @@ GET /api/asset/summary
 ```
 返回：
 ```
-{"code":200,"message":"success","data":{"totalAmount":50000.00,...}}
+{"code":200,"message":"success","data":{"totalAmount":50000.00,"categoryDistribution":{"固定资产":0.00,"金融投资":10.00,"现金":90.00},"investmentLimit":10000.00,"safetyThreshold":30000,"liquidityGap":0,"safetyProgress":100.0,"personaTag":"🌳 增值期"}}
 ```
 
 ### 前端构建
