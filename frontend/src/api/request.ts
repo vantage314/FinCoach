@@ -26,7 +26,7 @@ request.interceptors.response.use(
     const res = response.data;
     if (res.code !== 200) {
       ElMessage.error(res.message || 'Error');
-      return Promise.reject(new Error(res.message || 'Error'));
+      return Promise.reject(new Error(res.message || 'Request failed'));
     }
     return res;
   },
@@ -35,7 +35,13 @@ request.interceptors.response.use(
       localStorage.removeItem('token');
       window.location.href = '/login';
     } else {
-      ElMessage.error(error.message || 'Network Error');
+      const backendMessage = error?.response?.data?.message;
+      const clientMessage = error?.message || 'Network Error';
+      const mergedMessage = backendMessage
+        ? (backendMessage === clientMessage ? backendMessage : `${backendMessage} (${clientMessage})`)
+        : clientMessage;
+      ElMessage.error(mergedMessage);
+      return Promise.reject(new Error(mergedMessage));
     }
     return Promise.reject(error);
   }
