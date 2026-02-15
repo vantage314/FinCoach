@@ -371,6 +371,18 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
         reportMapper.insert(entity);
 
+        // ========= 5.1 写入行为事件（M5-A） =========
+        try {
+            Map<String, Object> reportMeta = new LinkedHashMap<>();
+            reportMeta.put("reportId", entity.getId());
+            reportMeta.put("riskScore", riskScore);
+            reportMeta.put("healthScore", healthScore);
+            reportMeta.put("behaviorScore", behaviorScore);
+            behaviorEventService.recordEvent(userId, "REPORT_GENERATE", null, reportMeta);
+        } catch (Exception e) {
+            log.error("[HealthV2-Report] 写入行为事件失败, reportId={}", entity.getId(), e);
+        }
+
         // ========= 6. 审计日志 =========
         auditService.log(userId, "GENERATE_REPORT", "HEALTH_REPORT", entity.getId(), null, entity);
 
