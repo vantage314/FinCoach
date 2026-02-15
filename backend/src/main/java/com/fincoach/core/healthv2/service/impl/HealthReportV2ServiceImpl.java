@@ -51,35 +51,6 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     private FcGoalMapper goalMapper;
     @Autowired
     private FcInsuranceProfileMapper insuranceMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.*;
-
-/**
- * 体检报告生成服务实现（M1+M2）
- *
- * M1: 基础指标、简单规则评分、建议骨架
- * M2: Portfolio Performance (sharpe/maxDrawdown/corrMatrix) + Rebalance Advice
- */
-@Slf4j
-@Service
-public class HealthReportV2ServiceImpl implements HealthReportV2Service {
-
-    @Autowired
-    private FcAssetMapper assetMapper;
-    @Autowired
-    private FcLiabilityMapper liabilityMapper;
-    @Autowired
-    private FcCashflowMapper cashflowMapper;
-    @Autowired
-    private FcGoalMapper goalMapper;
-    @Autowired
-    private FcInsuranceProfileMapper insuranceMapper;
     @Autowired
     private FcHealthReportMapper reportMapper;
     @Autowired
@@ -112,6 +83,184 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     private FcAdviceTemplateMapper adviceTemplateMapper;
     @Autowired
     private FcScoreRuleVersionMapper scoreRuleVersionMapper;
+    @Autowired
+    private ConfigJsonHelper configJsonHelper;
+    @Autowired
+    private com.fincoach.core.healthv2.service.BehaviorEventService behaviorEventService;
+    @Autowired
+    private com.fincoach.core.healthv2.service.NotificationService notificationService;
+
+    @Override
+    public HealthReportV2VO generate(Long userId) {
+        log.info("[HealthV2-Report] 开始生成体检报告, userId={}", userId);
+
+        // ========= 1. 拉取用户最新数据 =========
+        List<FcAssetEntity> assets = assetMapper.selectList(
+                new LambdaQueryWrapper<FcAssetEntity>().eq(FcAssetEntity::getUserId, userId));
+
+        List<FcLiabilityEntity> liabilities = liabilityMapper.selectList(
+                new LambdaQueryWrapper<FcLiabilityEntity>().eq(FcLiabilityEntity::getUserId, userId));
+
+        // 取最近月份的现金流
+        FcCashflowEntity cashflow = cashflowMapper.selectOne(
+                new LambdaQueryWrapper<FcCashflowEntity>()
+                        .eq(FcCashflowEntity::getUserId, userId)
+                        .orderByDesc(FcCashflowEntity::getMonth)
+                        .last("LIMIT 1"));
+
+        List<FcGoalEntity> goals = goalMapper.selectList(
+                new LambdaQueryWrapper<FcGoalEntity>().eq(FcGoalEntity::getUserId, userId));
+
+        FcInsuranceProfileEntity insurance = insuranceMapper.selectOne(
+                new LambdaQueryWrapper<FcInsuranceProfileEntity>().eq(FcInsuranceProfileEntity::getUserId, userId));
+
+        // ========= 2. 计算基础指标（分模块） =========
+
+        // --- 2a. 基础数据提取 ---
+        BigDecimal cashAssets = assets.stream()
+                .filter(a -> "CASH".equals(a.getType()))
+                .map(FcAssetEntity::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalAssets = assets.stream()
+                .map(FcAssetEntity::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalDebt = liabilities.stream()
+                .map(FcLiabilityEntity::getPrincipal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal netWorth = totalAssets.subtract(totalDebt);
+
+        // --- 2b. 现金流模块 ---
+        Map<String, Object> cashflowMetrics = new LinkedHashMap<>();
+        BigDecimal dti = null;
+        BigDecimal essentialExpense = BigDecimal.ZERO;
+        BigDecimal monthlySurplus = null;
+        BigDecimal emergencyMonths = null;
+
+        if (cashflow != null) {
+            if (cashflow.getFixedExpense() != null) essentialExpense = essentialExpense.add(cashflow.getFixedExpense());
+            if (cashflow.getVariableExpense() != null) essentialExpense = essentialExpense.add(cashflow.getVariableExpense());
+            if (cashflow.getMonthlyDebtPayment() != null) essentialExpense = essentialExpense.add(cashflow.getMonthlyDebtPayment());
+
+            if (cashflow.getIncome() != null && cashflow.getIncome().compareTo(BigDecimal.ZERO) > 0) {
+                if (cashflow.getMonthlyDebtPayment() != null) {
+                    dti = cashflow.getMonthlyDebtPayment()
+                            .divide(cashflow.getIncome(), 4, RoundingMode.HALF_UP);
+                }
+                monthlySurplus = cashflow.getIncome().subtract(essentialExpense);
+            }
+
+            if (essentialExpense.compareTo(BigDecimal.ZERO) > 0) {
+                emergencyMonths = cashAssets.divide(essentialExpense, 2, RoundingMode.HALF_UP);
+            }
+        }
+        cashflowMetrics.put("dti", dti);
+        cashflowMetrics.put("essentialExpense", essentialExpense);
+        cashflowMetrics.put("monthlySurplus", monthlySurplus);
+        cashflowMetrics.put("emergencyMonths", emergencyMonths);
+
+        // --- 2c. 资产组合模块 ---
+        Map<String, Object> portfolioMetrics = new LinkedHashMap<>();
+        portfolioMetrics.put("cashAssets", cashAssets);
+        portfolioMetrics.put("totalAssets", totalAssets);
+        portfolioMetrics.put("netWorth", netWorth);
+
+        // 资产类别占比（M1 简版）
+        Map<String, Object> allocation = new LinkedHashMap<>();
+        if (totalAssets.compareTo(BigDecimal.ZERO) > 0) {
+            Map<String, BigDecimal> typeSum = new LinkedHashMap<>();
+            for (FcAssetEntity a : assets) {
+                String type = a.getType() != null ? a.getType() : "OTHER";
+                typeSum.merge(type, a.getAmount(), BigDecimal::add);
+            }
+            for (Map.Entry<String, BigDecimal> e : typeSum.entrySet()) {
+                allocation.put(e.getKey(), e.getValue().divide(totalAssets, 4, RoundingMode.HALF_UP));
+            }
+        }
+        portfolioMetrics.put("allocation", allocation);
+
+        // 最大类别集中度
+        Map<String, Object> concentration = new LinkedHashMap<>();
+        if (!allocation.isEmpty()) {
+            String maxType = null;
+            BigDecimal maxRatio = BigDecimal.ZERO;
+            for (Map.Entry<String, Object> e : allocation.entrySet()) {
+                BigDecimal ratio = (BigDecimal) e.getValue();
+                if (ratio.compareTo(maxRatio) > 0) {
+                    maxRatio = ratio;
+                    maxType = e.getKey();
+                }
+            }
+            concentration.put("topType", maxType);
+            concentration.put("topRatio", maxRatio);
+        }
+        portfolioMetrics.put("concentration", concentration);
+
+        // M2: Portfolio Performance（双路径：HISTORY / PARAM）
+        Map<String, Object> performance;
+        try {
+            performance = performanceAnalyzer.computePerformance(userId, allocation);
+        } catch (Exception e) {
+            log.error("[HealthV2-Report] Performance 计算异常, fallback to null", e);
+            performance = new LinkedHashMap<>();
+            performance.put("sharpe", null);
+            performance.put("maxDrawdown", null);
+            performance.put("corrMatrix", null);
+            performance.put("method", "ERROR");
+            performance.put("reason", e.getMessage());
+        }
+
+        // M7-1: Advanced Portfolio Metrics
+        try {
+             PortfolioInput input = PortfolioInput.builder()
+                    .rfAnnual(HealthV2ConfigDefaults.DEFAULT_RF_ANNUAL)
+                    .returnsSeries(null)
+                    .equityCurve(null)
+                    .returnsByAssetKey(null)
+                    .build();
+            PortfolioMetrics pm = portfolioAnalyzer.analyze(input);
+            if (pm != null) {
+                performance.put("sharpe", pm.getSharpe());
+                performance.put("maxDrawdown", pm.getMaxDrawdown());
+                Map<String, Object> correlation = new LinkedHashMap<>();
+                correlation.put("matrix", pm.getCorrelation());
+                
+                List<Map<String, Object>> highPairs = new ArrayList<>();
+                if (pm.getCorrelation() != null) {
+                    double threshold = HealthV2ConfigDefaults.DEFAULT_CORR_HIGH_THRESHOLD;
+                    for (Map.Entry<String, Map<String, Double>> row : pm.getCorrelation().entrySet()) {
+                        String keyA = row.getKey();
+                        for (Map.Entry<String, Double> col : row.getValue().entrySet()) {
+                            String keyB = col.getKey();
+                            Double val = col.getValue();
+                            if (keyA.compareTo(keyB) < 0 && val != null && val > threshold) {
+                                Map<String, Object> pair = new HashMap<>();
+                                pair.put("a", keyA);
+                                pair.put("b", keyB);
+                                pair.put("corr", val);
+                                highPairs.add(pair);
+                            }
+                        }
+                    }
+                }
+                correlation.put("highPairs", highPairs);
+                portfolioMetrics.put("correlation", correlation);
+                portfolioMetrics.put("warnings", pm.getWarnings());
+            }
+        } catch (Exception e) {
+             log.error("[HealthV2-Report] PortfolioAnalyzer M7-1 异常", e);
+             @SuppressWarnings("unchecked")
+             List<String> w = (List<String>) portfolioMetrics.getOrDefault("warnings", new ArrayList<>());
+             w.add("PORTFOLIO_METRICS_ERROR: " + e.getMessage());
+             portfolioMetrics.put("warnings", w);
+        }
+        portfolioMetrics.put("performance", performance);
+
+        // --- 2d. 负债模块 ---
+        Map<String, Object> debtMetrics = new LinkedHashMap<>();
+        debtMetrics.put("totalDebt", totalDebt);
         debtMetrics.put("debtCount", liabilities.size());
         debtMetrics.put("monthlyDebtPayment",
                 cashflow != null ? cashflow.getMonthlyDebtPayment() : null);
