@@ -124,6 +124,11 @@ com.fincoach
 - 操作更改日志：[`doc/logs-archive/20260215_m6_2_rebalance_confirm_ops_log.md`](../logs-archive/20260215_m6_2_rebalance_confirm_ops_log.md)
 - 接口操作手册：[`doc/logs-archive/20260215_m6_2_rebalance_confirm_runbook.md`](../logs-archive/20260215_m6_2_rebalance_confirm_runbook.md)
 
+## M6-3 Admin- [Walkthrough/README HealthV2 Logs Index](../../README.md#healthv2-logs--runbooks)
+
+### M7 Portfolio Analysis
+- **M7-1 Portfolio Metrics**: [Ops Log](../logs-archive/20260216_m7_1_portfolio_metrics_ops_log.md) | [Runbook](../logs-archive/20260216_m7_1_portfolio_metrics_runbook.md)
+
 ## M6-3 Admin Dashboard Stats Logs
 
 - 操作更改日志：[`doc/logs-archive/20260216_m6_3_admin_dashboard_stats_ops_log.md`](../logs-archive/20260216_m6_3_admin_dashboard_stats_ops_log.md)
