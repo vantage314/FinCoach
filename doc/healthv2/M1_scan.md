@@ -7,7 +7,8 @@
 | 项目 | 值 |
 |------|-----|
 | Spring Boot | 3.2.2 |
-| Java | 17 |
+| Java (runtime min) | 17 |
+| Java (build/toolchain) | 21（maven-toolchains-plugin enforced） |
 | MyBatis-Plus | 3.5.5（`mybatis-plus-spring-boot3-starter`） |
 | 数据库 | MySQL（`mysql-connector-j`） |
 | Lombok | ✔ |
@@ -69,6 +70,8 @@ com.fincoach
 - **无 Flyway / Liquibase**
 - 迁移脚本位于 `sql/migration/`，以日期命名（如 `20260211_xxx.sql`）
 - 手动执行
+
+> 备注：Spring Boot 3 要求 Java 17+。本项目为了依赖一致与 CI/本地一致，使用 toolchains 固定 JDK 21 编译；若本机 `mvn -v` 显示 Java 8/11，请按 `doc/build/java_toolchain.md` 修复。
 
 ## 4. 已有健康体检模块（旧版）
 
