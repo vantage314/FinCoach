@@ -57,10 +57,9 @@ public class ScoreEngine {
         healthBreakdown.add(dim("RiskAdjustedReturn", rarScore, 15, describeRAR(performanceResult)));
 
         // 5. Behavior (权重 15)
-        // M5: 行为事件驱动评分
-        // behaviorStats: { "eventCount"=10, "rebalanceConfirm"=1, "highFreqUpdate"=0 }
         int behaviorScore = scoreBehavior(behaviorStats);
-        healthBreakdown.add(dim("Behavior", behaviorScore, 15, describeBehavior(behaviorStats)));
+        String behaviorReason = describeBehavior(behaviorStats);
+        healthBreakdown.add(dim("Behavior", behaviorScore, 15, behaviorReason));
 
         int healthScore = calcWeighted(healthBreakdown);
         result.put("healthScore", clamp(healthScore));
@@ -93,32 +92,11 @@ public class ScoreEngine {
         int riskScore = calcWeighted(riskBreakdown);
         result.put("riskScore", clamp(riskScore));
 
-        // ========= Behavior Score (M3 轻量 -> M5 增强) =========
+        // ========= Behavior Score (M5-A 规则版) =========
         List<Map<String, Object>> behaviorBreakdown = new ArrayList<>();
-        // M5: 分解维度
-        // 1. DataSufficiency (40%): 数据活跃度
-        int dsScore = scoreDataSufficiency(behaviorStats);
-        behaviorBreakdown.add(dim("DataSufficiency", dsScore, 40, describeDataSufficiency(behaviorStats)));
-        
-        // 2. Discipline (30%): 执行力 (再平衡确认)
-        int discScore = scoreDiscipline(behaviorStats);
-        behaviorBreakdown.add(dim("Discipline", discScore, 30, describeDiscipline(behaviorStats)));
-        
-        // 3. Stability (30%): 操作稳定性 (避免频繁修改资产)
-        int stabScore = scoreStability(behaviorStats);
-        behaviorBreakdown.add(dim("Stability", stabScore, 30, describeStability(behaviorStats)));
-
-        // 此时 behaviorScore 已在上方 healthBreakdown 中计算过一次简单的
-        // 但为了保持一致性，重算一遍详细的 breakdown 后再赋值给 result
-        int finalBehaviorScore = calcWeighted(behaviorBreakdown);
-        result.put("behaviorScore", clamp(finalBehaviorScore)); 
-        
-        // 修正: healthBreakdown 里也用了 behaviorScore，需要保证一致
-        // 简单处理：重新更新 healthBreakdown 中的 Behavior 项目 (index 4)
-        healthBreakdown.set(4, dim("Behavior", finalBehaviorScore, 15, describeBehavior(behaviorStats)));
-        // 重新计算 healthScore
-        healthScore = calcWeighted(healthBreakdown);
-        result.put("healthScore", clamp(healthScore));
+        int finalBehaviorScore = clamp(behaviorScore);
+        behaviorBreakdown.add(dim("BehaviorRule30d", finalBehaviorScore, 100, behaviorReason));
+        result.put("behaviorScore", finalBehaviorScore);
 
         // ========= Breakdown =========
         Map<String, Object> breakdown = new LinkedHashMap<>();
@@ -323,39 +301,46 @@ public class ScoreEngine {
     // ============================= Behavior 维度 (M5) =============================
 
     private int scoreBehavior(Map<String, Object> stats) {
-        int eventCount = intValue(stats, "eventCount");
+        int eventCount = intValue(stats, "eventCount30d");
         if (eventCount < 3) {
             return 60;
         }
-        int score = 70;
-        int assetUpdateCount = intValue(stats, "assetUpdateCount");
-        int largeAdjustCount = intValue(stats, "largeAdjustCount");
-        boolean rebalanceFollowThrough = boolValue(stats, "rebalanceFollowThrough");
-        int reportGenerate7d = intValue(stats, "reportGenerate7d");
-        int rebalanceConfirm7d = intValue(stats, "rebalanceConfirm7d");
-
-        if (assetUpdateCount > 10) score -= 15;
-        if (largeAdjustCount >= 3) score -= 15;
-        else if (largeAdjustCount >= 1) score -= 8;
-        if (rebalanceFollowThrough) score += 10;
-        else if (reportGenerate7d > 0 && rebalanceConfirm7d == 0) score -= 5;
-
+        int score = 60;
+        int reportGenerateCount = intValue(stats, "reportGenerateCount30d");
+        int rebalanceConfirmCount = intValue(stats, "rebalanceConfirmCount30d");
+        if (rebalanceConfirmCount > 0) {
+            score = Math.min(85, score + 15);
+        }
+        if (reportGenerateCount >= 10) {
+            score -= 10;
+        }
+        if (rebalanceConfirmCount >= 3) {
+            score += 5;
+        }
         return clamp(score);
     }
 
     private String describeBehavior(Map<String, Object> stats) {
-        int eventCount = intValue(stats, "eventCount");
-        int assetUpdateCount = intValue(stats, "assetUpdateCount");
-        int largeAdjustCount = intValue(stats, "largeAdjustCount");
-        boolean rebalanceFollowThrough = boolValue(stats, "rebalanceFollowThrough");
+        int eventCount = intValue(stats, "eventCount30d");
+        int reportGenerateCount = intValue(stats, "reportGenerateCount30d");
+        int rebalanceConfirmCount = intValue(stats, "rebalanceConfirmCount30d");
         if (eventCount < 3) {
-            return "近30天行为事件不足3条，使用基线行为分";
+            return "近30天行为事件不足3条（当前" + eventCount + "条），采用基线60分";
         }
         List<String> reasons = new ArrayList<>();
+        reasons.add("基线60分");
         reasons.add("近30天事件数=" + eventCount);
-        if (assetUpdateCount > 10) reasons.add("资产调整次数偏高(" + assetUpdateCount + ")");
-        if (largeAdjustCount > 0) reasons.add("大幅调整次数=" + largeAdjustCount);
-        reasons.add(rebalanceFollowThrough ? "再平衡建议7天内已确认执行" : "再平衡建议执行确认不足");
+        if (rebalanceConfirmCount > 0) {
+            reasons.add("存在再平衡确认(+15)");
+        } else {
+            reasons.add("近30天无再平衡确认");
+        }
+        if (reportGenerateCount >= 10) {
+            reasons.add("报告生成次数>=10(-10)");
+        }
+        if (rebalanceConfirmCount >= 3) {
+            reasons.add("再平衡确认次数>=3(+5)");
+        }
         return String.join("；", reasons);
     }
 

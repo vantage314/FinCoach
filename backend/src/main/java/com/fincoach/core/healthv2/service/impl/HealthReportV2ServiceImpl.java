@@ -244,18 +244,15 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
         // ========= 3. M3 评分引擎（多维加权 + 可解释 breakdown） =========
         // M5: 准备行为数据
-        Map<String, Object> behaviorStats = new HashMap<>();;
+        Map<String, Object> behaviorStats = new HashMap<>();
         try {
             // 简单统计近30天数据
             Map<String, Integer> counts = behaviorEventService.countByType(userId, 30);
             behaviorStats.putAll(counts);
-            // 补充特殊统计
             int totalEvents = counts.values().stream().mapToInt(Integer::intValue).sum();
-            behaviorStats.put("eventCount", totalEvents);
-            behaviorStats.put("rebalanceConfirmCount", counts.getOrDefault("REBALANCE_CONFIRM", 0));
-            behaviorStats.put("assetUpdateCount", counts.getOrDefault("ASSET_UPDATE", 0));
-            // FIXME: 注册天数暂无，mock 100
-            behaviorStats.put("daysSinceRegister", 100); 
+            behaviorStats.put("eventCount30d", totalEvents);
+            behaviorStats.put("reportGenerateCount30d", counts.getOrDefault("REPORT_GENERATE", 0));
+            behaviorStats.put("rebalanceConfirmCount30d", counts.getOrDefault("REBALANCE_CONFIRM", 0));
         } catch (Exception e) {
             log.warn("[HealthV2-Report] 获取行为数据失败", e);
         }
