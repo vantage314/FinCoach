@@ -126,4 +126,6 @@ com.fincoach
 
 ## M6-3 Admin Dashboard Stats Logs
 
-- 操作更改日志：[`doc/logs-archive/20260215_m6_3_admin_dashboard_stats_ops_log.md`](../logs-archive/20260215_m6_3_admin_dashboard_stats_ops_log.md)
+- 操作更改日志：[`doc/logs-archive/20260216_m6_3_admin_dashboard_stats_ops_log.md`](../logs-archive/20260216_m6_3_admin_dashboard_stats_ops_log.md)
+- 接口操作手册：[`doc/logs-archive/20260216_m6_3_admin_dashboard_stats_runbook.md`](../logs-archive/20260216_m6_3_admin_dashboard_stats_runbook.md)
+- 自测指南：[`doc/logs-archive/20260216_m6_3_admin_dashboard_stats_selftest.md`](../logs-archive/20260216_m6_3_admin_dashboard_stats_selftest.md)
