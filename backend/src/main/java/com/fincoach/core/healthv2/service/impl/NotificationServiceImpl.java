@@ -2,6 +2,8 @@ package com.fincoach.core.healthv2.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fincoach.core.healthv2.entity.FcNotificationEntity;
 import com.fincoach.core.healthv2.mapper.FcNotificationMapper;
 import com.fincoach.core.healthv2.service.NotificationService;
@@ -10,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 通知服务实现
@@ -37,29 +38,34 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<FcNotificationEntity> list(Long userId, Integer isRead, int size) {
+    public IPage<FcNotificationEntity> list(Long userId, Integer isRead, int page, int size) {
         LambdaQueryWrapper<FcNotificationEntity> qw = new LambdaQueryWrapper<FcNotificationEntity>()
                 .eq(FcNotificationEntity::getUserId, userId)
-                .orderByDesc(FcNotificationEntity::getCreatedAt)
-                .last("LIMIT " + size);
+                .orderByDesc(FcNotificationEntity::getCreatedAt);
         if (isRead != null) {
             qw.eq(FcNotificationEntity::getIsRead, isRead);
         }
-        return notificationMapper.selectList(qw);
+        return notificationMapper.selectPage(new Page<>(page, size), qw);
     }
 
     @Override
-    public void markRead(Long userId, Long notificationId) {
-        notificationMapper.update(null,
+    public FcNotificationEntity getById(Long notificationId) {
+        return notificationMapper.selectById(notificationId);
+    }
+
+    @Override
+    public boolean markRead(Long userId, Long notificationId) {
+        int rows = notificationMapper.update(null,
                 new LambdaUpdateWrapper<FcNotificationEntity>()
                         .eq(FcNotificationEntity::getId, notificationId)
                         .eq(FcNotificationEntity::getUserId, userId)
                         .set(FcNotificationEntity::getIsRead, 1));
+        return rows > 0;
     }
 
     @Override
-    public void markAllRead(Long userId) {
-        notificationMapper.update(null,
+    public int markAllRead(Long userId) {
+        return notificationMapper.update(null,
                 new LambdaUpdateWrapper<FcNotificationEntity>()
                         .eq(FcNotificationEntity::getUserId, userId)
                         .eq(FcNotificationEntity::getIsRead, 0)
