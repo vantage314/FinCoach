@@ -100,3 +100,8 @@ com.fincoach
 
 - 操作更改日志：[`doc/logs-archive/20260215_m5c_import_export_ops_log.md`](../logs-archive/20260215_m5c_import_export_ops_log.md)
 - 接口操作手册：[`doc/logs-archive/20260215_m5c_import_export_runbook.md`](../logs-archive/20260215_m5c_import_export_runbook.md)
+
+## M5-B Notifications Logs
+
+- 操作更改日志：[`doc/logs-archive/20260215_m5b_notifications_ops_log.md`](../logs-archive/20260215_m5b_notifications_ops_log.md)
+- 接口操作手册：[`doc/logs-archive/20260215_m5b_notifications_runbook.md`](../logs-archive/20260215_m5b_notifications_runbook.md)

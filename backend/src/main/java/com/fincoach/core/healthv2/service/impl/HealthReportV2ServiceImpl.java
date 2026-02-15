@@ -377,7 +377,7 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         // ========= 7. M4 触发预警 =========
         if (flags.getOrDefault("ENABLE_ALERTS", true)) {
             try {
-                triggerAlerts(userId, emergencyMonths, dti, concentration);
+                triggerAlerts(userId, entity.getId(), emergencyMonths, dti, concentration);
             } catch (Exception e) {
                 log.error("[HealthV2-Report] 触发预警异常", e);
             }
@@ -600,7 +600,7 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     /**
      * M4: 根据预警规则触发预警记录
      */
-    private void triggerAlerts(Long userId, BigDecimal emergencyMonths, BigDecimal dti, Map<String, Object> concentration) {
+    private void triggerAlerts(Long userId, Long reportId, BigDecimal emergencyMonths, BigDecimal dti, Map<String, Object> concentration) {
         BigDecimal concentrationRatio = null;
         if (concentration != null && concentration.get("topRatio") instanceof BigDecimal) {
             concentrationRatio = (BigDecimal) concentration.get("topRatio");
@@ -611,6 +611,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         for (FcAlertRuleEntity rule : rules) {
             boolean triggered = false;
             String message = rule.getMessageTemplate() != null ? rule.getMessageTemplate() : rule.getRuleKey();
+            Double thresholdValue = null;
+            Double currentValue = null;
 
             try {
                 Map<String, Object> thresholds = parseAlertThresholds(rule, userId);
@@ -620,6 +622,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                     case "DTI_CRITICAL":
                         if (dti != null) {
                             Double threshold = toDoubleObj(thresholds.get("threshold"));
+                            thresholdValue = threshold;
+                            currentValue = dti.doubleValue();
                             if (threshold != null) {
                                 triggered = dti.doubleValue() > threshold;
                             }
@@ -629,6 +633,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                     case "EMERGENCY_WARN":
                         if (emergencyMonths != null) {
                             Double months = toDoubleObj(thresholds.get("months"));
+                            thresholdValue = months;
+                            currentValue = emergencyMonths.doubleValue();
                             if (months != null) {
                                 triggered = emergencyMonths.doubleValue() < months;
                             }
@@ -637,6 +643,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                     case "CONCENTRATION":
                         if (concentrationRatio != null) {
                             Double threshold = toDoubleObj(thresholds.get("threshold"));
+                            thresholdValue = threshold;
+                            currentValue = concentrationRatio.doubleValue();
                             if (threshold != null) {
                                 triggered = concentrationRatio.doubleValue() > threshold;
                             }
@@ -674,14 +682,48 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
                 // M5: 同步写入通知中心
                 try {
-                    String title = "⚠️ 健康预警: " + message;
-                    // 尝试从 adviceTemplate 获取更友好的文案 (TODO: 暂复用message)
-                    notificationService.create(userId, "ALERT", title, message, record.getPayloadJson());
+                    Map<String, Object> notificationPayload = new LinkedHashMap<>();
+                    notificationPayload.put("ruleKey", rule.getRuleKey());
+                    notificationPayload.put("threshold", thresholdValue);
+                    notificationPayload.put("currentValue", currentValue);
+                    notificationPayload.put("reportId", reportId);
+                    String notificationPayloadJson;
+                    try {
+                        notificationPayloadJson = objectMapper.writeValueAsString(notificationPayload);
+                    } catch (Exception e) {
+                        notificationPayloadJson = "{}";
+                    }
+                    String title = buildNotificationTitle(rule.getRuleKey());
+                    String content = buildNotificationContent(rule.getRuleKey(), thresholdValue, currentValue);
+                    notificationService.create(userId, "ALERT", title, content, notificationPayloadJson);
                 } catch (Exception e) {
                     log.error("[HealthV2-Alert] 写入通知失败", e);
                 }
             }
         }
+    }
+
+    private String buildNotificationTitle(String ruleKey) {
+        return switch (ruleKey) {
+            case "DTI_WARNING", "DTI_CRITICAL" -> "现金流预警：DTI 超阈值";
+            case "EMERGENCY_LOW", "EMERGENCY_WARN" -> "流动性预警：应急金不足";
+            case "CONCENTRATION" -> "配置预警：集中度过高";
+            default -> "健康预警";
+        };
+    }
+
+    private String buildNotificationContent(String ruleKey, Double threshold, Double currentValue) {
+        String thresholdText = threshold == null ? "-" : String.format("%.3f", threshold);
+        String currentText = currentValue == null ? "-" : String.format("%.3f", currentValue);
+        return switch (ruleKey) {
+            case "DTI_WARNING", "DTI_CRITICAL" ->
+                    "当前DTI=" + currentText + "，阈值=" + thresholdText + "，建议优先优化债务与现金流。";
+            case "EMERGENCY_LOW", "EMERGENCY_WARN" ->
+                    "当前应急月数=" + currentText + "，阈值=" + thresholdText + "，建议补足3-6个月储备。";
+            case "CONCENTRATION" ->
+                    "当前集中度=" + currentText + "，阈值=" + thresholdText + "，建议分散配置。";
+            default -> "命中健康预警规则，请在报告中查看详细建议。";
+        };
     }
 
     private Map<String, Object> parseAlertThresholds(FcAlertRuleEntity rule, Long actorUserId) {
