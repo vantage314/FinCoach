@@ -15,7 +15,9 @@ import com.fincoach.core.healthv2.entity.*;
 import com.fincoach.core.healthv2.mapper.*;
 import com.fincoach.core.healthv2.service.AuditService;
 import com.fincoach.core.healthv2.service.HealthReportV2Service;
+import com.fincoach.core.healthv2.util.CanonicalJsonHelper;
 import com.fincoach.core.healthv2.util.ConfigJsonHelper;
+import com.fincoach.core.healthv2.util.HashHelper;
 import com.fincoach.core.healthv2.util.HealthV2ConfigDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -312,6 +314,18 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             try {
                 rebalance = rebalanceAdvisor.advise(
                         allocation, riskScore, emergencyMonths, dti, monthlySurplus, totalAssets);
+                if (rebalance != null) {
+                    Map<String, Object> bind = new LinkedHashMap<>();
+                    bind.put("actions", rebalance.get("actions"));
+                    bind.put("targetAllocation", rebalance.get("targetAllocation"));
+                    bind.put("currentAllocation", rebalance.get("currentAllocation"));
+                    bind.put("thresholds", rebalance.get("thresholds"));
+                    bind.put("strategy", rebalance.get("strategy"));
+                    String canonicalJson = CanonicalJsonHelper.toCanonicalJson(bind);
+                    String hash = canonicalJson == null ? null : HashHelper.sha256Hex(canonicalJson);
+                    rebalance.put("actionsHash", hash == null ? null : "sha256:" + hash);
+                    rebalance.put("confirmable", true);
+                }
             } catch (Exception e) {
                 log.error("[HealthV2-Report] Rebalance 计算异常", e);
             }
