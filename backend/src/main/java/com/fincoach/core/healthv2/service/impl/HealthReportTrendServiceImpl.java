@@ -109,27 +109,57 @@ public class HealthReportTrendServiceImpl implements HealthReportTrendService {
 
     private Map<String, Object> buildTrend(List<HealthReportTrendPointVO> points) {
         Map<String, Object> trend = new LinkedHashMap<>();
-        trend.put("reportCount", points.size());
-        if (points.size() < 2) {
-            trend.put("scoreDelta", Collections.emptyMap());
-            trend.put("metricDelta", Collections.emptyMap());
-            return trend;
+        int n = points.size();
+        trend.put("reportCount", n);
+
+        List<Object> labels = new ArrayList<>();
+        List<Integer> healthSeries = new ArrayList<>();
+        List<Integer> riskSeries = new ArrayList<>();
+        List<Integer> behaviorSeries = new ArrayList<>();
+        List<Object> dtiSeries = new ArrayList<>();
+        List<Object> emergencySeries = new ArrayList<>();
+        List<Object> netWorthSeries = new ArrayList<>();
+        List<Object> sharpeSeries = new ArrayList<>();
+        List<Object> maxDdSeries = new ArrayList<>();
+
+        for (HealthReportTrendPointVO p : points) {
+            labels.add(p.getReportDate());
+            healthSeries.add(p.getScores().get("health"));
+            riskSeries.add(p.getScores().get("risk"));
+            behaviorSeries.add(p.getScores().get("behavior"));
+
+            Map<String, Object> m = p.getMetrics();
+            dtiSeries.add(m.get("dti"));
+            emergencySeries.add(m.get("emergencyMonths"));
+            netWorthSeries.add(m.get("netWorth"));
+            sharpeSeries.add(m.get("sharpe"));
+            maxDdSeries.add(m.get("maxDrawdown"));
         }
 
-        HealthReportTrendPointVO first = points.get(0);
-        HealthReportTrendPointVO last = points.get(points.size() - 1);
+        trend.put("labels", labels);
+        trend.put("health", healthSeries);
+        trend.put("risk", riskSeries);
+        trend.put("behavior", behaviorSeries);
+        trend.put("dti", dtiSeries);
+        trend.put("emergencyMonths", emergencySeries);
+        trend.put("netWorth", netWorthSeries);
+        trend.put("sharpe", sharpeSeries);
+        trend.put("maxDrawdown", maxDdSeries);
+
+        HealthReportTrendPointVO first = n >= 1 ? points.get(0) : null;
+        HealthReportTrendPointVO last = n >= 1 ? points.get(n - 1) : null;
 
         Map<String, Object> scoreDelta = new LinkedHashMap<>();
-        scoreDelta.put("health", intDelta(first.getScores().get("health"), last.getScores().get("health")));
-        scoreDelta.put("risk", intDelta(first.getScores().get("risk"), last.getScores().get("risk")));
-        scoreDelta.put("behavior", intDelta(first.getScores().get("behavior"), last.getScores().get("behavior")));
+        scoreDelta.put("health", n >= 2 ? intDelta(first.getScores().get("health"), last.getScores().get("health")) : null);
+        scoreDelta.put("risk", n >= 2 ? intDelta(first.getScores().get("risk"), last.getScores().get("risk")) : null);
+        scoreDelta.put("behavior", n >= 2 ? intDelta(first.getScores().get("behavior"), last.getScores().get("behavior")) : null);
 
         Map<String, Object> metricDelta = new LinkedHashMap<>();
-        metricDelta.put("dti", decimalDelta(first.getMetrics().get("dti"), last.getMetrics().get("dti")));
-        metricDelta.put("emergencyMonths", decimalDelta(first.getMetrics().get("emergencyMonths"), last.getMetrics().get("emergencyMonths")));
-        metricDelta.put("netWorth", decimalDelta(first.getMetrics().get("netWorth"), last.getMetrics().get("netWorth")));
-        metricDelta.put("sharpe", decimalDelta(first.getMetrics().get("sharpe"), last.getMetrics().get("sharpe")));
-        metricDelta.put("maxDrawdown", decimalDelta(first.getMetrics().get("maxDrawdown"), last.getMetrics().get("maxDrawdown")));
+        metricDelta.put("dti", n >= 2 ? decimalDelta(first.getMetrics().get("dti"), last.getMetrics().get("dti")) : null);
+        metricDelta.put("emergencyMonths", n >= 2 ? decimalDelta(first.getMetrics().get("emergencyMonths"), last.getMetrics().get("emergencyMonths")) : null);
+        metricDelta.put("netWorth", n >= 2 ? decimalDelta(first.getMetrics().get("netWorth"), last.getMetrics().get("netWorth")) : null);
+        metricDelta.put("sharpe", n >= 2 ? decimalDelta(first.getMetrics().get("sharpe"), last.getMetrics().get("sharpe")) : null);
+        metricDelta.put("maxDrawdown", n >= 2 ? decimalDelta(first.getMetrics().get("maxDrawdown"), last.getMetrics().get("maxDrawdown")) : null);
 
         trend.put("scoreDelta", scoreDelta);
         trend.put("metricDelta", metricDelta);
