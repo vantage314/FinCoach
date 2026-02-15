@@ -1,5 +1,5 @@
 
-# M6-3 Admin Dashboard Stats Ops Log_
+# M6-3 Admin Dashboard Stats Ops Log
 > 日期：2026-02-16  
 > 模块：HealthV2 Admin  
 > 目标：为后台仪表盘提供“可直接画图/列表”的聚合统计数据输出（不依赖前端二次聚合）。

@@ -35,7 +35,7 @@ curl -s -H "Authorization: Bearer $ADMIN_TOKEN" \
 ```
 
 ## 4. 验收点
-- `buckets`：至少一个桶 count > 0
-- `recentReports`：返回条数符合预期（例如默认 10）
-- `recentAlerts`：至少 1 条（如果你刚触发了预警）
+- `scoreDistribution.healthScoreBuckets`：至少一个桶 count > 0
+- `recent.recentReports`：返回条数符合预期（例如默认 10）
+- `recent.recentAlerts`：至少 1 条（如果你刚触发了预警）
 - 普通用户访问 admin 接口：403

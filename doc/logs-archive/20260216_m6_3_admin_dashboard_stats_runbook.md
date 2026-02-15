@@ -25,7 +25,7 @@ curl -H "Authorization: Bearer $ADMIN_TOKEN" \
 code=200
 
 data 包含：
-- `overview`: userCount, reportCount, alertTriggerCount
+- `overview`: userCount, reportCount, alertTriggerCount, notificationUnreadCount
 - `scoreDistribution`: healthScoreBuckets, riskScoreBuckets
 - `recent`: recentReports, recentAlerts
 - `meta`: generatedAt, windowDays
