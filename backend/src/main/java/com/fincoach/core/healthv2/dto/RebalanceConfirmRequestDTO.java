@@ -1,5 +1,6 @@
 package com.fincoach.core.healthv2.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -11,6 +12,9 @@ public class RebalanceConfirmRequestDTO {
 
     @NotNull(message = "reportId不能为空")
     private Long reportId;
+
+    @NotBlank(message = "actionsHash不能为空")
+    private String actionsHash;
 
     private String notes;
 

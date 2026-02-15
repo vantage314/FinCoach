@@ -46,6 +46,10 @@ public class RebalanceController {
         if (!userId.equals(report.getUserId())) {
             return Result.error(403, "无权访问此报告");
         }
+        String expectedHash = extractActionsHash(report);
+        if (expectedHash == null || !expectedHash.equals(body.getActionsHash())) {
+            return Result.error(400, "REBALANCE_HASH_MISMATCH");
+        }
 
         BigDecimal amount = BigDecimal.ZERO;
         if (body.getExecutedActions() != null) {
@@ -63,10 +67,24 @@ public class RebalanceController {
         meta.put("reportId", body.getReportId());
         meta.put("notes", body.getNotes());
         meta.put("executedActions", body.getExecutedActions());
+        meta.put("actionsHash", body.getActionsHash());
 
         behaviorEventService.recordEvent(userId, "REBALANCE_CONFIRM", amount, meta);
 
         log.info("[Rebalance] 用户确认再平衡: userId={}, reportId={}", userId, body.getReportId());
         return Result.success("再平衡确认已记录");
+    }
+
+    @SuppressWarnings("unchecked")
+    private String extractActionsHash(HealthReportV2VO report) {
+        if (report == null || report.getAdvice() == null) {
+            return null;
+        }
+        Object rebalance = report.getAdvice().get("rebalance");
+        if (!(rebalance instanceof Map<?, ?> rebalanceMap)) {
+            return null;
+        }
+        Object hash = ((Map<String, Object>) rebalanceMap).get("actionsHash");
+        return hash == null ? null : hash.toString();
     }
 }
