@@ -41,6 +41,8 @@ curl -H "Authorization: Bearer $TOKEN" \
   - `scores.health/risk/behavior`
   - `metrics.dti/emergencyMonths/netWorth/sharpe/maxDrawdown`
 - `data.trend`:
+  - `labels`：与 `reports` 一一对应（长度恒等于 `reports.length`）
+  - `health/risk/behavior/dti/emergencyMonths/netWorth/sharpe/maxDrawdown`：长度恒等于 `reports.length`，缺失填 `null`
   - `reportCount`
   - `scoreDelta`（health/risk/behavior）
   - `metricDelta`（dti/emergencyMonths/netWorth/sharpe/maxDrawdown）

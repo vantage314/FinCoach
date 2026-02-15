@@ -27,9 +27,14 @@
   - `rebalanceConfirmCount30d`
   - `lastRebalanceConfirmAt`
 
+## 输出格式补充
+- `trend.labels` 与 `reports` 一一对应，长度固定为 `reports.length`，来源 `reportDate`。
+- `trend.health/risk/behavior/dti/emergencyMonths/netWorth/sharpe/maxDrawdown` 均为长度 `N` 的数组，缺失位置填 `null`，不跳过。
+- `scoreDelta` / `metricDelta` 仅在 `N>=2` 且首尾均有值时计算，否则为 `null`。
+
 ## 容错约定
 - metrics JSON 解析失败或字段缺失时，不抛错，相关字段返回 `null`。
-- 报告不足 2 条时，`trend.scoreDelta` / `trend.metricDelta` 返回空对象。
+- 报告不足 2 条时，`scoreDelta` / `metricDelta` 中各字段为 `null`。
 
 ## 安全与约束
 - `/api/app/**` 不接收 `userId`，统一从 `UserContext` 获取。
