@@ -113,3 +113,8 @@ com.fincoach
 
 - 操作更改日志：[`doc/logs-archive/20260215_m5a_behavior_events_ops_log.md`](../logs-archive/20260215_m5a_behavior_events_ops_log.md)
 - 接口操作手册：[`doc/logs-archive/20260215_m5a_behavior_events_runbook.md`](../logs-archive/20260215_m5a_behavior_events_runbook.md)
+
+## M6-1 Trend Logs
+
+- 操作更改日志：[`doc/logs-archive/20260215_m6_1_trend_ops_log.md`](../logs-archive/20260215_m6_1_trend_ops_log.md)
+- 接口操作手册：[`doc/logs-archive/20260215_m6_1_trend_runbook.md`](../logs-archive/20260215_m6_1_trend_runbook.md)
