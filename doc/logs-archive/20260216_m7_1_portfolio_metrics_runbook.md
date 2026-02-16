@@ -14,7 +14,7 @@ Trigger a new report generation to populate metrics.
 
 ```bash
 # Replace YOUR_TOKEN with valid JWT
-curl -X POST http://localhost:8080/api/app/report/generate \
+curl -X POST http://localhost:8080/api/app/health-reports/generate \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json"
 ```
