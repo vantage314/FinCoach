@@ -128,6 +128,7 @@ com.fincoach
 
 ### M7 Portfolio Analysis
 - **M7-1 Portfolio Metrics**: [Ops Log](../logs-archive/20260216_m7_1_portfolio_metrics_ops_log.md) | [Runbook](../logs-archive/20260216_m7_1_portfolio_metrics_runbook.md)
+- **M7-2 Portfolio History**: [Ops Log](../logs-archive/20260216_m7_2_portfolio_history_ops_log.md) | [Runbook](../logs-archive/20260216_m7_2_portfolio_history_runbook.md)
 
 ## M6-3 Admin Dashboard Stats Logs
 
