@@ -30,9 +30,18 @@ SELECT count(*) FROM fc_portfolio_price_snapshot WHERE user_id = ?;
 ```
 *Note: If DB migration failed (due to environment access), this table might not exist. The application handles this gracefully by skipping persistence.*
 
-### Step 4: Fallback Verification
-If you cannot fetch market data (e.g. offline or no positions):
-1. `GET /api/app/portfolio/metrics/latest`
-2. Check response:
-   - `"source": "REPORT_NET_WORTH_APPROX"`
-   - `"warnings": ["MARKET_DATA_FALLBACK_TO_REPORT_APPROX", ...]`
+### Step 4: Fallback & Warning Verification
+1. **Ticker Resolution**:
+   - Create a portfolio with "贵州茅台" or "AAPL" (no suffix).
+   - Check response warnings for `MARKET_DATA_SYMBOL_NORMALIZED`.
+   - Result: `600519.SS` or `AAPL.US` should be used.
+2. **Missing Ticker**:
+   - Create a portfolio with "Unknown Asset".
+   - Check warnings for `POSITION_TICKER_UNRESOLVED`.
+   - Check `source`: `REPORT_NET_WORTH_APPROX` (if all fail).
+
+### Step 5: Snapshot Persistence
+- Default config: `fincoach.portfolio.snapshot.enabled=false`.
+- Verify warning: `SNAPSHOT_PERSIST_SKIPPED` in logs/response (if warnings propagated).
+- To enable: Add `fincoach.portfolio.snapshot.enabled=true` to `application.properties`.
+- Check DB: `SELECT * FROM fc_portfolio_price_snapshot` (Note: Requires DB access).

@@ -11,9 +11,14 @@ Upgrade Portfolio Metrics to use real market data for Volatility and Correlation
   - Fetches CSV from Stooq.
   - Returns `Map<LocalDate, BigDecimal>`.
 - **Builder**: `PortfolioHistoryBuilderMarket`.
-  - Input: Current Positions (Symbol -> Quantity).
-  - Output: `PortfolioInput` (Equity Curve, Returns, Asset Returns).
-  - Logic: Skips gaps, warns on missing symbols.
+  - **Ticker Resolution**: Maps names to tickers (e.g. "茅台" -> "600519.SS"). Returns `POSITION_TICKER_UNRESOLVED` if failed.
+  - **Symbol Normalization**: 
+    - 6 digits starting with 6 -> .SS
+    - 6 digits starting with 0/3 -> .SZ
+    - Alpha only -> .US
+    - Records `MARKET_DATA_SYMBOL_NORMALIZED` warning.
+  - **Robustness**: Catches provider errors, returns empty series instead of failing. Warns `MARKET_DATA_HTTP_ERROR`.
+  - **Persistence**: Controlled by `fincoach.portfolio.snapshot.enabled` (default false). Warns `SNAPSHOT_PERSIST_SKIPPED` if disabled/failed.
 - **Facade**: `PortfolioHistoryFacade`.
   - Tries `buildFromMarketData`.
   - If fails or insufficient points (<2), falls back to `PortfolioHistoryBuilder` (Report Approx).

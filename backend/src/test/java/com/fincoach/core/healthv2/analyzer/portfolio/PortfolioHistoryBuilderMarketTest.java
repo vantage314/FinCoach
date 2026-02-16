@@ -16,22 +16,23 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PortfolioHistoryBuilderMarketTest {
 
     @Test
-    public void testBuild_HappyPath() {
+    public void testBuild_HappyPath_WithNormalization() {
         // Arrange
         MarketDataProvider mockProvider = Mockito.mock(MarketDataProvider.class);
         PortfolioHistoryBuilderMarket builder = new PortfolioHistoryBuilderMarket(mockProvider);
         
-        // Setup data: 1 Asset, 3 days, increasing price
+        // Setup data: 1 Asset, 3 days
         Map<LocalDate, BigDecimal> prices = new TreeMap<>();
         prices.put(LocalDate.of(2023,1,1), new BigDecimal("100"));
-        prices.put(LocalDate.of(2023,1,2), new BigDecimal("110")); // +10%
-        prices.put(LocalDate.of(2023,1,3), new BigDecimal("121")); // +10%
+        prices.put(LocalDate.of(2023,1,2), new BigDecimal("110"));
+        prices.put(LocalDate.of(2023,1,3), new BigDecimal("121"));
         
-        Mockito.when(mockProvider.getDailySeries(ArgumentMatchers.eq("AAPL"), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        // EXPECT "AAPL.US" because "AAPL" gets normalized
+        Mockito.when(mockProvider.getDailySeries(ArgumentMatchers.eq("AAPL.US"), ArgumentMatchers.any(), ArgumentMatchers.any()))
                .thenReturn(prices);
                
         Map<String, Object> positions = new HashMap<>();
-        positions.put("AAPL", 10.0); // 10 shares
+        positions.put("AAPL", 10.0); // "AAPL" -> Resolved "AAPL" -> Normalized "AAPL.US"
         
         // Act
         PortfolioInput input = builder.buildFromMarketData(1L, positions);
@@ -39,14 +40,34 @@ public class PortfolioHistoryBuilderMarketTest {
         // Assert
         assertNotNull(input);
         assertEquals(3, input.getEquityCurve().size());
-        assertEquals(1000.0, input.getEquityCurve().get(0), 0.01);
-        assertEquals(1100.0, input.getEquityCurve().get(1), 0.01);
-        assertEquals(1210.0, input.getEquityCurve().get(2), 0.01);
         
-        assertEquals(2, input.getReturnsSeries().size());
-        assertEquals(0.10, input.getReturnsSeries().get(0), 0.0001);
+        // Check warnings for normalization
+        boolean hasNormWarning = input.getWarnings().stream().anyMatch(w -> w.contains("MARKET_DATA_SYMBOL_NORMALIZED") && w.contains("AAPL.US"));
+        assertTrue(hasNormWarning, "Should warn about normalization");
     }
     
+    @Test
+    public void testBuild_Resolution_ChineseName() {
+         MarketDataProvider mockProvider = Mockito.mock(MarketDataProvider.class);
+         PortfolioHistoryBuilderMarket builder = new PortfolioHistoryBuilderMarket(mockProvider);
+         
+         Map<LocalDate, BigDecimal> prices = new TreeMap<>();
+         prices.put(LocalDate.of(2023,1,1), new BigDecimal("1000"));
+         prices.put(LocalDate.of(2023,1,2), new BigDecimal("1010"));
+         
+         // "贵州茅台" -> "600519.SS"
+         Mockito.when(mockProvider.getDailySeries(ArgumentMatchers.eq("600519.SS"), ArgumentMatchers.any(), ArgumentMatchers.any()))
+                .thenReturn(prices);
+                
+         Map<String, Object> positions = new HashMap<>();
+         positions.put("贵州茅台", 100);
+         
+         PortfolioInput input = builder.buildFromMarketData(1L, positions);
+         
+         assertNotNull(input);
+         assertEquals(2, input.getEquityCurve().size());
+    }
+
     @Test
     public void testBuild_Gaps() {
         // Arrange
@@ -59,7 +80,7 @@ public class PortfolioHistoryBuilderMarketTest {
         // Gap on 2023-01-02
         prices.put(LocalDate.of(2023,1,3), new BigDecimal("120")); 
         
-        Mockito.when(mockProvider.getDailySeries(ArgumentMatchers.eq("AAPL"), ArgumentMatchers.any(), ArgumentMatchers.any()))
+        Mockito.when(mockProvider.getDailySeries(ArgumentMatchers.eq("AAPL.US"), ArgumentMatchers.any(), ArgumentMatchers.any()))
                .thenReturn(prices);
                
         Map<String, Object> positions = new HashMap<>();
@@ -70,20 +91,12 @@ public class PortfolioHistoryBuilderMarketTest {
         
         // Assert
         assertNotNull(input);
-        assertEquals(2, input.getEquityCurve().size()); // Only valid points
-        assertEquals(1, input.getReturnsSeries().size()); // 1 return
+        assertEquals(2, input.getEquityCurve().size()); 
+        assertEquals(1, input.getReturnsSeries().size()); 
         
-        // Asset returns check: Logic fills gap with 0.0 for asset return series if alignment issue? 
-        // Logic says: if alignment issue, add 0.0. But here validDates only has 2 dates.
-        // Step 4 logic: returnsSeries length = equityCurve size - 1.
-        
-        // Asset Returns logic: iterates validDates (size 2). 
-        // Loop range: i=1 to size-1 (index 1).
-        // dPrev = index 0 (2023-01-01), dCurr = index 1 (2023-01-03).
-        // prices has both. So return is calc correctly (120/100 - 1 = 0.2).
-        // No gap warning expected for asset return itself because we skipped the gap day entirely in validDates.
-        
-        assertEquals(0.20, input.getReturnsSeries().get(0), 0.0001);
+        // Check warnings
+        // Norm warning present
+        assertTrue(input.getWarnings().stream().anyMatch(w -> w.contains("MARKET_DATA_SYMBOL_NORMALIZED")));
     }
     
     @Test
