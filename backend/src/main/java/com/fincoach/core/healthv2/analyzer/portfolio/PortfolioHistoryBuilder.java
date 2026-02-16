@@ -48,9 +48,6 @@ public class PortfolioHistoryBuilder {
         List<String> warnings = new ArrayList<>();
         warnings.add("CORR_PROXY_ALLOCATION_DRIFT");
 
-        List<String> warnings = new ArrayList<>();
-        warnings.add("CORR_PROXY_ALLOCATION_DRIFT");
-
         // 1. Fetch recent reports (time desc)
         List<FcHealthReportEntity> history = reportMapper.selectList(
                 new LambdaQueryWrapper<FcHealthReportEntity>()

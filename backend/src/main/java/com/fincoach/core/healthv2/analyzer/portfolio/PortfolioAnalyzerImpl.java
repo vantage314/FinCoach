@@ -13,7 +13,7 @@ public class PortfolioAnalyzerImpl implements PortfolioAnalyzer {
     @Override
     public PortfolioMetrics analyze(PortfolioInput input) {
         if (input == null) {
-            input = new PortfolioInput(null, null, null, null);
+            input = new PortfolioInput(null, null, null, null, null);
         }
 
         PortfolioMetrics metrics = new PortfolioMetrics();

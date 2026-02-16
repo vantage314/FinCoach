@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fincoach.core.healthv2.analyzer.PortfolioPerformanceAnalyzer;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioAnalyzer;
-import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioHistoryBuilder;
+import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioHistoryFacade;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioInput;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioMetrics;
 import com.fincoach.core.healthv2.analyzer.RebalanceAdvisor;
@@ -63,7 +63,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     @Autowired
     private PortfolioAnalyzer portfolioAnalyzer;
     @Autowired
-    private PortfolioHistoryBuilder portfolioHistoryBuilder;
+    private PortfolioHistoryFacade portfolioHistoryFacade;
+    // Removed direct use of PortfolioHistoryBuilder, using Facade instead
     @Autowired
     private RebalanceAdvisor rebalanceAdvisor;
     @Autowired
@@ -217,11 +218,17 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
         // M7-1: Advanced Portfolio Metrics
         try {
-            // M7-2: Build history from recent reports (Approx)
-            PortfolioInput input = portfolioHistoryBuilder.buildFromRecentReports(
-                    userId, netWorth, allocation);
+            // M7-3: Use Facade (Market Data -> Fallback Report History)
+            // Extract positions. CURRENTLY MOCKING POSITIONS as M1 doesn't have per-symbol qty.
+            // In real world, we'd query fc_asset details.
+            // For MVP integration test, we can pass null positions to test fallback.
+            // OR if we want to test happy path, we need to fake some positions if not in DB.
+            Map<String, Object> positions = new HashMap<>(); // Empty triggers fallback
             
-            // If the builder returned empty/null for some reason, fallback to defaults
+            PortfolioHistoryFacade.FacadeResult result = portfolioHistoryFacade.build(userId, netWorth, allocation, positions);
+            PortfolioInput input = result.input;
+            
+            // If even fallback failed, use empty default
             if (input == null) {
                  input = PortfolioInput.builder()
                     .rfAnnual(HealthV2ConfigDefaults.DEFAULT_RF_ANNUAL)
@@ -258,12 +265,12 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                 
                 // Add Source Info & Warnings
                 List<String> w = pm.getWarnings() != null ? new ArrayList<>(pm.getWarnings()) : new ArrayList<>();
-                w.add("HISTORY_BUILT_FROM_REPORTS_APPROX");
+                // Facade handles fallback warning. We just need to ensure source is correct.
                 portfolioMetrics.put("warnings", w);
-                portfolioMetrics.put("source", "REPORT_NET_WORTH_APPROX");
+                portfolioMetrics.put("source", result.source);
             }
         } catch (Exception e) {
-             log.error("[HealthV2-Report] PortfolioAnalyzer M7-1 异常", e);
+             log.error("[HealthV2-Report] PortfolioAnalyzer M7-1/M7-3 异常", e);
              @SuppressWarnings("unchecked")
              List<String> w = (List<String>) portfolioMetrics.getOrDefault("warnings", new ArrayList<>());
              w.add("PORTFOLIO_METRICS_ERROR: " + e.getMessage());
