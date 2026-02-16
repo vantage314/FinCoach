@@ -8,6 +8,12 @@ public final class HealthV2ConfigDefaults {
 
     private HealthV2ConfigDefaults() {}
 
+    // Annual risk-free rate (2%)
+    public static final double DEFAULT_RF_ANNUAL = 0.02;
+
+    // High correlation threshold
+    public static final double DEFAULT_CORR_HIGH_THRESHOLD = 0.75;
+
     public static final String DEFAULT_SCORE_RULE_WEIGHTS_JSON =
             "{\"health\":{\"Liquidity\":25,\"DebtHealth\":25,\"Diversification\":20,\"RiskAdjustedReturn\":15,\"Behavior\":15},"
                     + "\"risk\":{\"EquityRatio\":25,\"MaxDrawdown\":20,\"Concentration\":20,\"CashflowFragility\":20,\"NetWorthNegative\":15},"

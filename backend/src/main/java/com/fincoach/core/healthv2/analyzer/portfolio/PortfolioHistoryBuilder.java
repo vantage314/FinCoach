@@ -3,7 +3,7 @@ package com.fincoach.core.healthv2.analyzer.portfolio;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fincoach.core.healthv2.common.HealthV2ConfigDefaults;
+import com.fincoach.core.healthv2.util.HealthV2ConfigDefaults;
 import com.fincoach.core.healthv2.entity.FcHealthReportEntity;
 import com.fincoach.core.healthv2.mapper.FcHealthReportMapper;
 import lombok.extern.slf4j.Slf4j;
