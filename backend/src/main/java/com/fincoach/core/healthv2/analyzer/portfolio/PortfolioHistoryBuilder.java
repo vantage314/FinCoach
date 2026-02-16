@@ -46,6 +46,10 @@ public class PortfolioHistoryBuilder {
         builder.rfAnnual(HealthV2ConfigDefaults.DEFAULT_RF_ANNUAL); // Default Rf
 
         List<String> warnings = new ArrayList<>();
+        warnings.add("CORR_PROXY_ALLOCATION_DRIFT");
+
+        List<String> warnings = new ArrayList<>();
+        warnings.add("CORR_PROXY_ALLOCATION_DRIFT");
 
         // 1. Fetch recent reports (time desc)
         List<FcHealthReportEntity> history = reportMapper.selectList(
@@ -91,66 +95,50 @@ public class PortfolioHistoryBuilder {
 
         // 4. Build Returns Series (Total Portfolio)
         // r_t = (eq_t / eq_t-1) - 1
+        // Fix M7-2: Skip invalid points, do not assume 0.
         List<Double> returnsSeries = new ArrayList<>();
         for (int i = 1; i < snapshots.size(); i++) {
             double prev = snapshots.get(i - 1).netWorth;
             double curr = snapshots.get(i).netWorth;
-            if (prev <= 0) {
-                // Cannot calculate return if prev is 0 or negative (edge case handling)
-                returnsSeries.add(0.0);
+            if (prev <= 0 || curr <= 0) {
+                // Invalid equity point, skip return calculation
+                if (!warnings.contains("RETURN_POINT_SKIPPED")) {
+                    warnings.add("RETURN_POINT_SKIPPED");
+                }
             } else {
                 returnsSeries.add((curr / prev) - 1.0);
             }
         }
+        
         builder.returnsSeries(returnsSeries);
 
         // 5. Build Proxy Asset Returns for Correlation
-        // Strategy: Track the change in "Asset Class Amount".
-        // This is a proxy. Ideally we want Price Change, but we don't have prices.
-        // We assume rebalancing isn't drastic between reports so Amount Change ~ Performance + Contribution.
-        // It's an approximation.
+        // Strategy M7-2 (refined): Track Allocation Drift (alloc[i] - alloc[i-1])
+        // This is a proxy for "relative performance + active change".
         Map<String, List<Double>> assetReturns = new HashMap<>();
         Set<String> allKeys = new HashSet<>();
         for (Snapshot s : snapshots) {
             if (s.allocation != null) allKeys.addAll(s.allocation.keySet());
         }
-
-        // For each asset type, build a return series
+        
         for (String key : allKeys) {
             List<Double> series = new ArrayList<>();
-            // We need returns, so size will be N-1
-            boolean valid = true;
             for (int i = 1; i < snapshots.size(); i++) {
                 Snapshot prevS = snapshots.get(i - 1);
                 Snapshot currS = snapshots.get(i);
                 
-                // Implied amount = Total NetWorth * Allocation Ratio ?
-                // NetWorth includes debt. We really want Total Assets.
-                // But we parsed NetWorth.
-                // Let's assume allocation is % of Total Assets.
-                // We should ideally track TotalAssets in snapshot.
-                // But parseReport extracts from metrics.portfolio.netWorth (as per prompt).
-                // Actually prompt says "metricsJson -> portfolio.netWorth (or totalAssets)".
-                // Let's stick to using NetWorth as body for now, or refine Parse to read TotalAssets.
+                Double prevAlloc = prevS.allocation != null ? prevS.allocation.getOrDefault(key, 0.0) : 0.0;
+                Double currAlloc = currS.allocation != null ? currS.allocation.getOrDefault(key, 0.0) : 0.0;
                 
-                // Let's try to calculate an "Asset Amount" proxy: NetWorth * Ratio (very rough if debt high)
-                // Refinement: parseReport should try to get totalAssets.
-                
-                Double prevAmt = getAssetAmount(prevS, key);
-                Double currAmt = getAssetAmount(currS, key);
-                
-                if (prevAmt == null || currAmt == null || prevAmt <= 1.0) {
-                     // Can't calc return, assume 0
-                     series.add(0.0);
-                } else {
-                     series.add((currAmt / prevAmt) - 1.0);
-                }
+                // Drift = curr - prev
+                series.add(currAlloc - prevAlloc);
             }
             if (series.size() >= MIN_POINTS - 1) {
                 assetReturns.put(key, series);
             }
         }
         builder.returnsByAssetKey(assetReturns);
+        builder.warnings(warnings);
 
         return builder.build();
     }

@@ -35,4 +35,9 @@ public class PortfolioInput {
      * Used for Correlation Matrix
      */
     private Map<String, List<Double>> returnsByAssetKey;
+
+    /**
+     * Warnings collected during input building (e.g. data gaps)
+     */
+    private List<String> warnings;
 }

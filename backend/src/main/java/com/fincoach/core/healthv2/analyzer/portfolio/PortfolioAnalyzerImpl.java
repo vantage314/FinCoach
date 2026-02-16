@@ -17,7 +17,11 @@ public class PortfolioAnalyzerImpl implements PortfolioAnalyzer {
         }
 
         PortfolioMetrics metrics = new PortfolioMetrics();
-        metrics.setWarnings(new ArrayList<>());
+        List<String> w = new ArrayList<>();
+        if (input.getWarnings() != null) {
+            w.addAll(input.getWarnings());
+        }
+        metrics.setWarnings(w);
         
         try {
             calculateSharpe(input, metrics);
