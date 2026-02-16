@@ -46,20 +46,23 @@ curl -X GET http://localhost:8080/api/app/portfolio/metrics/latest \
     "code": 200,
     "data": {
         "performance": {
-            "sharpe": 0.0,         // Should be a number (or 0.0 if flat)
-            "maxDrawdown": 0.0     // Should be a number
+            "sharpe": 0.0,         // Null or 0.0 if not enough distinct points
+            "maxDrawdown": 0.0     // Real value
         },
         "source": "REPORT_NET_WORTH_APPROX",
         "warnings": [
-            "HISTORY_BUILT_FROM_REPORTS_APPROX"
+            "HISTORY_BUILT_FROM_REPORTS_APPROX",
+            "CORR_PROXY_ALLOCATION_DRIFT"
         ]
     }
 }
 ```
-*Note: If you just generated rapid reports with no asset value change, Sharpe might be 0 or NaN (handled as null), but `source` must be present.*
+*Note: If Sharpe is null, it means there are fewer than 2 valid return points (e.g. flat net worth). Check `warnings` for `RETURN_POINT_SKIPPED`.*
 
 ### Step 4: Database Check
 ```sql
 SELECT metrics_json FROM fc_health_report ORDER BY id DESC LIMIT 1;
 ```
-Verify `metrics_json` contains `"source": "REPORT_NET_WORTH_APPROX"`.
+Verify `metrics_json` contains:
+- `"source": "REPORT_NET_WORTH_APPROX"`
+- `"warnings": [...]` (Should list approximation warnings)
