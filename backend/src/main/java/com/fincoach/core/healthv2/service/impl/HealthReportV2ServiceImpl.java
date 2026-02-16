@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fincoach.core.healthv2.analyzer.PortfolioPerformanceAnalyzer;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioAnalyzer;
+import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioHistoryBuilder;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioInput;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioMetrics;
 import com.fincoach.core.healthv2.analyzer.RebalanceAdvisor;
@@ -61,6 +62,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     private PortfolioPerformanceAnalyzer performanceAnalyzer;
     @Autowired
     private PortfolioAnalyzer portfolioAnalyzer;
+    @Autowired
+    private PortfolioHistoryBuilder portfolioHistoryBuilder;
     @Autowired
     private RebalanceAdvisor rebalanceAdvisor;
     @Autowired
@@ -214,12 +217,17 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
         // M7-1: Advanced Portfolio Metrics
         try {
-             PortfolioInput input = PortfolioInput.builder()
+            // M7-2: Build history from recent reports (Approx)
+            PortfolioInput input = portfolioHistoryBuilder.buildFromRecentReports(
+                    userId, netWorth, allocation);
+            
+            // If the builder returned empty/null for some reason, fallback to defaults
+            if (input == null) {
+                 input = PortfolioInput.builder()
                     .rfAnnual(HealthV2ConfigDefaults.DEFAULT_RF_ANNUAL)
-                    .returnsSeries(null)
-                    .equityCurve(null)
-                    .returnsByAssetKey(null)
                     .build();
+            }
+
             PortfolioMetrics pm = portfolioAnalyzer.analyze(input);
             if (pm != null) {
                 performance.put("sharpe", pm.getSharpe());
@@ -247,7 +255,12 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                 }
                 correlation.put("highPairs", highPairs);
                 portfolioMetrics.put("correlation", correlation);
-                portfolioMetrics.put("warnings", pm.getWarnings());
+                
+                // Add Source Info & Warnings
+                List<String> w = pm.getWarnings() != null ? new ArrayList<>(pm.getWarnings()) : new ArrayList<>();
+                w.add("HISTORY_BUILT_FROM_REPORTS_APPROX");
+                portfolioMetrics.put("warnings", w);
+                portfolioMetrics.put("source", "REPORT_NET_WORTH_APPROX");
             }
         } catch (Exception e) {
              log.error("[HealthV2-Report] PortfolioAnalyzer M7-1 异常", e);
