@@ -20,6 +20,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class AdviceEngineCashflowDebtTest {
@@ -62,14 +63,64 @@ public class AdviceEngineCashflowDebtTest {
     }
 
     @Test
-    public void testBuildDoesNotThrowWhenEvidenceValuesMissing() {
+    public void testWarningsWhenAllInputsMissing() {
         AdviceEngineV2 engine = new AdviceEngineV2(null, null);
 
-        AdviceEngineResult result = assertDoesNotThrow(() ->
-                engine.build(null, null, null, null, null));
+        AdviceEngineResult result = assertDoesNotThrow(() -> engine.build(null, null, null, null, null));
 
         assertNotNull(result);
         assertNotNull(result.getAdvices());
+        assertNotNull(warnings(result));
+        assertTrue(warnings(result).contains(AdviceWarningCodes.MISSING_ASSETS));
+        assertTrue(warnings(result).contains(AdviceWarningCodes.MISSING_LIABILITIES));
+        assertTrue(warnings(result).contains(AdviceWarningCodes.MISSING_CASHFLOW));
+        assertTrue(warnings(result).contains(AdviceWarningCodes.MISSING_ALLOCATION));
+        assertTrue(warnings(result).contains(AdviceWarningCodes.MISSING_TOTAL_ASSETS));
+    }
+
+    @Test
+    public void testWarningsWhenCashflowPresentAllocationMissing() {
+        AdviceEngineV2 engine = new AdviceEngineV2(null, null);
+
+        FcCashflowEntity cashflow = new FcCashflowEntity();
+        cashflow.setIncome(new BigDecimal("8000"));
+        cashflow.setFixedExpense(new BigDecimal("2000"));
+        cashflow.setVariableExpense(new BigDecimal("1500"));
+        cashflow.setMonthlyDebtPayment(new BigDecimal("800"));
+
+        List<FcAssetEntity> assets = List.of(asset("CASH", "5000"));
+        List<com.fincoach.core.healthv2.entity.FcLiabilityEntity> liabilities = List.of(new com.fincoach.core.healthv2.entity.FcLiabilityEntity());
+
+        AdviceEngineResult result = assertDoesNotThrow(() ->
+                engine.build(assets, liabilities, cashflow, null, new BigDecimal("50000")));
+
+        assertNotNull(result);
+        assertNotNull(result.getAdvices());
+        assertNotNull(warnings(result));
+        assertTrue(warnings(result).contains(AdviceWarningCodes.MISSING_ALLOCATION));
+    }
+
+    @Test
+    public void testWarningsWhenTotalAssetsMissingButAssetsPresent() {
+        AdviceEngineV2 engine = new AdviceEngineV2(null, null);
+
+        FcCashflowEntity cashflow = new FcCashflowEntity();
+        cashflow.setIncome(new BigDecimal("9000"));
+        cashflow.setFixedExpense(new BigDecimal("3000"));
+        cashflow.setVariableExpense(new BigDecimal("2000"));
+        cashflow.setMonthlyDebtPayment(new BigDecimal("500"));
+
+        List<FcAssetEntity> assets = List.of(asset("CASH", "12000"));
+        List<com.fincoach.core.healthv2.entity.FcLiabilityEntity> liabilities = List.of(new com.fincoach.core.healthv2.entity.FcLiabilityEntity());
+        Map<String, Object> allocation = Map.of("CASH", new BigDecimal("1.0"));
+
+        AdviceEngineResult result = assertDoesNotThrow(() ->
+                engine.build(assets, liabilities, cashflow, allocation, null));
+
+        assertNotNull(result);
+        assertNotNull(result.getAdvices());
+        assertNotNull(warnings(result));
+        assertTrue(warnings(result).contains(AdviceWarningCodes.MISSING_TOTAL_ASSETS));
     }
 
     private AdviceDTO getAdvice(AdviceEngineResult result, String code) {
@@ -110,5 +161,14 @@ public class AdviceEngineCashflowDebtTest {
                 params,
                 List.of(),
                 List.of());
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> warnings(AdviceEngineResult result) {
+        Object warnings = result.getMeta().get("warnings");
+        if (warnings instanceof List) {
+            return (List<String>) warnings;
+        }
+        return List.of();
     }
 }
