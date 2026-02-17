@@ -24,6 +24,7 @@ Provide a stable, explainable correlation matrix output for portfolio analysis, 
 
 ## How to verify
 - `cd backend && mvn clean test`
+- Latest run: `Tests run: 53, Failures: 0, Errors: 0, Skipped: 0` + `BUILD SUCCESS`
 
 ## Rollback
-- `git revert <commit_sha>`
+- `git revert bb4b6c9d 519abe17 0831bfac`
