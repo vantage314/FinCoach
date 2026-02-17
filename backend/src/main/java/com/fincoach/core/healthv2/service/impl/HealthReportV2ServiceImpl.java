@@ -18,6 +18,8 @@ import com.fincoach.core.healthv2.analyzer.RebalanceAdvisor;
 import com.fincoach.core.healthv2.analyzer.ScoreEngine;
 import com.fincoach.core.healthv2.analyzer.DebtCashflowV1Builder;
 import com.fincoach.core.healthv2.analyzer.DebtCashflowV1Result;
+import com.fincoach.core.healthv2.analyzer.DebtOptimizerV1Builder;
+import com.fincoach.core.healthv2.analyzer.DebtOptimizerV1Result;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizer;
 import com.fincoach.core.healthv2.analyzer.CashflowPlanner;
 import com.fincoach.core.healthv2.analyzer.GoalPlanner;
@@ -200,6 +202,9 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         List<Map<String, Object>> rebalanceV1WarningDetails = new ArrayList<>();
         List<String> debtCashflowWarnings = new ArrayList<>();
         List<Map<String, Object>> debtCashflowWarningDetails = new ArrayList<>();
+        List<String> debtOptimizerWarnings = new ArrayList<>();
+        List<Map<String, Object>> debtOptimizerWarningDetails = new ArrayList<>();
+        DebtOptimizerV1Result debtOptimizerV1 = null;
 
         // 资产类别占比（M1 简版）
         Map<String, Object> allocation = new LinkedHashMap<>();
@@ -403,6 +408,27 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                 snapshot.setDebtCashflowSummary(summary);
             });
         }
+        if (debtCashflowResult != null) {
+            debtOptimizerV1 = new DebtOptimizerV1Builder().build(
+                    liabilities, monthlySurplus, debtCashflowResult.getStressLevel(), scoreRuleSnapshot);
+            debtOptimizerWarnings = debtOptimizerV1.getWarnings();
+            debtOptimizerWarningDetails = debtOptimizerV1.getWarningDetails();
+            DebtOptimizerV1Result debtOptimizerFinal = debtOptimizerV1;
+            List<String> debtOptimizerWarningsFinal = debtOptimizerWarnings == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(debtOptimizerWarnings);
+            PortfolioDebugContextHolder.record(snapshot -> {
+                PortfolioMarketDebugSnapshot.DebtOptimizerSummary summary = new PortfolioMarketDebugSnapshot.DebtOptimizerSummary();
+                summary.setStrategy(debtOptimizerFinal.getStrategy());
+                summary.setTopDebtName(debtOptimizerFinal.getTopDebtName());
+                summary.setBudgetForExtraPayment(
+                        debtOptimizerFinal.getBudgetForExtraPayment() == null
+                                ? null
+                                : debtOptimizerFinal.getBudgetForExtraPayment().doubleValue());
+                summary.setWarningsCount(debtOptimizerWarningsFinal.size());
+                snapshot.setDebtOptimizerSummary(summary);
+            });
+        }
 
         // --- 2e. 目标模块 ---
         Map<String, Object> goalsMetrics = new LinkedHashMap<>();
@@ -566,14 +592,19 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             if (debtCashflowResult != null) {
                 adviceV2Payload.put("debtCashflowAdviceV1", debtCashflowResult.getAdvice());
             }
+            if (debtOptimizerV1 != null) {
+                adviceV2Payload.put("debtOptimizerV1", debtOptimizerV1.toAdviceMap());
+            }
             Map<String, Object> meta = adviceV2.getMeta();
             if (meta != null) {
                 List<String> mergedCodes = mergeWarningCodes(meta.get("warnings"), corrWarnings);
                 mergedCodes = mergeWarningCodes(mergedCodes, rebalanceV1Warnings);
                 mergedCodes = mergeWarningCodes(mergedCodes, debtCashflowWarnings);
+                mergedCodes = mergeWarningCodes(mergedCodes, debtOptimizerWarnings);
                 List<Map<String, Object>> mergedDetails = mergeWarningDetails(meta.get("warningDetails"), corrWarningDetails);
                 mergedDetails = mergeWarningDetails(mergedDetails, rebalanceV1WarningDetails);
                 mergedDetails = mergeWarningDetails(mergedDetails, debtCashflowWarningDetails);
+                mergedDetails = mergeWarningDetails(mergedDetails, debtOptimizerWarningDetails);
                 meta.put("warnings", mergedCodes);
                 meta.put("warningDetails", mergedDetails);
             }
@@ -619,6 +650,15 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                 debtCashflowResult == null ? null : debtCashflowResult.getEmergencyFundMonths(),
                 debtCashflowResult == null ? null : debtCashflowResult.getStressLevel(),
                 debtCashflowWarnings);
+        if (debtOptimizerV1 != null) {
+            log.info("[HealthV2-Report] event=DEBT_OPTIMIZER_V1 userId={} reportId={} strategy={} budgetExtra={} topDebt={} warnings={} recommendation={}",
+                    userId, entity.getId(),
+                    debtOptimizerV1.getStrategy(),
+                    debtOptimizerV1.getBudgetForExtraPayment(),
+                    debtOptimizerV1.getTopDebtName(),
+                    debtOptimizerWarnings,
+                    debtOptimizerV1.getTradeoffHint() == null ? null : debtOptimizerV1.getTradeoffHint().get("recommendation"));
+        }
 
         // ========= 5.1 写入行为事件（M5-A） =========
         try {

@@ -49,6 +49,10 @@ public final class ScoreRuleDefaults {
     public static final String EMERGENCY_MONTHS_OK = "EMERGENCY_MONTHS_OK";
     public static final String DEBT_TO_ASSETS_HIGH = "DEBT_TO_ASSETS_HIGH";
     public static final String LIQUID_ASSET_ESTIMATE_RATIO = "LIQUID_ASSET_ESTIMATE_RATIO";
+    public static final String DEBT_OPTIMIZER_STRATEGY = "DEBT_OPTIMIZER_STRATEGY";
+    public static final String DEBT_OPTIMIZER_EXTRA_PAY_RATIO = "DEBT_OPTIMIZER_EXTRA_PAY_RATIO";
+    public static final String DEBT_OPTIMIZER_EXPECTED_RETURN = "DEBT_OPTIMIZER_EXPECTED_RETURN";
+    public static final String DEBT_OPTIMIZER_RETURN_MARGIN = "DEBT_OPTIMIZER_RETURN_MARGIN";
 
     private static final Map<String, ScoreRuleParamDefinition> DEFAULT_PARAMS;
 
@@ -159,6 +163,18 @@ public final class ScoreRuleDefaults {
         map.put(LIQUID_ASSET_ESTIMATE_RATIO, new ScoreRuleParamDefinition(
                 LIQUID_ASSET_ESTIMATE_RATIO, ScoreRuleValueType.DECIMAL, "0.10",
                 BigDecimal.ZERO, BigDecimal.ONE, "Liquid asset estimate ratio"));
+        map.put(DEBT_OPTIMIZER_STRATEGY, new ScoreRuleParamDefinition(
+                DEBT_OPTIMIZER_STRATEGY, ScoreRuleValueType.STRING, "AVALANCHE",
+                null, null, "Debt optimizer default strategy"));
+        map.put(DEBT_OPTIMIZER_EXTRA_PAY_RATIO, new ScoreRuleParamDefinition(
+                DEBT_OPTIMIZER_EXTRA_PAY_RATIO, ScoreRuleValueType.DECIMAL, "0.50",
+                BigDecimal.ZERO, BigDecimal.ONE, "Debt optimizer extra payment ratio"));
+        map.put(DEBT_OPTIMIZER_EXPECTED_RETURN, new ScoreRuleParamDefinition(
+                DEBT_OPTIMIZER_EXPECTED_RETURN, ScoreRuleValueType.DECIMAL, "0.06",
+                BigDecimal.ZERO, BigDecimal.ONE, "Expected investment return"));
+        map.put(DEBT_OPTIMIZER_RETURN_MARGIN, new ScoreRuleParamDefinition(
+                DEBT_OPTIMIZER_RETURN_MARGIN, ScoreRuleValueType.DECIMAL, "0.01",
+                BigDecimal.ZERO, BigDecimal.ONE, "Debt vs investment margin"));
 
         DEFAULT_PARAMS = Collections.unmodifiableMap(map);
     }
