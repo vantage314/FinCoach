@@ -170,14 +170,14 @@ public class DebtCashflowV1Builder {
                     "DEBT_DTI_HIGH", "降低负债压力",
                     "DTI=" + formatPercent(dti) + "，高于阈值" + formatPercent(thresholds.getDtiHigh())
                             + "，建议控制月供/优化债务/增收节支。",
-                    "P0",
+                    1,
                     List.of("dti")));
         } else if (dti != null && dti >= thresholds.getDtiMed()) {
             advices.add(adviceItem(
                     "DEBT_DTI_ELEVATED", "负债压力偏高",
                     "DTI=" + formatPercent(dti) + "，接近阈值" + formatPercent(thresholds.getDtiHigh())
                             + "，建议控制负债增长。",
-                    "P1",
+                    2,
                     List.of("dti")));
         }
 
@@ -186,14 +186,14 @@ public class DebtCashflowV1Builder {
             advices.add(adviceItem(
                     "CASHFLOW_NEGATIVE", "现金流为负，先止血",
                     "结余率=" + formatPercent(surplusRate) + "，现金流为负，优先缩减支出或增加收入。",
-                    "P0",
+                    1,
                     List.of("surplusRate")));
         } else if (surplusRate != null && surplusRate < thresholds.getSurplusRateMin()) {
             advices.add(adviceItem(
                     "CASHFLOW_LOW_SURPLUS", "提升结余率",
                     "结余率=" + formatPercent(surplusRate) + "，低于阈值" + formatPercent(thresholds.getSurplusRateMin())
                             + "，建议优化支出结构。",
-                    "P1",
+                    2,
                     List.of("surplusRate")));
         }
 
@@ -203,14 +203,14 @@ public class DebtCashflowV1Builder {
                     "EMERGENCY_FUND_LOW", "优先建立应急金",
                     "应急金=" + formatDecimal(emergencyMonths) + "个月，低于" + formatDecimal(thresholds.getEmergencyLow())
                             + "个月，建议优先补足储备。",
-                    "P0",
+                    1,
                     List.of("emergencyFundMonths")));
         } else if (emergencyMonths != null && emergencyMonths < thresholds.getEmergencyOk()) {
             advices.add(adviceItem(
                     "EMERGENCY_FUND_MED", "提高应急金覆盖",
                     "应急金=" + formatDecimal(emergencyMonths) + "个月，低于" + formatDecimal(thresholds.getEmergencyOk())
                             + "个月，建议逐步提高。",
-                    "P1",
+                    2,
                     List.of("emergencyFundMonths")));
         }
 
@@ -220,7 +220,7 @@ public class DebtCashflowV1Builder {
                     "DEBT_TO_ASSETS_HIGH", "限制新增负债",
                     "负债占比=" + formatPercent(debtToAssets.doubleValue()) + "，高于阈值"
                             + formatPercent(thresholds.getDebtToAssetsHigh()) + "，建议限制新增负债并提升净资产。",
-                    "P1",
+                    2,
                     List.of("debtToAssets")));
         }
 
@@ -233,7 +233,7 @@ public class DebtCashflowV1Builder {
     private Map<String, Object> adviceItem(String code,
                                            String title,
                                            String detail,
-                                           String priority,
+                                           int priority,
                                            List<String> relatedMetrics) {
         Map<String, Object> item = new LinkedHashMap<>();
         item.put("code", code);

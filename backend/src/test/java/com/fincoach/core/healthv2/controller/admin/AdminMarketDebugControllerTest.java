@@ -69,6 +69,13 @@ public class AdminMarketDebugControllerTest {
         matrix.setMethod("pearson");
         matrix.setSampleSize(12);
         snapshot.setCorrelationMatrix(matrix);
+        PortfolioMarketDebugSnapshot.DebtCashflowSummary debtCashflowSummary = new PortfolioMarketDebugSnapshot.DebtCashflowSummary();
+        debtCashflowSummary.setDti(0.25);
+        debtCashflowSummary.setSurplusRate(0.08);
+        debtCashflowSummary.setEmergencyFundMonths(2.5);
+        debtCashflowSummary.setStressLevel("MED");
+        debtCashflowSummary.setWarningsCount(2);
+        snapshot.setDebtCashflowSummary(debtCashflowSummary);
         PortfolioDebugContextHolder.enableCapture();
         PortfolioDebugContextHolder.set(snapshot);
 
@@ -82,6 +89,11 @@ public class AdminMarketDebugControllerTest {
                 .andExpect(jsonPath("$.data.correlationMatrixSummary.sampleSize").value(12))
                 .andExpect(jsonPath("$.data.correlationMatrix.assets[0]").value("A"))
                 .andExpect(jsonPath("$.data.correlationMatrix.matrix[0][0]").value(1.0))
+                .andExpect(jsonPath("$.data.debtCashflowSummary.dti").value(0.25))
+                .andExpect(jsonPath("$.data.debtCashflowSummary.surplusRate").value(0.08))
+                .andExpect(jsonPath("$.data.debtCashflowSummary.emergencyFundMonths").value(2.5))
+                .andExpect(jsonPath("$.data.debtCashflowSummary.stressLevel").value("MED"))
+                .andExpect(jsonPath("$.data.debtCashflowSummary.warningsCount").value(2))
                 .andExpect(jsonPath("$.data.requestId").exists())
                 .andExpect(jsonPath("$.data.timestamp").exists());
         UserContext.clear();

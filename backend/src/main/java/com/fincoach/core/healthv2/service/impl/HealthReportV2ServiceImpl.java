@@ -420,7 +420,7 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         metrics.put("goals", goalsMetrics);
         metrics.put("insurance", insuranceMetrics);
         if (debtCashflowResult != null) {
-            metrics.put("debtCashflow", debtCashflowResult.toMetricsMap());
+            metrics.put("debtCashflowV1", debtCashflowResult.toMetricsMap());
         }
 
         // ========= 3. M3 评分引擎（多维加权 + 可解释 breakdown） =========

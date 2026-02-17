@@ -4,7 +4,7 @@
 Introduce debt and cashflow metrics with explainable outputs, structured advice, and warnings. Missing inputs degrade gracefully and warnings are surfaced for observability.
 
 ## Metrics Definitions
-`metrics.debtCashflow` includes:
+`metrics.debtCashflowV1` includes:
 - `debtMetrics`: `totalDebt`, `monthlyDebtPayment`, `dti`, `debtToAssets`, `interestWeightedRate`, `warnings`, `explanations`
 - `cashflowMetrics`: `monthlyIncome`, `monthlyExpense`, `monthlySurplus`, `surplusRate`, `emergencyFundMonths`, `warnings`, `explanations`
 - `combined`: `stressLevel`, `stressReasons`, `warnings`
