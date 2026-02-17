@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -57,15 +58,30 @@ public class AdminMarketDebugControllerTest {
         snapshot.setHistorySource("MARKET_DATA_DAILY_CLOSE");
         snapshot.setGeneratedAt(Instant.now());
         snapshot.setWarnings(new ArrayList<>());
+        PortfolioMarketDebugSnapshot.CorrelationMatrixSummary summary = new PortfolioMarketDebugSnapshot.CorrelationMatrixSummary();
+        summary.setAssetsCount(2);
+        summary.setSampleSize(12);
+        summary.setWarnings(List.of("CORR_INSUFFICIENT_POINTS:XYZ"));
+        snapshot.setCorrelationMatrixSummary(summary);
+        PortfolioMarketDebugSnapshot.CorrelationMatrixData matrix = new PortfolioMarketDebugSnapshot.CorrelationMatrixData();
+        matrix.setAssets(List.of("A", "B"));
+        matrix.setMatrix(List.of(List.of(1.0, 0.9), List.of(0.9, 1.0)));
+        matrix.setMethod("pearson");
+        matrix.setSampleSize(12);
+        snapshot.setCorrelationMatrix(matrix);
         PortfolioDebugContextHolder.enableCapture();
         PortfolioDebugContextHolder.set(snapshot);
 
         UserContext.setUserId(1L);
-        mockMvc.perform(get("/api/admin/portfolio/market-debug/latest"))
+        mockMvc.perform(get("/api/admin/portfolio/market-debug/latest").param("includeMatrix", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.history.source").value("MARKET_DATA_DAILY_CLOSE"))
                 .andExpect(jsonPath("$.data.warnings").isArray())
+                .andExpect(jsonPath("$.data.correlationMatrixSummary.assetsCount").value(2))
+                .andExpect(jsonPath("$.data.correlationMatrixSummary.sampleSize").value(12))
+                .andExpect(jsonPath("$.data.correlationMatrix.assets[0]").value("A"))
+                .andExpect(jsonPath("$.data.correlationMatrix.matrix[0][0]").value(1.0))
                 .andExpect(jsonPath("$.data.requestId").exists())
                 .andExpect(jsonPath("$.data.timestamp").exists());
         UserContext.clear();
