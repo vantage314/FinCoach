@@ -386,13 +386,20 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         if (debtCashflowResult != null) {
             debtCashflowWarnings = debtCashflowResult.getWarnings();
             debtCashflowWarningDetails = debtCashflowResult.getWarningDetails();
+            Double debtCashflowDti = debtCashflowResult.getDti();
+            Double debtCashflowSurplusRate = debtCashflowResult.getSurplusRate();
+            Double debtCashflowEmergencyMonths = debtCashflowResult.getEmergencyFundMonths();
+            String debtCashflowStressLevel = debtCashflowResult.getStressLevel();
+            List<String> debtCashflowWarningsFinal = debtCashflowWarnings == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(debtCashflowWarnings);
             PortfolioDebugContextHolder.record(snapshot -> {
                 PortfolioMarketDebugSnapshot.DebtCashflowSummary summary = new PortfolioMarketDebugSnapshot.DebtCashflowSummary();
-                summary.setDti(debtCashflowResult.getDti());
-                summary.setSurplusRate(debtCashflowResult.getSurplusRate());
-                summary.setEmergencyFundMonths(debtCashflowResult.getEmergencyFundMonths());
-                summary.setStressLevel(debtCashflowResult.getStressLevel());
-                summary.setWarningsCount(debtCashflowWarnings == null ? 0 : debtCashflowWarnings.size());
+                summary.setDti(debtCashflowDti);
+                summary.setSurplusRate(debtCashflowSurplusRate);
+                summary.setEmergencyFundMonths(debtCashflowEmergencyMonths);
+                summary.setStressLevel(debtCashflowStressLevel);
+                summary.setWarningsCount(debtCashflowWarningsFinal.size());
                 snapshot.setDebtCashflowSummary(summary);
             });
         }
