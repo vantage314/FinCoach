@@ -15,6 +15,7 @@ public class PortfolioMarketDebugSnapshot {
     private CorrelationDebug correlation;
     private CorrelationMatrixSummary correlationMatrixSummary;
     private CorrelationMatrixData correlationMatrix;
+    private ScoreSummary scoreSummary;
     private List<String> warnings = new ArrayList<>();
     private Instant generatedAt;
 
@@ -36,6 +37,8 @@ public class PortfolioMarketDebugSnapshot {
     public void setCorrelationMatrixSummary(CorrelationMatrixSummary correlationMatrixSummary) { this.correlationMatrixSummary = correlationMatrixSummary; }
     public CorrelationMatrixData getCorrelationMatrix() { return correlationMatrix; }
     public void setCorrelationMatrix(CorrelationMatrixData correlationMatrix) { this.correlationMatrix = correlationMatrix; }
+    public ScoreSummary getScoreSummary() { return scoreSummary; }
+    public void setScoreSummary(ScoreSummary scoreSummary) { this.scoreSummary = scoreSummary; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public Instant getGeneratedAt() { return generatedAt; }
@@ -156,6 +159,32 @@ public class PortfolioMarketDebugSnapshot {
         public void setStartDate(String startDate) { this.startDate = startDate; }
         public String getEndDate() { return endDate; }
         public void setEndDate(String endDate) { this.endDate = endDate; }
+    }
+
+    public static class ScoreSummary {
+        private ScoreSummaryItem risk;
+        private ScoreSummaryItem assetHealth;
+        private ScoreSummaryItem behavior;
+
+        public ScoreSummaryItem getRisk() { return risk; }
+        public void setRisk(ScoreSummaryItem risk) { this.risk = risk; }
+        public ScoreSummaryItem getAssetHealth() { return assetHealth; }
+        public void setAssetHealth(ScoreSummaryItem assetHealth) { this.assetHealth = assetHealth; }
+        public ScoreSummaryItem getBehavior() { return behavior; }
+        public void setBehavior(ScoreSummaryItem behavior) { this.behavior = behavior; }
+    }
+
+    public static class ScoreSummaryItem {
+        private Integer value;
+        private String level;
+        private List<String> warnings = new ArrayList<>();
+
+        public Integer getValue() { return value; }
+        public void setValue(Integer value) { this.value = value; }
+        public String getLevel() { return level; }
+        public void setLevel(String level) { this.level = level; }
+        public List<String> getWarnings() { return warnings; }
+        public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     }
 
     public static class FallbackDebug {

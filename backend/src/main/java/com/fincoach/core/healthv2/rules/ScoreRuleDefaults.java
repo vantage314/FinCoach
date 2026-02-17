@@ -32,6 +32,17 @@ public final class ScoreRuleDefaults {
 
     public static final String ASSET_LIABILITY_RATIO_GOOD = "ASSET_LIABILITY_RATIO_GOOD";
     public static final String LIQUIDITY_RATIO_GOOD = "LIQUIDITY_RATIO_GOOD";
+    public static final String HEALTH_W_LIQUIDITY = "HEALTH_W_LIQUIDITY";
+    public static final String HEALTH_W_DEBT = "HEALTH_W_DEBT";
+    public static final String HEALTH_W_DIVERSIFICATION = "HEALTH_W_DIVERSIFICATION";
+    public static final String HEALTH_W_RAR = "HEALTH_W_RAR";
+    public static final String HEALTH_W_BEHAVIOR = "HEALTH_W_BEHAVIOR";
+    public static final String RISK_LEVEL_HIGH_MIN = "RISK_LEVEL_HIGH_MIN";
+    public static final String RISK_LEVEL_MED_MIN = "RISK_LEVEL_MED_MIN";
+    public static final String HEALTH_LEVEL_HIGH_MIN = "HEALTH_LEVEL_HIGH_MIN";
+    public static final String HEALTH_LEVEL_MED_MIN = "HEALTH_LEVEL_MED_MIN";
+    public static final String BEHAVIOR_LEVEL_HIGH_MIN = "BEHAVIOR_LEVEL_HIGH_MIN";
+    public static final String BEHAVIOR_LEVEL_MED_MIN = "BEHAVIOR_LEVEL_MED_MIN";
 
     private static final Map<String, ScoreRuleParamDefinition> DEFAULT_PARAMS;
 
@@ -88,6 +99,41 @@ public final class ScoreRuleDefaults {
         map.put(LIQUIDITY_RATIO_GOOD, new ScoreRuleParamDefinition(
                 LIQUIDITY_RATIO_GOOD, ScoreRuleValueType.DECIMAL, "0.20",
                 BigDecimal.ZERO, BigDecimal.ONE, "Liquidity ratio good threshold"));
+
+        map.put(HEALTH_W_LIQUIDITY, new ScoreRuleParamDefinition(
+                HEALTH_W_LIQUIDITY, ScoreRuleValueType.DECIMAL, "0.25",
+                BigDecimal.ZERO, BigDecimal.ONE, "Health score liquidity weight"));
+        map.put(HEALTH_W_DEBT, new ScoreRuleParamDefinition(
+                HEALTH_W_DEBT, ScoreRuleValueType.DECIMAL, "0.25",
+                BigDecimal.ZERO, BigDecimal.ONE, "Health score debt weight"));
+        map.put(HEALTH_W_DIVERSIFICATION, new ScoreRuleParamDefinition(
+                HEALTH_W_DIVERSIFICATION, ScoreRuleValueType.DECIMAL, "0.20",
+                BigDecimal.ZERO, BigDecimal.ONE, "Health score diversification weight"));
+        map.put(HEALTH_W_RAR, new ScoreRuleParamDefinition(
+                HEALTH_W_RAR, ScoreRuleValueType.DECIMAL, "0.15",
+                BigDecimal.ZERO, BigDecimal.ONE, "Health score risk-adjusted return weight"));
+        map.put(HEALTH_W_BEHAVIOR, new ScoreRuleParamDefinition(
+                HEALTH_W_BEHAVIOR, ScoreRuleValueType.DECIMAL, "0.15",
+                BigDecimal.ZERO, BigDecimal.ONE, "Health score behavior weight"));
+
+        map.put(RISK_LEVEL_HIGH_MIN, new ScoreRuleParamDefinition(
+                RISK_LEVEL_HIGH_MIN, ScoreRuleValueType.INT, "70",
+                BigDecimal.ZERO, new BigDecimal("100"), "Risk score high level min"));
+        map.put(RISK_LEVEL_MED_MIN, new ScoreRuleParamDefinition(
+                RISK_LEVEL_MED_MIN, ScoreRuleValueType.INT, "40",
+                BigDecimal.ZERO, new BigDecimal("100"), "Risk score medium level min"));
+        map.put(HEALTH_LEVEL_HIGH_MIN, new ScoreRuleParamDefinition(
+                HEALTH_LEVEL_HIGH_MIN, ScoreRuleValueType.INT, "70",
+                BigDecimal.ZERO, new BigDecimal("100"), "Health score high level min"));
+        map.put(HEALTH_LEVEL_MED_MIN, new ScoreRuleParamDefinition(
+                HEALTH_LEVEL_MED_MIN, ScoreRuleValueType.INT, "40",
+                BigDecimal.ZERO, new BigDecimal("100"), "Health score medium level min"));
+        map.put(BEHAVIOR_LEVEL_HIGH_MIN, new ScoreRuleParamDefinition(
+                BEHAVIOR_LEVEL_HIGH_MIN, ScoreRuleValueType.INT, "70",
+                BigDecimal.ZERO, new BigDecimal("100"), "Behavior score high level min"));
+        map.put(BEHAVIOR_LEVEL_MED_MIN, new ScoreRuleParamDefinition(
+                BEHAVIOR_LEVEL_MED_MIN, ScoreRuleValueType.INT, "40",
+                BigDecimal.ZERO, new BigDecimal("100"), "Behavior score medium level min"));
 
         DEFAULT_PARAMS = Collections.unmodifiableMap(map);
     }

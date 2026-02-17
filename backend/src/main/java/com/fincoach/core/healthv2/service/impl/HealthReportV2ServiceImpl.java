@@ -428,9 +428,22 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
         // scoreBreakdown 写入 metrics
         metrics.put("scoreBreakdown", scoreResult.get("breakdown"));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> scoresPayload = (Map<String, Object>) scoreResult.get("scores");
+        if (scoresPayload != null) {
+            metrics.put("scores", scoresPayload);
+        }
         if (scoreResult.get("ruleSet") != null) {
             metrics.put("scoreRuleSet", scoreResult.get("ruleSet"));
         }
+        List<String> scoreWarnings = extractWarningCodes(scoreResult.get("scoreWarnings"));
+        PortfolioDebugContextHolder.record(snapshot -> {
+            PortfolioMarketDebugSnapshot.ScoreSummary summary = new PortfolioMarketDebugSnapshot.ScoreSummary();
+            summary.setRisk(buildScoreSummaryItem(scoresPayload == null ? null : scoresPayload.get("riskScore")));
+            summary.setAssetHealth(buildScoreSummaryItem(scoresPayload == null ? null : scoresPayload.get("assetHealthScore")));
+            summary.setBehavior(buildScoreSummaryItem(scoresPayload == null ? null : scoresPayload.get("behaviorScore")));
+            snapshot.setScoreSummary(summary);
+        });
 
         // ========= 4. M4 策略开关 + 生成建议 =========
         Map<String, Boolean> flags = loadStrategyFlags();
@@ -562,6 +575,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         reportMapper.insert(entity);
         log.info("[HealthV2-Report] event=ADVICE_V2_WARNINGS userId={} reportId={} warnings={} warningDetails={}",
                 userId, entity.getId(), adviceV2Warnings, adviceV2WarningDetails);
+        log.info("[HealthV2-Report] event=SCORES_V1 userId={} reportId={} scores={} warnings={}",
+                userId, entity.getId(), buildScoreSummaryMap(scoresPayload), scoreWarnings);
 
         // ========= 5.1 写入行为事件（M5-A） =========
         try {
@@ -958,6 +973,53 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private PortfolioMarketDebugSnapshot.ScoreSummaryItem buildScoreSummaryItem(Object raw) {
+        PortfolioMarketDebugSnapshot.ScoreSummaryItem item = new PortfolioMarketDebugSnapshot.ScoreSummaryItem();
+        if (!(raw instanceof Map<?, ?> map)) {
+            return item;
+        }
+        Object value = map.get("value");
+        if (value instanceof Number number) {
+            item.setValue(number.intValue());
+        } else if (value != null) {
+            try {
+                item.setValue(Integer.parseInt(value.toString()));
+            } catch (Exception e) {
+                item.setValue(null);
+            }
+        }
+        Object level = map.get("level");
+        item.setLevel(level == null ? null : level.toString());
+        Object warnings = map.get("warnings");
+        item.setWarnings(extractWarningCodes(warnings));
+        return item;
+    }
+
+    private Map<String, Object> buildScoreSummaryMap(Map<String, Object> scoresPayload) {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("risk", buildScoreSummaryMapItem(scoresPayload == null ? null : scoresPayload.get("riskScore")));
+        summary.put("assetHealth", buildScoreSummaryMapItem(scoresPayload == null ? null : scoresPayload.get("assetHealthScore")));
+        summary.put("behavior", buildScoreSummaryMapItem(scoresPayload == null ? null : scoresPayload.get("behaviorScore")));
+        return summary;
+    }
+
+    private Map<String, Object> buildScoreSummaryMapItem(Object raw) {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        if (raw instanceof Map<?, ?> map) {
+            Object value = map.get("value");
+            Object level = map.get("level");
+            List<String> warnings = extractWarningCodes(map.get("warnings"));
+            summary.put("value", value);
+            summary.put("level", level);
+            summary.put("warningsCount", warnings.size());
+        } else {
+            summary.put("value", null);
+            summary.put("level", null);
+            summary.put("warningsCount", 0);
+        }
+        return summary;
     }
 
     private List<String> extractWarningCodes(Object raw) {

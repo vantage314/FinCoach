@@ -1,5 +1,6 @@
 package com.fincoach.core.healthv2.analyzer;
 
+import com.fincoach.core.healthv2.advice.WarningCollector;
 import com.fincoach.core.healthv2.entity.*;
 import com.fincoach.core.healthv2.rules.ScoreRuleDefaults;
 import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
@@ -41,6 +42,10 @@ public class ScoreEngine {
         Map<String, Object> result = new LinkedHashMap<>();
 
         ScoreRuleSnapshot snapshot = ruleSnapshot != null ? ruleSnapshot : defaultSnapshot();
+        WarningCollector warningCollector = new WarningCollector();
+        if (snapshot != null) {
+            warningCollector.addAll(snapshot.getWarnings());
+        }
 
         double wSharpe = toDouble(snapshot.getDecimal(ScoreRuleDefaults.W_SHARPE, new BigDecimal("0.35")));
         double wMdd = toDouble(snapshot.getDecimal(ScoreRuleDefaults.W_MDD, new BigDecimal("0.35")));
@@ -57,43 +62,99 @@ public class ScoreEngine {
         int emergencyMonthsMin = snapshot.getInt(ScoreRuleDefaults.EMERGENCY_MONTHS_MIN, 3);
         double assetLiabilityRatioGood = toDouble(snapshot.getDecimal(ScoreRuleDefaults.ASSET_LIABILITY_RATIO_GOOD, new BigDecimal("2.0")));
         double liquidityRatioGood = toDouble(snapshot.getDecimal(ScoreRuleDefaults.LIQUIDITY_RATIO_GOOD, new BigDecimal("0.2")));
+        double wHealthLiquidity = toDouble(snapshot.getDecimal(ScoreRuleDefaults.HEALTH_W_LIQUIDITY, new BigDecimal("0.25")));
+        double wHealthDebt = toDouble(snapshot.getDecimal(ScoreRuleDefaults.HEALTH_W_DEBT, new BigDecimal("0.25")));
+        double wHealthDiversification = toDouble(snapshot.getDecimal(ScoreRuleDefaults.HEALTH_W_DIVERSIFICATION, new BigDecimal("0.20")));
+        double wHealthRar = toDouble(snapshot.getDecimal(ScoreRuleDefaults.HEALTH_W_RAR, new BigDecimal("0.15")));
+        double wHealthBehavior = toDouble(snapshot.getDecimal(ScoreRuleDefaults.HEALTH_W_BEHAVIOR, new BigDecimal("0.15")));
+
+        int riskHighMin = snapshot.getInt(ScoreRuleDefaults.RISK_LEVEL_HIGH_MIN, 70);
+        int riskMedMin = snapshot.getInt(ScoreRuleDefaults.RISK_LEVEL_MED_MIN, 40);
+        int healthHighMin = snapshot.getInt(ScoreRuleDefaults.HEALTH_LEVEL_HIGH_MIN, 70);
+        int healthMedMin = snapshot.getInt(ScoreRuleDefaults.HEALTH_LEVEL_MED_MIN, 40);
+        int behaviorHighMin = snapshot.getInt(ScoreRuleDefaults.BEHAVIOR_LEVEL_HIGH_MIN, 70);
+        int behaviorMedMin = snapshot.getInt(ScoreRuleDefaults.BEHAVIOR_LEVEL_MED_MIN, 40);
 
         BigDecimal cashAssets = sumCashAssets(assets);
         BigDecimal liquidityRatio = calcRatio(cashAssets, totalAssets);
         BigDecimal assetLiabilityRatio = calcRatio(totalAssets, totalDebt);
         Double cashFlowRate = calcCashFlowRate(cashflow);
 
+        List<String> baseWarnings = new ArrayList<>(warningCollector.codes());
+
         // ========= Health Score (5 维) =========
         List<Map<String, Object>> healthBreakdown = new ArrayList<>();
+        List<Map<String, Object>> healthBreakdownV1 = new ArrayList<>();
 
         // 1. Liquidity (权重 25)
         int liqScore = scoreLiquidity(emergencyMonths, liquidityRatio, liquidityRatioGood);
-        healthBreakdown.add(dim("Liquidity", liqScore, 25, describeLiquidity(emergencyMonths, liquidityRatio, liquidityRatioGood)));
+        int liqWeight;
+        int debtWeight;
+        int divWeight;
+        int rarWeight;
+        int behWeight;
+        double healthWeightSum = wHealthLiquidity + wHealthDebt + wHealthDiversification + wHealthRar + wHealthBehavior;
+        if (healthWeightSum <= 0) {
+            wHealthLiquidity = 0.25;
+            wHealthDebt = 0.25;
+            wHealthDiversification = 0.20;
+            wHealthRar = 0.15;
+            wHealthBehavior = 0.15;
+            healthWeightSum = wHealthLiquidity + wHealthDebt + wHealthDiversification + wHealthRar + wHealthBehavior;
+        }
+        liqWeight = weightPercent(wHealthLiquidity, healthWeightSum);
+        debtWeight = weightPercent(wHealthDebt, healthWeightSum);
+        divWeight = weightPercent(wHealthDiversification, healthWeightSum);
+        rarWeight = weightPercent(wHealthRar, healthWeightSum);
+        behWeight = Math.max(0, 100 - liqWeight - debtWeight - divWeight - rarWeight);
+
+        healthBreakdown.add(dim("Liquidity", liqScore, liqWeight, describeLiquidity(emergencyMonths, liquidityRatio, liquidityRatioGood)));
+        healthBreakdownV1.add(breakdownItem(
+                "LIQUIDITY", "Liquidity", liqWeight,
+                rawOrNa(emergencyMonths), liqScore,
+                describeLiquidity(emergencyMonths, liquidityRatio, liquidityRatioGood)));
 
         // 2. DebtHealth (权重 25)
         int debtScore = scoreDebtHealth(dti, liabilities, assetLiabilityRatio, assetLiabilityRatioGood);
-        healthBreakdown.add(dim("DebtHealth", debtScore, 25, describeDebtHealth(dti, assetLiabilityRatio, assetLiabilityRatioGood)));
+        healthBreakdown.add(dim("DebtHealth", debtScore, debtWeight, describeDebtHealth(dti, assetLiabilityRatio, assetLiabilityRatioGood)));
+        healthBreakdownV1.add(breakdownItem(
+                "DEBT_HEALTH", "DebtHealth", debtWeight,
+                rawOrNa(dti), debtScore,
+                describeDebtHealth(dti, assetLiabilityRatio, assetLiabilityRatioGood)));
 
         // 3. Diversification (权重 20)
         int divScore = scoreDiversification(allocation, concentration);
-        healthBreakdown.add(dim("Diversification", divScore, 20, describeDiversification(concentration)));
+        healthBreakdown.add(dim("Diversification", divScore, divWeight, describeDiversification(concentration)));
+        healthBreakdownV1.add(breakdownItem(
+                "DIVERSIFICATION", "Diversification", divWeight,
+                rawOrNa(concentration == null ? null : concentration.get("topRatio")), divScore,
+                describeDiversification(concentration)));
 
         // 4. RiskAdjustedReturn (权重 15)
         int rarScore = scoreRiskAdjustedReturn(performanceResult, sharpeOk, sharpeGood, mddOk, mddBad);
-        healthBreakdown.add(dim("RiskAdjustedReturn", rarScore, 15, describeRAR(performanceResult)));
+        healthBreakdown.add(dim("RiskAdjustedReturn", rarScore, rarWeight, describeRAR(performanceResult)));
+        healthBreakdownV1.add(breakdownItem(
+                "RISK_ADJUSTED_RETURN", "RiskAdjustedReturn", rarWeight,
+                rawOrNa(performanceResult == null ? null : performanceResult.get("sharpe")), rarScore,
+                describeRAR(performanceResult)));
 
         // 5. Behavior (权重 15)
         int behaviorScore = scoreBehavior(behaviorStats, cashFlowRate, dti, emergencyMonths,
                 cashFlowRateMin, debtRatioMax, emergencyMonthsMin);
         String behaviorReason = describeBehavior(behaviorStats, cashFlowRate, dti, emergencyMonths,
                 cashFlowRateMin, debtRatioMax, emergencyMonthsMin);
-        healthBreakdown.add(dim("Behavior", behaviorScore, 15, behaviorReason));
+        healthBreakdown.add(dim("Behavior", behaviorScore, behWeight, behaviorReason));
+        healthBreakdownV1.add(breakdownItem(
+                "BEHAVIOR", "Behavior", behWeight,
+                rawOrNa(intValue(behaviorStats, "eventCount30d")), behaviorScore,
+                behaviorReason));
 
         int healthScore = calcWeighted(healthBreakdown);
         result.put("healthScore", clamp(healthScore));
 
         // ========= Risk Score (规则权重) =========
         List<Map<String, Object>> riskBreakdown = new ArrayList<>();
+        List<Map<String, Object>> riskBreakdownV1 = new ArrayList<>();
 
         Double sharpe = toDoubleObj(performanceResult == null ? null : performanceResult.get("sharpe"));
         Double maxDD = toDoubleObj(performanceResult == null ? null : performanceResult.get("maxDrawdown"));
@@ -116,12 +177,28 @@ public class ScoreEngine {
         int sharpeWeight = weightPercent(wSharpe, weightSum);
         int mddWeight = weightPercent(wMdd, weightSum);
         int volWeight = weightPercent(wVol, weightSum);
-        int divWeight = Math.max(0, 100 - sharpeWeight - mddWeight - volWeight);
+        int divRiskWeight = Math.max(0, 100 - sharpeWeight - mddWeight - volWeight);
 
         riskBreakdown.add(dim("Sharpe", sharpeRisk, sharpeWeight, describeSharpeRisk(sharpe, sharpeOk, sharpeGood)));
         riskBreakdown.add(dim("MaxDrawdown", mddRisk, mddWeight, describeMddRisk(maxDD, mddOk, mddBad)));
         riskBreakdown.add(dim("Volatility", volRisk, volWeight, describeVolRisk(volatility)));
-        riskBreakdown.add(dim("Diversification", divRisk, divWeight, describeDiversification(concentration)));
+        riskBreakdown.add(dim("Diversification", divRisk, divRiskWeight, describeDiversification(concentration)));
+        riskBreakdownV1.add(breakdownItem(
+                "SHARPE", "Sharpe", sharpeWeight,
+                rawOrNa(sharpe), sharpeRisk,
+                describeSharpeRisk(sharpe, sharpeOk, sharpeGood)));
+        riskBreakdownV1.add(breakdownItem(
+                "MAX_DRAWDOWN", "MaxDrawdown", mddWeight,
+                rawOrNa(maxDD), mddRisk,
+                describeMddRisk(maxDD, mddOk, mddBad)));
+        riskBreakdownV1.add(breakdownItem(
+                "VOLATILITY", "Volatility", volWeight,
+                rawOrNa(volatility), volRisk,
+                describeVolRisk(volatility)));
+        riskBreakdownV1.add(breakdownItem(
+                "DIVERSIFICATION", "Diversification", divRiskWeight,
+                rawOrNa(concentration == null ? null : concentration.get("topRatio")), divRisk,
+                describeDiversification(concentration)));
 
         int riskScore = (int) Math.round(
                 (sharpeRisk * wSharpe + mddRisk * wMdd + volRisk * wVol + divRisk * wDiv) / weightSum);
@@ -129,8 +206,13 @@ public class ScoreEngine {
 
         // ========= Behavior Score (M5-A 规则版) =========
         List<Map<String, Object>> behaviorBreakdown = new ArrayList<>();
+        List<Map<String, Object>> behaviorBreakdownV1 = new ArrayList<>();
         int finalBehaviorScore = clamp(behaviorScore);
         behaviorBreakdown.add(dim("BehaviorRule30d", finalBehaviorScore, 100, behaviorReason));
+        behaviorBreakdownV1.add(breakdownItem(
+                "BEHAVIOR_RULE_30D", "BehaviorRule30d", 100,
+                rawOrNa(intValue(behaviorStats, "eventCount30d")), finalBehaviorScore,
+                behaviorReason));
         result.put("behaviorScore", finalBehaviorScore);
 
         // ========= Breakdown =========
@@ -139,6 +221,39 @@ public class ScoreEngine {
         breakdown.put("risk", riskBreakdown);
         breakdown.put("behavior", behaviorBreakdown);
         result.put("breakdown", breakdown);
+
+        List<String> riskWarnings = new ArrayList<>(baseWarnings);
+        if (sharpe == null) addWarning(riskWarnings, ScoreWarningCodes.SCORE_MISSING_SHARPE);
+        if (maxDD == null) addWarning(riskWarnings, ScoreWarningCodes.SCORE_MISSING_MDD);
+        if (volatility == null) addWarning(riskWarnings, ScoreWarningCodes.SCORE_MISSING_VOLATILITY);
+        if (allocation == null || allocation.isEmpty()) addWarning(riskWarnings, ScoreWarningCodes.SCORE_MISSING_ALLOCATION);
+
+        List<String> healthWarnings = new ArrayList<>(baseWarnings);
+        if (cashflow == null) addWarning(healthWarnings, ScoreWarningCodes.SCORE_MISSING_CASHFLOW);
+        if (liabilities == null) addWarning(healthWarnings, ScoreWarningCodes.SCORE_MISSING_LIABILITIES);
+        if (allocation == null || allocation.isEmpty()) addWarning(healthWarnings, ScoreWarningCodes.SCORE_MISSING_ALLOCATION);
+        if (totalAssets == null || totalAssets.compareTo(BigDecimal.ZERO) <= 0) {
+            addWarning(healthWarnings, ScoreWarningCodes.SCORE_MISSING_TOTAL_ASSETS);
+        }
+        if (sharpe == null) addWarning(healthWarnings, ScoreWarningCodes.SCORE_MISSING_SHARPE);
+        if (maxDD == null) addWarning(healthWarnings, ScoreWarningCodes.SCORE_MISSING_MDD);
+
+        List<String> behaviorWarnings = new ArrayList<>(baseWarnings);
+        int eventCount = intValue(behaviorStats, "eventCount30d");
+        if (behaviorStats == null || behaviorStats.isEmpty() || eventCount <= 0) {
+            addWarning(behaviorWarnings, ScoreWarningCodes.SCORE_BEHAVIOR_DATA_UNAVAILABLE);
+        }
+
+        String riskLevel = levelForScore(clamp(riskScore), riskMedMin, riskHighMin);
+        String healthLevel = levelForScore(clamp(healthScore), healthMedMin, healthHighMin);
+        String behaviorLevel = levelForScore(finalBehaviorScore, behaviorMedMin, behaviorHighMin);
+
+        Map<String, Object> scores = new LinkedHashMap<>();
+        scores.put("riskScore", scorePayload(clamp(riskScore), riskLevel, riskBreakdownV1, riskWarnings));
+        scores.put("assetHealthScore", scorePayload(clamp(healthScore), healthLevel, healthBreakdownV1, healthWarnings));
+        scores.put("behaviorScore", scorePayload(finalBehaviorScore, behaviorLevel, behaviorBreakdownV1, behaviorWarnings));
+        result.put("scores", scores);
+        result.put("scoreWarnings", mergeWarnings(riskWarnings, healthWarnings, behaviorWarnings));
         result.put("ruleSet", snapshot.toDebugMap());
 
         return result;
@@ -655,6 +770,34 @@ public class ScoreEngine {
         return d;
     }
 
+    private Map<String, Object> breakdownItem(String code,
+                                              String name,
+                                              int weight,
+                                              Object rawValue,
+                                              int score,
+                                              String detail) {
+        Map<String, Object> d = new LinkedHashMap<>();
+        d.put("code", code);
+        d.put("name", name);
+        d.put("weight", weight);
+        d.put("rawValue", rawValue);
+        d.put("scoreContribution", contribution(score, weight));
+        d.put("detail", detail);
+        return d;
+    }
+
+    private Map<String, Object> scorePayload(int value,
+                                             String level,
+                                             List<Map<String, Object>> breakdown,
+                                             List<String> warnings) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("value", clamp(value));
+        payload.put("level", level);
+        payload.put("breakdown", breakdown == null ? new ArrayList<>() : breakdown);
+        payload.put("warnings", warnings == null ? new ArrayList<>() : warnings);
+        return payload;
+    }
+
     private int calcWeighted(List<Map<String, Object>> dims) {
         double total = 0;
         double weightSum = 0;
@@ -669,6 +812,44 @@ public class ScoreEngine {
     }
 
     private int clamp(int v) { return Math.max(0, Math.min(100, v)); }
+
+    private int contribution(int score, int weight) {
+        return (int) Math.round(clamp(score) * (weight / 100.0));
+    }
+
+    private Object rawOrNa(Object value) {
+        return value == null ? "N/A" : value;
+    }
+
+    private void addWarning(List<String> warnings, String code) {
+        if (warnings == null || code == null) return;
+        if (!warnings.contains(code)) {
+            warnings.add(code);
+        }
+    }
+
+    private List<String> mergeWarnings(List<String>... lists) {
+        List<String> merged = new ArrayList<>();
+        if (lists == null) return merged;
+        for (List<String> list : lists) {
+            if (list == null) continue;
+            for (String w : list) {
+                if (!merged.contains(w)) merged.add(w);
+            }
+        }
+        return merged;
+    }
+
+    private String levelForScore(int score, int medMin, int highMin) {
+        int high = Math.max(0, Math.min(100, highMin));
+        int med = Math.max(0, Math.min(100, medMin));
+        if (med >= high) {
+            med = Math.max(0, high - 1);
+        }
+        if (score >= high) return "HIGH";
+        if (score >= med) return "MED";
+        return "LOW";
+    }
 
     private double toDouble(Object obj) {
         if (obj == null) return 0;
