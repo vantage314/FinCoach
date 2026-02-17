@@ -17,8 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 public class AdviceEngineCashflowDebtTest {
@@ -58,6 +59,17 @@ public class AdviceEngineCashflowDebtTest {
         assertEquals("P0", byCode.get("EMERGENCY_FUND_LOW").getPriority());
         assertEquals("P0", byCode.get("DEBT_PAYMENT_RATIO_HIGH").getPriority());
         assertEquals("P1", byCode.get("SURPLUS_RATE_LOW").getPriority());
+    }
+
+    @Test
+    public void testBuildDoesNotThrowWhenEvidenceValuesMissing() {
+        AdviceEngineV2 engine = new AdviceEngineV2(null, null);
+
+        AdviceEngineResult result = assertDoesNotThrow(() ->
+                engine.build(null, null, null, null, null));
+
+        assertNotNull(result);
+        assertNotNull(result.getAdvices());
     }
 
     private AdviceDTO getAdvice(AdviceEngineResult result, String code) {
