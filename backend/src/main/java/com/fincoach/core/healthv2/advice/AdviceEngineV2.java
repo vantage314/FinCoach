@@ -109,7 +109,7 @@ public class AdviceEngineV2 {
             advice.setReason("现金流或资产数据缺失，无法评估应急金覆盖月数");
             advice.setImpact("可能低估短期流动性风险");
             advice.setAction("补充现金流/资产数据，并建立6个月以上应急金");
-            advice.setEvidence(Map.of("emergencyMonths", null, "minMonths", minMonths));
+            advice.setEvidence(buildEvidence("emergencyMonths", null, "minMonths", minMonths));
             return advice;
         }
         if (emergencyMonths < minMonths) {
@@ -123,7 +123,7 @@ public class AdviceEngineV2 {
             advice.setImpact("流动性风险可控");
             advice.setAction("持续维护应急金规模");
         }
-        advice.setEvidence(Map.of("emergencyMonths", emergencyMonths, "minMonths", minMonths));
+        advice.setEvidence(buildEvidence("emergencyMonths", emergencyMonths, "minMonths", minMonths));
         return advice;
     }
 
@@ -134,7 +134,7 @@ public class AdviceEngineV2 {
             advice.setReason("缺少收入或负债月供数据，无法评估债务压力");
             advice.setImpact("可能低估债务风险");
             advice.setAction("补充现金流/负债月供数据");
-            advice.setEvidence(Map.of("debtPaymentRatio", null, "maxRatio", maxRatio));
+            advice.setEvidence(buildEvidence("debtPaymentRatio", null, "maxRatio", maxRatio));
             return advice;
         }
         if (debtPaymentRatio > maxRatio) {
@@ -148,7 +148,7 @@ public class AdviceEngineV2 {
             advice.setImpact("债务压力可控");
             advice.setAction("继续保持健康负债水平");
         }
-        advice.setEvidence(Map.of("debtPaymentRatio", debtPaymentRatio, "maxRatio", maxRatio));
+        advice.setEvidence(buildEvidence("debtPaymentRatio", debtPaymentRatio, "maxRatio", maxRatio));
         return advice;
     }
 
@@ -159,7 +159,7 @@ public class AdviceEngineV2 {
             advice.setReason("缺少收入或支出数据，无法计算结余率");
             advice.setImpact("难以判断长期储蓄能力");
             advice.setAction("补充现金流数据");
-            advice.setEvidence(Map.of("surplusRate", null, "minRate", minRate));
+            advice.setEvidence(buildEvidence("surplusRate", null, "minRate", minRate));
             return advice;
         }
         if (surplusRate < minRate) {
@@ -173,7 +173,7 @@ public class AdviceEngineV2 {
             advice.setImpact("储蓄能力良好");
             advice.setAction("保持当前收支结构");
         }
-        advice.setEvidence(Map.of("surplusRate", surplusRate, "minRate", minRate));
+        advice.setEvidence(buildEvidence("surplusRate", surplusRate, "minRate", minRate));
         return advice;
     }
 
@@ -294,6 +294,13 @@ public class AdviceEngineV2 {
 
     private String pct(double v) {
         return BigDecimal.valueOf(v * 100).setScale(1, RoundingMode.HALF_UP) + "%";
+    }
+
+    private Map<String, Object> buildEvidence(String key1, Object value1, String key2, Object value2) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put(key1, value1);
+        map.put(key2, value2);
+        return map;
     }
 
     private List<String> dedup(List<String> input) {
