@@ -12,4 +12,8 @@ public final class RbacPermissionCodes {
 
     public static final String ADMIN_MARKET_DEBUG_VIEW = "ADMIN_MARKET_DEBUG_VIEW";
     public static final String ADMIN_MARKET_DEBUG_CAPTURE = "ADMIN_MARKET_DEBUG_CAPTURE";
+
+    public static final String ADMIN_SCORE_RULE_VIEW = "ADMIN_SCORE_RULE_VIEW";
+    public static final String ADMIN_SCORE_RULE_EDIT = "ADMIN_SCORE_RULE_EDIT";
+    public static final String ADMIN_SCORE_RULE_PUBLISH = "ADMIN_SCORE_RULE_PUBLISH";
 }

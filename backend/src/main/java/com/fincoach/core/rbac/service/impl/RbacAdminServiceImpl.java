@@ -231,6 +231,9 @@ public class RbacAdminServiceImpl implements RbacAdminService {
         list.add(buildPerm(RbacPermissionCodes.ADMIN_TICKER_MAPPING_EDIT, "Ticker 映射编辑", "M7"));
         list.add(buildPerm(RbacPermissionCodes.ADMIN_MARKET_DEBUG_VIEW, "市场调试查看", "M7"));
         list.add(buildPerm(RbacPermissionCodes.ADMIN_MARKET_DEBUG_CAPTURE, "市场调试采集", "M7"));
+        list.add(buildPerm(RbacPermissionCodes.ADMIN_SCORE_RULE_VIEW, "评分规则查看", "M8"));
+        list.add(buildPerm(RbacPermissionCodes.ADMIN_SCORE_RULE_EDIT, "评分规则编辑", "M8"));
+        list.add(buildPerm(RbacPermissionCodes.ADMIN_SCORE_RULE_PUBLISH, "评分规则发布", "M8"));
         return list;
     }
 

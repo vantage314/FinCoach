@@ -1,172 +1,153 @@
 package com.fincoach.core.healthv2.controller.admin;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fincoach.core.common.Result;
-import com.fincoach.core.common.UserContext;
-import com.fincoach.core.healthv2.entity.FcScoreRuleVersionEntity;
-import com.fincoach.core.healthv2.mapper.FcScoreRuleVersionMapper;
-import com.fincoach.core.healthv2.service.AuditService;
-import com.fincoach.core.healthv2.util.ConfigJsonHelper;
-import com.fincoach.core.healthv2.util.HealthV2ConfigDefaults;
+import com.fincoach.core.healthv2.dto.admin.AdminScoreRuleParamDTO;
+import com.fincoach.core.healthv2.dto.admin.AdminScoreRulePublishRequest;
+import com.fincoach.core.healthv2.dto.admin.AdminScoreRuleSaveParamsRequest;
+import com.fincoach.core.healthv2.dto.admin.AdminScoreRuleSetDTO;
+import com.fincoach.core.healthv2.entity.FcScoreRuleParamEntity;
+import com.fincoach.core.healthv2.entity.FcScoreRuleSetEntity;
+import com.fincoach.core.healthv2.rules.ScoreRuleParamValue;
+import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
+import com.fincoach.core.healthv2.service.ScoreRuleSetService;
+import com.fincoach.core.rbac.RbacPermissionCodes;
+import com.fincoach.core.security.AdminOnly;
+import com.fincoach.core.security.Permission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/admin/score-rules")
-@Tag(name = "Admin-ScoreRule", description = "评分规则版本管理")
+@Tag(name = "Admin-ScoreRule", description = "评分规则管理")
+@AdminOnly
 public class ScoreRuleController {
 
-    @Autowired
-    private FcScoreRuleVersionMapper ruleMapper;
-    @Autowired
-    private AuditService auditService;
-    @Autowired
-    private ConfigJsonHelper configJsonHelper;
+    private final ScoreRuleSetService scoreRuleSetService;
 
-    @GetMapping
-    @Operation(summary = "全部版本列表")
-    public Result<List<FcScoreRuleVersionEntity>> list() {
-        List<FcScoreRuleVersionEntity> list = ruleMapper.selectList(
-                new LambdaQueryWrapper<FcScoreRuleVersionEntity>()
-                        .orderByDesc(FcScoreRuleVersionEntity::getCreatedAt));
-        Long actorUserId = UserContext.getCurrentUserId();
-        for (FcScoreRuleVersionEntity entity : list) {
-            entity.setWeightsJson(configJsonHelper.parseOrDefault(
-                    entity.getWeightsJson(),
-                    HealthV2ConfigDefaults.DEFAULT_SCORE_RULE_WEIGHTS_JSON,
-                    actorUserId,
-                    "SCORE_RULE",
-                    entity.getId(),
-                    "weightsJson"));
-            entity.setThresholdsJson(configJsonHelper.parseOrDefault(
-                    entity.getThresholdsJson(),
-                    HealthV2ConfigDefaults.DEFAULT_SCORE_RULE_THRESHOLDS_JSON,
-                    actorUserId,
-                    "SCORE_RULE",
-                    entity.getId(),
-                    "thresholdsJson"));
-        }
-        return Result.success(list);
+    public ScoreRuleController(ScoreRuleSetService scoreRuleSetService) {
+        this.scoreRuleSetService = scoreRuleSetService;
     }
 
-    @GetMapping("/published")
-    @Operation(summary = "当前发布版本")
-    public Result<FcScoreRuleVersionEntity> getPublished() {
-        FcScoreRuleVersionEntity entity = ruleMapper.selectOne(
-                new LambdaQueryWrapper<FcScoreRuleVersionEntity>()
-                        .eq(FcScoreRuleVersionEntity::getStatus, "PUBLISHED")
-                        .last("LIMIT 1"));
-        if (entity != null) {
-            Long actorUserId = UserContext.getCurrentUserId();
-            entity.setWeightsJson(configJsonHelper.parseOrDefault(
-                    entity.getWeightsJson(),
-                    HealthV2ConfigDefaults.DEFAULT_SCORE_RULE_WEIGHTS_JSON,
-                    actorUserId,
-                    "SCORE_RULE",
-                    entity.getId(),
-                    "weightsJson"));
-            entity.setThresholdsJson(configJsonHelper.parseOrDefault(
-                    entity.getThresholdsJson(),
-                    HealthV2ConfigDefaults.DEFAULT_SCORE_RULE_THRESHOLDS_JSON,
-                    actorUserId,
-                    "SCORE_RULE",
-                    entity.getId(),
-                    "thresholdsJson"));
-        }
-        return Result.success(entity);
-    }
-
-    @PostMapping
-    @Operation(summary = "创建新版本(DRAFT)")
-    public Result<FcScoreRuleVersionEntity> create(@RequestBody FcScoreRuleVersionEntity dto) {
-        Result<String> jsonCheck = validateScoreRuleJson(dto);
-        if (jsonCheck != null) return Result.error(jsonCheck.getCode(), jsonCheck.getMessage());
-        dto.setId(null);
-        dto.setStatus("DRAFT");
-        dto.setCreatedBy(UserContext.getCurrentUserId());
-        dto.setCreatedAt(LocalDateTime.now());
-        dto.setUpdatedAt(LocalDateTime.now());
-        ruleMapper.insert(dto);
-        auditService.log(UserContext.getCurrentUserId(), "CREATE_SCORE_RULE", "SCORE_RULE", dto.getId(), null, dto);
+    @GetMapping("/active")
+    @Operation(summary = "当前生效规则集 + 参数")
+    @Permission(RbacPermissionCodes.ADMIN_SCORE_RULE_VIEW)
+    public Result<AdminScoreRuleSetDTO> getActive() {
+        ScoreRuleSnapshot snapshot = scoreRuleSetService.getActiveSnapshot();
+        FcScoreRuleSetEntity active = scoreRuleSetService.getActiveRuleSet();
+        List<FcScoreRuleParamEntity> params = active == null ? new ArrayList<>() : scoreRuleSetService.listParams(active.getId());
+        AdminScoreRuleSetDTO dto = toDto(active, snapshot, params);
         return Result.success(dto);
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "编辑版本")
-    public Result<String> update(@PathVariable Long id, @RequestBody FcScoreRuleVersionEntity dto) {
-        FcScoreRuleVersionEntity existing = ruleMapper.selectById(id);
-        if (existing == null) return Result.error(404, "版本不存在");
-        if ("PUBLISHED".equals(existing.getStatus())) return Result.error(400, "已发布版本不可直接编辑，请创建新版本");
-
-        Result<String> jsonCheck = validateScoreRuleJson(dto);
-        if (jsonCheck != null) return jsonCheck;
-        dto.setId(id);
-        dto.setUpdatedAt(LocalDateTime.now());
-        ruleMapper.updateById(dto);
-        auditService.log(UserContext.getCurrentUserId(), "UPDATE_SCORE_RULE", "SCORE_RULE", id, existing, dto);
-        return Result.success("更新成功");
-    }
-
-    @PostMapping("/{id}/publish")
-    @Operation(summary = "发布版本（自动下线旧版）")
-    @Transactional
-    public Result<String> publish(@PathVariable Long id) {
-        FcScoreRuleVersionEntity target = ruleMapper.selectById(id);
-        if (target == null) return Result.error(404, "版本不存在");
-
-        // 锁住当前发布记录，避免并发发布
-        ruleMapper.selectPublishedForUpdate();
-
-        LocalDateTime now = LocalDateTime.now();
-        // 将所有 PUBLISHED 改为 DRAFT
-        ruleMapper.update(
-                null,
-                new LambdaUpdateWrapper<FcScoreRuleVersionEntity>()
-                        .eq(FcScoreRuleVersionEntity::getStatus, "PUBLISHED")
-                        .set(FcScoreRuleVersionEntity::getStatus, "DRAFT")
-                        .set(FcScoreRuleVersionEntity::getUpdatedAt, now));
-
-        target.setStatus("PUBLISHED");
-        target.setUpdatedAt(now);
-        ruleMapper.updateById(target);
-
-        Long publishedCount = ruleMapper.selectCount(
-                new LambdaQueryWrapper<FcScoreRuleVersionEntity>()
-                        .eq(FcScoreRuleVersionEntity::getStatus, "PUBLISHED"));
-        if (publishedCount == null || publishedCount != 1) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return Result.error(409, "发布冲突，请重试");
+    @PostMapping("/save-params")
+    @Operation(summary = "批量保存参数（可自动创建新版本）")
+    @Permission(RbacPermissionCodes.ADMIN_SCORE_RULE_EDIT)
+    public Result<Long> saveParams(@RequestBody AdminScoreRuleSaveParamsRequest request) {
+        Long ruleSetId = request == null ? null : request.getRuleSetId();
+        if (ruleSetId == null) {
+            FcScoreRuleSetEntity draft = scoreRuleSetService.draftNewVersion(
+                    request == null ? null : request.getFromVersion());
+            ruleSetId = draft == null ? null : draft.getId();
         }
-
-        auditService.log(UserContext.getCurrentUserId(), "PUBLISH_SCORE_RULE", "SCORE_RULE", id, null, target);
-        log.info("[Admin] 评分规则发布: version={}, by={}", target.getVersion(), UserContext.getCurrentUserId());
-        return Result.success("版本 " + target.getVersion() + " 已发布");
-    }
-
-    @PostMapping("/{id}/rollback")
-    @Operation(summary = "回滚到指定版本")
-    @Transactional
-    public Result<String> rollback(@PathVariable Long id) {
-        return publish(id); // 回滚即重新发布
-    }
-
-    private Result<String> validateScoreRuleJson(FcScoreRuleVersionEntity dto) {
-        try {
-            configJsonHelper.validateJsonOrThrow(dto.getWeightsJson(), "weightsJson");
-            configJsonHelper.validateJsonOrThrow(dto.getThresholdsJson(), "thresholdsJson");
-        } catch (IllegalArgumentException e) {
-            return Result.error(400, e.getMessage());
+        if (ruleSetId == null) {
+            return Result.error(400, "ruleSetId 不能为空");
         }
-        return null;
+        List<FcScoreRuleParamEntity> entities = toEntities(ruleSetId, request == null ? null : request.getParams());
+        scoreRuleSetService.upsertParams(ruleSetId, entities);
+        return Result.success(ruleSetId);
+    }
+
+    @PostMapping("/publish")
+    @Operation(summary = "发布规则集（立即生效）")
+    @Permission(RbacPermissionCodes.ADMIN_SCORE_RULE_PUBLISH)
+    public Result<String> publish(@RequestBody AdminScoreRulePublishRequest request) {
+        if (request == null || request.getRuleSetId() == null) {
+            return Result.error(400, "ruleSetId 不能为空");
+        }
+        scoreRuleSetService.publish(request.getRuleSetId());
+        return Result.success("published");
+    }
+
+    @PostMapping("/reload")
+    @Operation(summary = "手动重载规则集快照")
+    @Permission(RbacPermissionCodes.ADMIN_SCORE_RULE_EDIT)
+    public Result<String> reload() {
+        scoreRuleSetService.reload();
+        return Result.success("reloaded");
+    }
+
+    private AdminScoreRuleSetDTO toDto(FcScoreRuleSetEntity active,
+                                       ScoreRuleSnapshot snapshot,
+                                       List<FcScoreRuleParamEntity> params) {
+        AdminScoreRuleSetDTO dto = new AdminScoreRuleSetDTO();
+        if (active != null) {
+            dto.setId(active.getId());
+            dto.setCode(active.getCode());
+            dto.setName(active.getName());
+            dto.setVersion(active.getVersion());
+            dto.setEnabled(active.getEnabled());
+            dto.setPublishedAt(active.getPublishedAt());
+        } else {
+            dto.setCode(snapshot.getCode());
+            dto.setVersion(snapshot.getVersion());
+            dto.setEnabled(0);
+        }
+        dto.setSource(snapshot.getSource());
+        dto.setMissingParams(snapshot.getMissingParams());
+        dto.setWarnings(snapshot.getWarnings());
+        dto.setParams(mergeParams(snapshot.getParams(), params));
+        return dto;
+    }
+
+    private List<AdminScoreRuleParamDTO> mergeParams(Map<String, ScoreRuleParamValue> snapshotParams,
+                                                     List<FcScoreRuleParamEntity> entities) {
+        List<AdminScoreRuleParamDTO> result = new ArrayList<>();
+        if (snapshotParams == null) return result;
+        for (ScoreRuleParamValue value : snapshotParams.values()) {
+            AdminScoreRuleParamDTO dto = new AdminScoreRuleParamDTO();
+            dto.setParamKey(value.getKey());
+            dto.setParamValue(value.getRawValue());
+            dto.setValueType(value.getValueType() == null ? null : value.getValueType().name());
+            dto.setMinValue(value.getMinValue() == null ? null : value.getMinValue().toPlainString());
+            dto.setMaxValue(value.getMaxValue() == null ? null : value.getMaxValue().toPlainString());
+            dto.setDescription(value.getDescription());
+            dto.setSource(value.getSource());
+            result.add(dto);
+        }
+        if (entities != null) {
+            for (FcScoreRuleParamEntity e : entities) {
+                for (AdminScoreRuleParamDTO dto : result) {
+                    if (dto.getParamKey() != null && dto.getParamKey().equals(e.getParamKey())) {
+                        dto.setId(e.getId());
+                        dto.setRuleSetId(e.getRuleSetId());
+                        dto.setUpdatedAt(e.getUpdatedAt());
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private List<FcScoreRuleParamEntity> toEntities(Long ruleSetId, List<AdminScoreRuleParamDTO> params) {
+        List<FcScoreRuleParamEntity> result = new ArrayList<>();
+        if (params == null) return result;
+        for (AdminScoreRuleParamDTO p : params) {
+            if (p == null || p.getParamKey() == null) continue;
+            FcScoreRuleParamEntity entity = new FcScoreRuleParamEntity();
+            entity.setRuleSetId(ruleSetId);
+            entity.setParamKey(p.getParamKey());
+            entity.setParamValue(p.getParamValue());
+            entity.setValueType(p.getValueType());
+            entity.setMinValue(p.getMinValue());
+            entity.setMaxValue(p.getMaxValue());
+            entity.setDescription(p.getDescription());
+            result.add(entity);
+        }
+        return result;
     }
 }
