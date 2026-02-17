@@ -57,6 +57,14 @@ Enhance Market Data History (M7-3) with:
 - **Verification**:
   - Admin controller tests and registry reload test passing.
 
+### Step 7: CI Gate (GitHub Actions)
+- **Status**: Completed
+- **Changes**:
+  - Added GitHub Actions workflow `backend-ci` (JDK 21, compile + test, Maven cache).
+  - Added local gate script `scripts/ci-backend.sh`.
+- **Verification**:
+  - Workflow runs on push/PR.
+
 ### Step 3: Correlation Stability
 - **Status**: Completed
 - **Changes**:

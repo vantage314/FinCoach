@@ -80,3 +80,9 @@
    ```
 3. Call Portfolio Metrics.
 4. Verify `source=SNAPSHOT_CACHE` and warnings include `SNAPSHOT_CACHE_HIT` and `SNAPSHOT_PREFER_CACHE_ENABLED`.
+
+## 5. CI Gate (Local)
+Run before pushing changes:
+```bash
+./scripts/ci-backend.sh
+```

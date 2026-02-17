@@ -34,3 +34,7 @@
     ## 7. Admin Ticker Mapping CRUD
     - [x] Admin CRUD endpoints (page/save/enable/disable/reload).
     - [x] Registry reload uses in-memory snapshot (no per-request DB hit).
+
+    ## 8. CI Gate
+    - [x] GitHub Actions workflow (JDK 21, compile + test, Maven cache).
+    - [x] Local script `scripts/ci-backend.sh`.
