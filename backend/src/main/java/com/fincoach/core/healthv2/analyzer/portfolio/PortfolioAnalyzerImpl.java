@@ -2,18 +2,25 @@ package com.fincoach.core.healthv2.analyzer.portfolio;
 
 import org.springframework.stereotype.Component;
 
+import com.fincoach.core.healthv2.debug.PortfolioDebugContextHolder;
+import com.fincoach.core.healthv2.debug.PortfolioMarketDebugSnapshot;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 
 @Component
 public class PortfolioAnalyzerImpl implements PortfolioAnalyzer {
 
+    private static final int MIN_CORR_POINTS = 20;
+
     @Override
     public PortfolioMetrics analyze(PortfolioInput input) {
         if (input == null) {
-            input = new PortfolioInput(null, null, null, null, null);
+            input = new PortfolioInput(null, null, null, null, null, null);
         }
 
         PortfolioMetrics metrics = new PortfolioMetrics();
@@ -121,35 +128,119 @@ public class PortfolioAnalyzerImpl implements PortfolioAnalyzer {
     }
 
     private void calculateCorrelation(PortfolioInput input, PortfolioMetrics metrics) {
-        Map<String, List<Double>> assetReturns = input.getReturnsByAssetKey();
-        if (assetReturns == null || assetReturns.size() < 2) {
-            // Not enough assets to corelate or null
-            metrics.setCorrelation(null); 
-            // Warning? Maybe just info. "INSUFFICIENT_ASSETS_FOR_CORR"
+        Map<String, NavigableMap<LocalDate, Double>> assetReturnsByDate = input.getReturnsByAssetDate();
+        if (assetReturnsByDate == null || assetReturnsByDate.size() < 2) {
+            metrics.setCorrelation(null);
             return;
         }
 
-        Map<String, Map<String, Double>> matrix = new HashMap<>();
-        List<String> keys = new ArrayList<>(assetReturns.keySet());
-        
-        for (int i = 0; i < keys.size(); i++) {
-            String keyA = keys.get(i);
-            matrix.putIfAbsent(keyA, new HashMap<>());
-            matrix.get(keyA).put(keyA, 1.0); // Self correlation
+        ReturnSeriesAligner aligner = new ReturnSeriesAligner(MIN_CORR_POINTS);
+        ReturnSeriesAligner.AlignedSeriesResult aligned = aligner.align(assetReturnsByDate);
+        mergeWarnings(metrics, aligned.getWarnings());
+        updateCorrelationDebug(aligned, false);
 
-            for (int j = i + 1; j < keys.size(); j++) {
-                String keyB = keys.get(j);
-                List<Double> seriesA = assetReturns.get(keyA);
-                List<Double> seriesB = assetReturns.get(keyB);
-                
-                Double corr = MathStatsHelper.correlation(seriesA, seriesB);
-                if (corr != null) {
-                    matrix.get(keyA).put(keyB, corr);
-                    matrix.putIfAbsent(keyB, new HashMap<>());
-                    matrix.get(keyB).put(keyA, corr);
-                }
+        if (aligned.getEffectivePoints() < MIN_CORR_POINTS || aligned.getReturns().length < 2) {
+            addWarning(metrics, ReturnSeriesAligner.WARN_INSUFFICIENT);
+            metrics.setCorrelation(null);
+            updateCorrelationDebug(aligned, false);
+            return;
+        }
+
+        List<String> symbols = aligned.getSymbols();
+        double[][] returns = aligned.getReturns();
+        Map<String, Map<String, Double>> matrix = new LinkedHashMap<>();
+
+        for (int i = 0; i < symbols.size(); i++) {
+            String symA = symbols.get(i);
+            Map<String, Double> row = new LinkedHashMap<>();
+            matrix.put(symA, row);
+            row.put(symA, 1.0);
+        }
+
+        for (int i = 0; i < symbols.size(); i++) {
+            for (int j = i + 1; j < symbols.size(); j++) {
+                double corr = pearson(returns[i], returns[j], metrics);
+                matrix.get(symbols.get(i)).put(symbols.get(j), corr);
+                matrix.get(symbols.get(j)).put(symbols.get(i), corr);
             }
         }
+
         metrics.setCorrelation(matrix);
+        updateCorrelationDebug(aligned, true);
+    }
+
+    private double pearson(double[] x, double[] y, PortfolioMetrics metrics) {
+        int len = Math.min(x.length, y.length);
+        if (len < 2) {
+            addWarning(metrics, ReturnSeriesAligner.WARN_INSUFFICIENT);
+            return 0.0;
+        }
+
+        double sumX = 0.0;
+        double sumY = 0.0;
+        for (int i = 0; i < len; i++) {
+            sumX += x[i];
+            sumY += y[i];
+        }
+        double meanX = sumX / len;
+        double meanY = sumY / len;
+
+        double sumXY = 0.0;
+        double sumX2 = 0.0;
+        double sumY2 = 0.0;
+        for (int i = 0; i < len; i++) {
+            double dx = x[i] - meanX;
+            double dy = y[i] - meanY;
+            sumXY += dx * dy;
+            sumX2 += dx * dx;
+            sumY2 += dy * dy;
+        }
+
+        if (sumX2 == 0.0 || sumY2 == 0.0) {
+            return 0.0;
+        }
+
+        double r = sumXY / Math.sqrt(sumX2 * sumY2);
+        if (Double.isNaN(r) || Double.isInfinite(r)) {
+            return 0.0;
+        }
+        return Math.max(-1.0, Math.min(1.0, r));
+    }
+
+    private void mergeWarnings(PortfolioMetrics metrics, List<String> warnings) {
+        if (warnings == null || warnings.isEmpty()) return;
+        for (String w : warnings) {
+            addWarning(metrics, w);
+        }
+    }
+
+    private void addWarning(PortfolioMetrics metrics, String warning) {
+        if (metrics == null || warning == null) return;
+        if (metrics.getWarnings() == null) {
+            metrics.setWarnings(new ArrayList<>());
+        }
+        if (!metrics.getWarnings().contains(warning)) {
+            metrics.getWarnings().add(warning);
+        }
+    }
+
+    private void updateCorrelationDebug(ReturnSeriesAligner.AlignedSeriesResult aligned, boolean matrixEmitted) {
+        PortfolioMarketDebugSnapshot snapshot = PortfolioDebugContextHolder.get();
+        if (snapshot == null) return;
+        PortfolioMarketDebugSnapshot.CorrelationDebug debug = new PortfolioMarketDebugSnapshot.CorrelationDebug();
+        debug.setEffectivePoints(aligned != null ? aligned.getEffectivePoints() : 0);
+        debug.setMinPoints(MIN_CORR_POINTS);
+        debug.setMatrixEmitted(matrixEmitted);
+        String mode = "NONE";
+        List<String> warnings = aligned != null ? aligned.getWarnings() : null;
+        if (warnings != null) {
+            if (warnings.contains(ReturnSeriesAligner.WARN_INTERSECTION)) {
+                mode = "INTERSECTION";
+            } else if (warnings.contains(ReturnSeriesAligner.WARN_RELAXED)) {
+                mode = "RELAXED";
+            }
+        }
+        debug.setAlignedMode(mode);
+        snapshot.setCorrelation(debug);
     }
 }
