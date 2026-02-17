@@ -53,6 +53,7 @@ public class AdminMarketDebugMapper {
             dto.setCorrelationMatrix(mapCorrelationMatrix(snapshot.getCorrelationMatrix()));
         }
         dto.setScoreSummary(mapScoreSummary(snapshot.getScoreSummary()));
+        dto.setDebtCashflowSummary(mapDebtCashflowSummary(snapshot.getDebtCashflowSummary()));
 
         return dto;
     }
@@ -227,6 +228,20 @@ public class AdminMarketDebugMapper {
         dto.setValue(item.getValue());
         dto.setLevel(item.getLevel());
         dto.setWarningsCount(item.getWarnings() == null ? 0 : item.getWarnings().size());
+        return dto;
+    }
+
+    private AdminMarketDebugLatestDTO.DebtCashflowSummaryDTO mapDebtCashflowSummary(
+            PortfolioMarketDebugSnapshot.DebtCashflowSummary summary) {
+        AdminMarketDebugLatestDTO.DebtCashflowSummaryDTO dto = new AdminMarketDebugLatestDTO.DebtCashflowSummaryDTO();
+        if (summary == null) {
+            return dto;
+        }
+        dto.setDti(summary.getDti());
+        dto.setSurplusRate(summary.getSurplusRate());
+        dto.setEmergencyFundMonths(summary.getEmergencyFundMonths());
+        dto.setStressLevel(summary.getStressLevel());
+        dto.setWarningsCount(summary.getWarningsCount());
         return dto;
     }
 

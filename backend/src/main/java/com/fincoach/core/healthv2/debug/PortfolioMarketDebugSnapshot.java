@@ -16,6 +16,7 @@ public class PortfolioMarketDebugSnapshot {
     private CorrelationMatrixSummary correlationMatrixSummary;
     private CorrelationMatrixData correlationMatrix;
     private ScoreSummary scoreSummary;
+    private DebtCashflowSummary debtCashflowSummary;
     private List<String> warnings = new ArrayList<>();
     private Instant generatedAt;
 
@@ -39,6 +40,8 @@ public class PortfolioMarketDebugSnapshot {
     public void setCorrelationMatrix(CorrelationMatrixData correlationMatrix) { this.correlationMatrix = correlationMatrix; }
     public ScoreSummary getScoreSummary() { return scoreSummary; }
     public void setScoreSummary(ScoreSummary scoreSummary) { this.scoreSummary = scoreSummary; }
+    public DebtCashflowSummary getDebtCashflowSummary() { return debtCashflowSummary; }
+    public void setDebtCashflowSummary(DebtCashflowSummary debtCashflowSummary) { this.debtCashflowSummary = debtCashflowSummary; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public Instant getGeneratedAt() { return generatedAt; }
@@ -185,6 +188,25 @@ public class PortfolioMarketDebugSnapshot {
         public void setLevel(String level) { this.level = level; }
         public List<String> getWarnings() { return warnings; }
         public void setWarnings(List<String> warnings) { this.warnings = warnings; }
+    }
+
+    public static class DebtCashflowSummary {
+        private Double dti;
+        private Double surplusRate;
+        private Double emergencyFundMonths;
+        private String stressLevel;
+        private int warningsCount;
+
+        public Double getDti() { return dti; }
+        public void setDti(Double dti) { this.dti = dti; }
+        public Double getSurplusRate() { return surplusRate; }
+        public void setSurplusRate(Double surplusRate) { this.surplusRate = surplusRate; }
+        public Double getEmergencyFundMonths() { return emergencyFundMonths; }
+        public void setEmergencyFundMonths(Double emergencyFundMonths) { this.emergencyFundMonths = emergencyFundMonths; }
+        public String getStressLevel() { return stressLevel; }
+        public void setStressLevel(String stressLevel) { this.stressLevel = stressLevel; }
+        public int getWarningsCount() { return warningsCount; }
+        public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
     }
 
     public static class FallbackDebug {

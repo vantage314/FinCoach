@@ -17,6 +17,7 @@ public class AdminMarketDebugLatestDTO {
     private CorrelationMatrixSummaryDTO correlationMatrixSummary;
     private CorrelationMatrixDTO correlationMatrix;
     private ScoreSummaryDTO scoreSummary;
+    private DebtCashflowSummaryDTO debtCashflowSummary;
     private List<String> warnings = new ArrayList<>();
     private String ruleSetCode;
     private Integer ruleSetVersion;
@@ -55,6 +56,8 @@ public class AdminMarketDebugLatestDTO {
     public void setCorrelationMatrix(CorrelationMatrixDTO correlationMatrix) { this.correlationMatrix = correlationMatrix; }
     public ScoreSummaryDTO getScoreSummary() { return scoreSummary; }
     public void setScoreSummary(ScoreSummaryDTO scoreSummary) { this.scoreSummary = scoreSummary; }
+    public DebtCashflowSummaryDTO getDebtCashflowSummary() { return debtCashflowSummary; }
+    public void setDebtCashflowSummary(DebtCashflowSummaryDTO debtCashflowSummary) { this.debtCashflowSummary = debtCashflowSummary; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public String getRuleSetCode() { return ruleSetCode; }
@@ -249,6 +252,25 @@ public class AdminMarketDebugLatestDTO {
         public void setValue(Integer value) { this.value = value; }
         public String getLevel() { return level; }
         public void setLevel(String level) { this.level = level; }
+        public int getWarningsCount() { return warningsCount; }
+        public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
+    }
+
+    public static class DebtCashflowSummaryDTO {
+        private Double dti;
+        private Double surplusRate;
+        private Double emergencyFundMonths;
+        private String stressLevel;
+        private int warningsCount;
+
+        public Double getDti() { return dti; }
+        public void setDti(Double dti) { this.dti = dti; }
+        public Double getSurplusRate() { return surplusRate; }
+        public void setSurplusRate(Double surplusRate) { this.surplusRate = surplusRate; }
+        public Double getEmergencyFundMonths() { return emergencyFundMonths; }
+        public void setEmergencyFundMonths(Double emergencyFundMonths) { this.emergencyFundMonths = emergencyFundMonths; }
+        public String getStressLevel() { return stressLevel; }
+        public void setStressLevel(String stressLevel) { this.stressLevel = stressLevel; }
         public int getWarningsCount() { return warningsCount; }
         public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
     }
