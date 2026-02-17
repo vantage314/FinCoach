@@ -55,6 +55,7 @@ public class AdminMarketDebugMapper {
         dto.setScoreSummary(mapScoreSummary(snapshot.getScoreSummary()));
         dto.setDebtCashflowSummary(mapDebtCashflowSummary(snapshot.getDebtCashflowSummary()));
         dto.setDebtOptimizerSummary(mapDebtOptimizerSummary(snapshot.getDebtOptimizerSummary()));
+        dto.setInsuranceGapSummary(mapInsuranceGapSummary(snapshot.getInsuranceGapSummary()));
 
         return dto;
     }
@@ -255,6 +256,19 @@ public class AdminMarketDebugMapper {
         dto.setStrategy(summary.getStrategy());
         dto.setTopDebtName(summary.getTopDebtName());
         dto.setBudgetForExtraPayment(summary.getBudgetForExtraPayment());
+        dto.setWarningsCount(summary.getWarningsCount());
+        return dto;
+    }
+
+    private AdminMarketDebugLatestDTO.InsuranceGapSummaryDTO mapInsuranceGapSummary(
+            PortfolioMarketDebugSnapshot.InsuranceGapSummary summary) {
+        AdminMarketDebugLatestDTO.InsuranceGapSummaryDTO dto = new AdminMarketDebugLatestDTO.InsuranceGapSummaryDTO();
+        if (summary == null) {
+            return dto;
+        }
+        dto.setPremiumRatio(summary.getPremiumRatio());
+        dto.setTopGapType(summary.getTopGapType());
+        dto.setTopGapValue(summary.getTopGapValue());
         dto.setWarningsCount(summary.getWarningsCount());
         return dto;
     }

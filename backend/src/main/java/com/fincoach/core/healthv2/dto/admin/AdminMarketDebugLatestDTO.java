@@ -19,6 +19,7 @@ public class AdminMarketDebugLatestDTO {
     private ScoreSummaryDTO scoreSummary;
     private DebtCashflowSummaryDTO debtCashflowSummary;
     private DebtOptimizerSummaryDTO debtOptimizerSummary;
+    private InsuranceGapSummaryDTO insuranceGapSummary;
     private List<String> warnings = new ArrayList<>();
     private String ruleSetCode;
     private Integer ruleSetVersion;
@@ -61,6 +62,8 @@ public class AdminMarketDebugLatestDTO {
     public void setDebtCashflowSummary(DebtCashflowSummaryDTO debtCashflowSummary) { this.debtCashflowSummary = debtCashflowSummary; }
     public DebtOptimizerSummaryDTO getDebtOptimizerSummary() { return debtOptimizerSummary; }
     public void setDebtOptimizerSummary(DebtOptimizerSummaryDTO debtOptimizerSummary) { this.debtOptimizerSummary = debtOptimizerSummary; }
+    public InsuranceGapSummaryDTO getInsuranceGapSummary() { return insuranceGapSummary; }
+    public void setInsuranceGapSummary(InsuranceGapSummaryDTO insuranceGapSummary) { this.insuranceGapSummary = insuranceGapSummary; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public String getRuleSetCode() { return ruleSetCode; }
@@ -290,6 +293,22 @@ public class AdminMarketDebugLatestDTO {
         public void setTopDebtName(String topDebtName) { this.topDebtName = topDebtName; }
         public Double getBudgetForExtraPayment() { return budgetForExtraPayment; }
         public void setBudgetForExtraPayment(Double budgetForExtraPayment) { this.budgetForExtraPayment = budgetForExtraPayment; }
+        public int getWarningsCount() { return warningsCount; }
+        public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
+    }
+
+    public static class InsuranceGapSummaryDTO {
+        private Double premiumRatio;
+        private String topGapType;
+        private Double topGapValue;
+        private int warningsCount;
+
+        public Double getPremiumRatio() { return premiumRatio; }
+        public void setPremiumRatio(Double premiumRatio) { this.premiumRatio = premiumRatio; }
+        public String getTopGapType() { return topGapType; }
+        public void setTopGapType(String topGapType) { this.topGapType = topGapType; }
+        public Double getTopGapValue() { return topGapValue; }
+        public void setTopGapValue(Double topGapValue) { this.topGapValue = topGapValue; }
         public int getWarningsCount() { return warningsCount; }
         public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
     }
