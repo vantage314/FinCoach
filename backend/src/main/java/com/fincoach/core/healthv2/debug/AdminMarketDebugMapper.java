@@ -1,7 +1,10 @@
 package com.fincoach.core.healthv2.debug;
 
 import com.fincoach.core.healthv2.dto.admin.AdminMarketDebugLatestDTO;
+import com.fincoach.core.healthv2.rules.ScoreRuleSetRegistry;
+import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,6 +14,9 @@ import java.util.UUID;
 @Component
 public class AdminMarketDebugMapper {
 
+    @Autowired(required = false)
+    private ScoreRuleSetRegistry scoreRuleSetRegistry;
+
     public AdminMarketDebugLatestDTO toDto(PortfolioMarketDebugSnapshot snapshot, Long userId) {
         AdminMarketDebugLatestDTO dto = new AdminMarketDebugLatestDTO();
         dto.setRequestId(resolveRequestId());
@@ -19,6 +25,8 @@ public class AdminMarketDebugMapper {
         dto.setEnabled(snapshot != null);
         dto.setWarnings(new ArrayList<>());
         dto.setResolvedTickers(new ArrayList<>());
+
+        attachRuleSet(dto);
 
         if (snapshot == null) {
             dto.getWarnings().add("DEBUG_SNAPSHOT_EMPTY");
@@ -36,6 +44,17 @@ public class AdminMarketDebugMapper {
         dto.setCorrelation(mapCorrelation(snapshot.getCorrelation()));
 
         return dto;
+    }
+
+    private void attachRuleSet(AdminMarketDebugLatestDTO dto) {
+        if (scoreRuleSetRegistry == null || dto == null) return;
+        ScoreRuleSnapshot snapshot = scoreRuleSetRegistry.get();
+        if (snapshot == null) return;
+        dto.setRuleSetCode(snapshot.getCode());
+        dto.setRuleSetVersion(snapshot.getVersion());
+        dto.setRuleSetSource(snapshot.getSource());
+        dto.setRuleSetMissingParams(new ArrayList<>(safeList(snapshot.getMissingParams())));
+        dto.setRuleSetWarnings(new ArrayList<>(safeList(snapshot.getWarnings())));
     }
 
     private String resolveRequestId() {

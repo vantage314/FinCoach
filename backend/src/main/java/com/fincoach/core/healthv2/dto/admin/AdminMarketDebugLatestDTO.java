@@ -15,6 +15,11 @@ public class AdminMarketDebugLatestDTO {
     private FallbackDTO fallback;
     private CorrelationDTO correlation;
     private List<String> warnings = new ArrayList<>();
+    private String ruleSetCode;
+    private Integer ruleSetVersion;
+    private String ruleSetSource;
+    private List<String> ruleSetMissingParams = new ArrayList<>();
+    private List<String> ruleSetWarnings = new ArrayList<>();
 
     public String getRequestId() { return requestId; }
     public void setRequestId(String requestId) { this.requestId = requestId; }
@@ -38,6 +43,16 @@ public class AdminMarketDebugLatestDTO {
     public void setCorrelation(CorrelationDTO correlation) { this.correlation = correlation; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
+    public String getRuleSetCode() { return ruleSetCode; }
+    public void setRuleSetCode(String ruleSetCode) { this.ruleSetCode = ruleSetCode; }
+    public Integer getRuleSetVersion() { return ruleSetVersion; }
+    public void setRuleSetVersion(Integer ruleSetVersion) { this.ruleSetVersion = ruleSetVersion; }
+    public String getRuleSetSource() { return ruleSetSource; }
+    public void setRuleSetSource(String ruleSetSource) { this.ruleSetSource = ruleSetSource; }
+    public List<String> getRuleSetMissingParams() { return ruleSetMissingParams; }
+    public void setRuleSetMissingParams(List<String> ruleSetMissingParams) { this.ruleSetMissingParams = ruleSetMissingParams; }
+    public List<String> getRuleSetWarnings() { return ruleSetWarnings; }
+    public void setRuleSetWarnings(List<String> ruleSetWarnings) { this.ruleSetWarnings = ruleSetWarnings; }
 
     public static class ResolvedTickerDTO {
         private String keyword;

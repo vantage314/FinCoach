@@ -1,6 +1,8 @@
 package com.fincoach.core.healthv2.analyzer;
 
 import com.fincoach.core.healthv2.entity.*;
+import com.fincoach.core.healthv2.rules.ScoreRuleDefaults;
+import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -33,63 +35,96 @@ public class ScoreEngine {
                                         BigDecimal dti,
                                         BigDecimal totalAssets,
                                         BigDecimal totalDebt,
-                                        Map<String, Object> behaviorStats) {
+                                        Map<String, Object> behaviorStats,
+                                        ScoreRuleSnapshot ruleSnapshot) {
 
         Map<String, Object> result = new LinkedHashMap<>();
+
+        ScoreRuleSnapshot snapshot = ruleSnapshot != null ? ruleSnapshot : defaultSnapshot();
+
+        double wSharpe = toDouble(snapshot.getDecimal(ScoreRuleDefaults.W_SHARPE, new BigDecimal("0.35")));
+        double wMdd = toDouble(snapshot.getDecimal(ScoreRuleDefaults.W_MDD, new BigDecimal("0.35")));
+        double wVol = toDouble(snapshot.getDecimal(ScoreRuleDefaults.W_VOL, new BigDecimal("0.15")));
+        double wDiv = toDouble(snapshot.getDecimal(ScoreRuleDefaults.W_DIVERSIFICATION, new BigDecimal("0.15")));
+
+        double sharpeOk = toDouble(snapshot.getDecimal(ScoreRuleDefaults.SHARPE_OK, new BigDecimal("0.5")));
+        double sharpeGood = toDouble(snapshot.getDecimal(ScoreRuleDefaults.SHARPE_GOOD, new BigDecimal("1.0")));
+        double mddOk = toDouble(snapshot.getDecimal(ScoreRuleDefaults.MDD_OK, new BigDecimal("0.2")));
+        double mddBad = toDouble(snapshot.getDecimal(ScoreRuleDefaults.MDD_BAD, new BigDecimal("0.4")));
+
+        double cashFlowRateMin = toDouble(snapshot.getDecimal(ScoreRuleDefaults.CASH_FLOW_RATE_MIN, new BigDecimal("0.1")));
+        double debtRatioMax = toDouble(snapshot.getDecimal(ScoreRuleDefaults.DEBT_RATIO_MAX, new BigDecimal("0.5")));
+        int emergencyMonthsMin = snapshot.getInt(ScoreRuleDefaults.EMERGENCY_MONTHS_MIN, 3);
+        double assetLiabilityRatioGood = toDouble(snapshot.getDecimal(ScoreRuleDefaults.ASSET_LIABILITY_RATIO_GOOD, new BigDecimal("2.0")));
+        double liquidityRatioGood = toDouble(snapshot.getDecimal(ScoreRuleDefaults.LIQUIDITY_RATIO_GOOD, new BigDecimal("0.2")));
+
+        BigDecimal cashAssets = sumCashAssets(assets);
+        BigDecimal liquidityRatio = calcRatio(cashAssets, totalAssets);
+        BigDecimal assetLiabilityRatio = calcRatio(totalAssets, totalDebt);
+        Double cashFlowRate = calcCashFlowRate(cashflow);
 
         // ========= Health Score (5 维) =========
         List<Map<String, Object>> healthBreakdown = new ArrayList<>();
 
         // 1. Liquidity (权重 25)
-        int liqScore = scoreLiquidity(emergencyMonths);
-        healthBreakdown.add(dim("Liquidity", liqScore, 25, describeLiquidity(emergencyMonths)));
+        int liqScore = scoreLiquidity(emergencyMonths, liquidityRatio, liquidityRatioGood);
+        healthBreakdown.add(dim("Liquidity", liqScore, 25, describeLiquidity(emergencyMonths, liquidityRatio, liquidityRatioGood)));
 
         // 2. DebtHealth (权重 25)
-        int debtScore = scoreDebtHealth(dti, liabilities);
-        healthBreakdown.add(dim("DebtHealth", debtScore, 25, describeDebtHealth(dti)));
+        int debtScore = scoreDebtHealth(dti, liabilities, assetLiabilityRatio, assetLiabilityRatioGood);
+        healthBreakdown.add(dim("DebtHealth", debtScore, 25, describeDebtHealth(dti, assetLiabilityRatio, assetLiabilityRatioGood)));
 
         // 3. Diversification (权重 20)
         int divScore = scoreDiversification(allocation, concentration);
         healthBreakdown.add(dim("Diversification", divScore, 20, describeDiversification(concentration)));
 
         // 4. RiskAdjustedReturn (权重 15)
-        int rarScore = scoreRiskAdjustedReturn(performanceResult);
+        int rarScore = scoreRiskAdjustedReturn(performanceResult, sharpeOk, sharpeGood, mddOk, mddBad);
         healthBreakdown.add(dim("RiskAdjustedReturn", rarScore, 15, describeRAR(performanceResult)));
 
         // 5. Behavior (权重 15)
-        int behaviorScore = scoreBehavior(behaviorStats);
-        String behaviorReason = describeBehavior(behaviorStats);
+        int behaviorScore = scoreBehavior(behaviorStats, cashFlowRate, dti, emergencyMonths,
+                cashFlowRateMin, debtRatioMax, emergencyMonthsMin);
+        String behaviorReason = describeBehavior(behaviorStats, cashFlowRate, dti, emergencyMonths,
+                cashFlowRateMin, debtRatioMax, emergencyMonthsMin);
         healthBreakdown.add(dim("Behavior", behaviorScore, 15, behaviorReason));
 
         int healthScore = calcWeighted(healthBreakdown);
         result.put("healthScore", clamp(healthScore));
 
-        // ========= Risk Score (5 维，越高风险越大) =========
+        // ========= Risk Score (规则权重) =========
         List<Map<String, Object>> riskBreakdown = new ArrayList<>();
 
-        // 1. EquityRatio (权重 25)
-        int eqScore = scoreEquityRatio(allocation);
-        riskBreakdown.add(dim("EquityRatio", eqScore, 25, describeEquityRatio(allocation)));
+        Double sharpe = toDoubleObj(performanceResult == null ? null : performanceResult.get("sharpe"));
+        Double maxDD = toDoubleObj(performanceResult == null ? null : performanceResult.get("maxDrawdown"));
+        Double volatility = toDoubleObj(performanceResult == null ? null : performanceResult.get("volatility"));
 
-        // 2. MaxDrawdown (权重 20)
-        int ddScore = scoreMaxDrawdown(performanceResult);
-        riskBreakdown.add(dim("MaxDrawdown", ddScore, 20, describeMaxDrawdown(performanceResult)));
+        int sharpeRisk = scoreSharpeRisk(sharpe, sharpeOk, sharpeGood);
+        int mddRisk = scoreMddRisk(maxDD, mddOk, mddBad);
+        int volRisk = scoreVolRisk(volatility);
+        int divRisk = scoreDiversificationRisk(concentration);
 
-        // 3. Concentration (权重 20)
-        int concScore = scoreConcentration(concentration);
-        riskBreakdown.add(dim("Concentration", concScore, 20, describeConcentration(concentration)));
+        double weightSum = wSharpe + wMdd + wVol + wDiv;
+        if (weightSum <= 0) {
+            wSharpe = 0.35;
+            wMdd = 0.35;
+            wVol = 0.15;
+            wDiv = 0.15;
+            weightSum = wSharpe + wMdd + wVol + wDiv;
+        }
 
-        // 4. CashflowFragility (权重 20)
-        int fragScore = scoreCashflowFragility(dti, emergencyMonths);
-        riskBreakdown.add(dim("CashflowFragility", fragScore, 20, describeCashflowFragility(dti, emergencyMonths)));
+        int sharpeWeight = weightPercent(wSharpe, weightSum);
+        int mddWeight = weightPercent(wMdd, weightSum);
+        int volWeight = weightPercent(wVol, weightSum);
+        int divWeight = Math.max(0, 100 - sharpeWeight - mddWeight - volWeight);
 
-        // 5. NetWorthNegative (权重 15)
-        BigDecimal netWorth = totalAssets.subtract(totalDebt);
-        int nwScore = netWorth.compareTo(BigDecimal.ZERO) < 0 ? 90 : 20;
-        riskBreakdown.add(dim("NetWorthNegative", nwScore, 15,
-                netWorth.compareTo(BigDecimal.ZERO) < 0 ? "净资产为负，风险显著" : "净资产为正"));
+        riskBreakdown.add(dim("Sharpe", sharpeRisk, sharpeWeight, describeSharpeRisk(sharpe, sharpeOk, sharpeGood)));
+        riskBreakdown.add(dim("MaxDrawdown", mddRisk, mddWeight, describeMddRisk(maxDD, mddOk, mddBad)));
+        riskBreakdown.add(dim("Volatility", volRisk, volWeight, describeVolRisk(volatility)));
+        riskBreakdown.add(dim("Diversification", divRisk, divWeight, describeDiversification(concentration)));
 
-        int riskScore = calcWeighted(riskBreakdown);
+        int riskScore = (int) Math.round(
+                (sharpeRisk * wSharpe + mddRisk * wMdd + volRisk * wVol + divRisk * wDiv) / weightSum);
         result.put("riskScore", clamp(riskScore));
 
         // ========= Behavior Score (M5-A 规则版) =========
@@ -104,30 +139,53 @@ public class ScoreEngine {
         breakdown.put("risk", riskBreakdown);
         breakdown.put("behavior", behaviorBreakdown);
         result.put("breakdown", breakdown);
+        result.put("ruleSet", snapshot.toDebugMap());
 
         return result;
     }
 
     // ============================= Health 维度 =============================
 
-    private int scoreLiquidity(BigDecimal emergencyMonths) {
-        if (emergencyMonths == null) return 30;
-        double m = emergencyMonths.doubleValue();
-        if (m >= 6) return 95;
-        if (m >= 3) return 75;
-        if (m >= 1) return 50;
-        return 20;
+    private int scoreLiquidity(BigDecimal emergencyMonths, BigDecimal liquidityRatio, double liquidityRatioGood) {
+        int score = 30;
+        if (emergencyMonths != null) {
+            double m = emergencyMonths.doubleValue();
+            if (m >= 6) score = 95;
+            else if (m >= 3) score = 75;
+            else if (m >= 1) score = 50;
+            else score = 20;
+        }
+        if (liquidityRatio != null) {
+            if (liquidityRatio.doubleValue() >= liquidityRatioGood) {
+                score += 5;
+            } else if (liquidityRatio.doubleValue() < liquidityRatioGood / 2) {
+                score -= 5;
+            }
+        }
+        return Math.max(10, Math.min(100, score));
     }
 
-    private String describeLiquidity(BigDecimal emergencyMonths) {
-        if (emergencyMonths == null) return "未录入现金流，无法评估应急金";
-        double m = emergencyMonths.doubleValue();
-        if (m >= 6) return "应急金充裕，覆盖" + emergencyMonths + "个月";
-        if (m >= 3) return "应急金基本达标（" + emergencyMonths + "个月），建议逐步补至6个月";
-        return "应急金不足（仅" + emergencyMonths + "个月），需优先补充";
+    private String describeLiquidity(BigDecimal emergencyMonths, BigDecimal liquidityRatio, double liquidityRatioGood) {
+        String base;
+        if (emergencyMonths == null) {
+            base = "未录入现金流，无法评估应急金";
+        } else {
+            double m = emergencyMonths.doubleValue();
+            if (m >= 6) base = "应急金充裕，覆盖" + emergencyMonths + "个月";
+            else if (m >= 3) base = "应急金基本达标（" + emergencyMonths + "个月），建议逐步补至6个月";
+            else base = "应急金不足（仅" + emergencyMonths + "个月），需优先补充";
+        }
+        if (liquidityRatio != null) {
+            String ratio = pct(liquidityRatio.doubleValue());
+            return base + "，流动性占比=" + ratio + " (目标>=" + pct(liquidityRatioGood) + ")";
+        }
+        return base;
     }
 
-    private int scoreDebtHealth(BigDecimal dti, List<FcLiabilityEntity> liabilities) {
+    private int scoreDebtHealth(BigDecimal dti,
+                                List<FcLiabilityEntity> liabilities,
+                                BigDecimal assetLiabilityRatio,
+                                double assetLiabilityRatioGood) {
         int score = 90;
         if (dti != null) {
             double d = dti.doubleValue();
@@ -142,17 +200,28 @@ public class ScoreEngine {
                     .count();
             score -= (int)(highRateCount * 10);
         }
+        if (assetLiabilityRatio != null) {
+            double ratio = assetLiabilityRatio.doubleValue();
+            if (ratio >= assetLiabilityRatioGood) score += 5;
+            else if (ratio < assetLiabilityRatioGood / 2) score -= 5;
+        }
         return Math.max(10, score);
     }
 
-    private String describeDebtHealth(BigDecimal dti) {
+    private String describeDebtHealth(BigDecimal dti, BigDecimal assetLiabilityRatio, double assetLiabilityRatioGood) {
         if (dti == null) return "未录入负债或现金流数据";
         double d = dti.doubleValue();
         String pct = dti.multiply(new BigDecimal("100")).setScale(1, RoundingMode.HALF_UP) + "%";
-        if (d > 0.5) return "DTI=" + pct + "，超过50%严重警戒线";
-        if (d > 0.4) return "DTI=" + pct + "，超过40%警戒线";
-        if (d > 0.3) return "DTI=" + pct + "，接近警戒区间";
-        return "DTI=" + pct + "，债务负担健康";
+        String base;
+        if (d > 0.5) base = "DTI=" + pct + "，超过50%严重警戒线";
+        else if (d > 0.4) base = "DTI=" + pct + "，超过40%警戒线";
+        else if (d > 0.3) base = "DTI=" + pct + "，接近警戒区间";
+        else base = "DTI=" + pct + "，债务负担健康";
+        if (assetLiabilityRatio != null) {
+            return base + "，资产负债比=" + assetLiabilityRatio.setScale(2, RoundingMode.HALF_UP)
+                    + " (目标>=" + assetLiabilityRatioGood + ")";
+        }
+        return base;
     }
 
     private int scoreDiversification(Map<String, Object> allocation, Map<String, Object> concentration) {
@@ -184,22 +253,26 @@ public class ScoreEngine {
         return "资产配置分散度尚可";
     }
 
-    private int scoreRiskAdjustedReturn(Map<String, Object> perf) {
+    private int scoreRiskAdjustedReturn(Map<String, Object> perf,
+                                        double sharpeOk,
+                                        double sharpeGood,
+                                        double mddOk,
+                                        double mddBad) {
         if (perf == null) return 50;
         Double sharpe = toDoubleObj(perf.get("sharpe"));
         Double maxDD = toDoubleObj(perf.get("maxDrawdown"));
         int score = 50;
         if (sharpe != null) {
-            if (sharpe > 1.0) score += 25;
-            else if (sharpe > 0.5) score += 15;
+            if (sharpe >= sharpeGood) score += 25;
+            else if (sharpe >= sharpeOk) score += 15;
             else if (sharpe > 0) score += 5;
             else score -= 15;
         }
         if (maxDD != null) {
-            if (maxDD < 0.1) score += 15;
-            else if (maxDD < 0.2) score += 5;
-            else if (maxDD > 0.4) score -= 15;
-            else if (maxDD > 0.3) score -= 5;
+            if (maxDD <= mddOk / 2) score += 15;
+            else if (maxDD <= mddOk) score += 5;
+            else if (maxDD >= mddBad) score -= 15;
+            else if (maxDD >= (mddOk + mddBad) / 2) score -= 5;
         }
         return Math.max(10, Math.min(100, score));
     }
@@ -216,6 +289,57 @@ public class ScoreEngine {
         }
         if (sb.length() == 0) return "性能指标暂无数据";
         return sb.toString();
+    }
+
+    private int scoreSharpeRisk(Double sharpe, double sharpeOk, double sharpeGood) {
+        if (sharpe == null) return 50;
+        if (sharpe >= sharpeGood) return 10;
+        if (sharpe >= sharpeOk) return 30;
+        if (sharpe >= 0) return 50;
+        return 80;
+    }
+
+    private String describeSharpeRisk(Double sharpe, double sharpeOk, double sharpeGood) {
+        if (sharpe == null) return "Sharpe 缺失，采用中性风险";
+        if (sharpe >= sharpeGood) return "Sharpe=" + sharpe + "，表现优秀";
+        if (sharpe >= sharpeOk) return "Sharpe=" + sharpe + "，表现达标";
+        if (sharpe >= 0) return "Sharpe=" + sharpe + "，表现一般";
+        return "Sharpe=" + sharpe + "，表现较弱";
+    }
+
+    private int scoreMddRisk(Double maxDD, double mddOk, double mddBad) {
+        if (maxDD == null) return 50;
+        if (maxDD <= mddOk) return 20;
+        if (maxDD <= mddBad) return 50;
+        return 80;
+    }
+
+    private String describeMddRisk(Double maxDD, double mddOk, double mddBad) {
+        if (maxDD == null) return "MaxDD 缺失，采用中性风险";
+        if (maxDD <= mddOk) return "MaxDD=" + pct(maxDD) + "，回撤可控";
+        if (maxDD <= mddBad) return "MaxDD=" + pct(maxDD) + "，回撤偏高";
+        return "MaxDD=" + pct(maxDD) + "，回撤过高";
+    }
+
+    private int scoreVolRisk(Double volatility) {
+        if (volatility == null) return 50;
+        if (volatility <= 0.15) return 20;
+        if (volatility <= 0.30) return 55;
+        return 80;
+    }
+
+    private String describeVolRisk(Double volatility) {
+        if (volatility == null) return "Volatility 缺失，采用中性风险";
+        return "Volatility=" + pct(volatility);
+    }
+
+    private int scoreDiversificationRisk(Map<String, Object> concentration) {
+        if (concentration == null || concentration.isEmpty()) return 50;
+        double topRatio = toDouble(concentration.get("topRatio"));
+        if (topRatio > 0.7) return 80;
+        if (topRatio > 0.5) return 60;
+        if (topRatio > 0.3) return 40;
+        return 20;
     }
 
     // ============================= Risk 维度 =============================
@@ -300,10 +424,17 @@ public class ScoreEngine {
 
     // ============================= Behavior 维度 (M5) =============================
 
-    private int scoreBehavior(Map<String, Object> stats) {
+    private int scoreBehavior(Map<String, Object> stats,
+                              Double cashFlowRate,
+                              BigDecimal dti,
+                              BigDecimal emergencyMonths,
+                              double cashFlowRateMin,
+                              double debtRatioMax,
+                              int emergencyMonthsMin) {
         int eventCount = intValue(stats, "eventCount30d");
         if (eventCount < 3) {
-            return 60;
+            return adjustBehaviorScore(60, cashFlowRate, dti, emergencyMonths,
+                    cashFlowRateMin, debtRatioMax, emergencyMonthsMin);
         }
         int score = 60;
         int reportGenerateCount = intValue(stats, "reportGenerateCount30d");
@@ -317,15 +448,24 @@ public class ScoreEngine {
         if (rebalanceConfirmCount >= 3) {
             score += 5;
         }
-        return clamp(score);
+        return adjustBehaviorScore(score, cashFlowRate, dti, emergencyMonths,
+                cashFlowRateMin, debtRatioMax, emergencyMonthsMin);
     }
 
-    private String describeBehavior(Map<String, Object> stats) {
+    private String describeBehavior(Map<String, Object> stats,
+                                    Double cashFlowRate,
+                                    BigDecimal dti,
+                                    BigDecimal emergencyMonths,
+                                    double cashFlowRateMin,
+                                    double debtRatioMax,
+                                    int emergencyMonthsMin) {
         int eventCount = intValue(stats, "eventCount30d");
         int reportGenerateCount = intValue(stats, "reportGenerateCount30d");
         int rebalanceConfirmCount = intValue(stats, "rebalanceConfirmCount30d");
         if (eventCount < 3) {
-            return "近30天行为事件不足3条（当前" + eventCount + "条），采用基线60分";
+            return appendBehaviorRuleNotes(
+                    "近30天行为事件不足3条（当前" + eventCount + "条），采用基线60分",
+                    cashFlowRate, dti, emergencyMonths, cashFlowRateMin, debtRatioMax, emergencyMonthsMin);
         }
         List<String> reasons = new ArrayList<>();
         reasons.add("基线60分");
@@ -341,7 +481,50 @@ public class ScoreEngine {
         if (rebalanceConfirmCount >= 3) {
             reasons.add("再平衡确认次数>=3(+5)");
         }
-        return String.join("；", reasons);
+        String base = String.join("；", reasons);
+        return appendBehaviorRuleNotes(base, cashFlowRate, dti, emergencyMonths,
+                cashFlowRateMin, debtRatioMax, emergencyMonthsMin);
+    }
+
+    private int adjustBehaviorScore(int base,
+                                    Double cashFlowRate,
+                                    BigDecimal dti,
+                                    BigDecimal emergencyMonths,
+                                    double cashFlowRateMin,
+                                    double debtRatioMax,
+                                    int emergencyMonthsMin) {
+        int score = base;
+        if (cashFlowRate != null && cashFlowRate < cashFlowRateMin) {
+            score -= 10;
+        }
+        if (dti != null && dti.doubleValue() > debtRatioMax) {
+            score -= 10;
+        }
+        if (emergencyMonths != null && emergencyMonths.doubleValue() < emergencyMonthsMin) {
+            score -= 10;
+        }
+        return clamp(score);
+    }
+
+    private String appendBehaviorRuleNotes(String base,
+                                           Double cashFlowRate,
+                                           BigDecimal dti,
+                                           BigDecimal emergencyMonths,
+                                           double cashFlowRateMin,
+                                           double debtRatioMax,
+                                           int emergencyMonthsMin) {
+        List<String> notes = new ArrayList<>();
+        if (cashFlowRate != null && cashFlowRate < cashFlowRateMin) {
+            notes.add("现金流率低于" + pct(cashFlowRateMin));
+        }
+        if (dti != null && dti.doubleValue() > debtRatioMax) {
+            notes.add("DTI高于" + pct(debtRatioMax));
+        }
+        if (emergencyMonths != null && emergencyMonths.doubleValue() < emergencyMonthsMin) {
+            notes.add("应急金不足" + emergencyMonthsMin + "个月");
+        }
+        if (notes.isEmpty()) return base;
+        return base + "；" + String.join("，", notes);
     }
 
     private int scoreDataSufficiency(Map<String, Object> stats) {
@@ -391,6 +574,54 @@ public class ScoreEngine {
         int assetUpdateCount = intValue(stats, "assetUpdateCount");
         int largeAdjustCount = intValue(stats, "largeAdjustCount");
         return "资产调整次数=" + assetUpdateCount + ", 大幅调整次数=" + largeAdjustCount;
+    }
+
+    private BigDecimal sumCashAssets(List<FcAssetEntity> assets) {
+        if (assets == null || assets.isEmpty()) return BigDecimal.ZERO;
+        BigDecimal sum = BigDecimal.ZERO;
+        for (FcAssetEntity asset : assets) {
+            if (asset != null && "CASH".equals(asset.getType()) && asset.getAmount() != null) {
+                sum = sum.add(asset.getAmount());
+            }
+        }
+        return sum;
+    }
+
+    private BigDecimal calcRatio(BigDecimal numerator, BigDecimal denominator) {
+        if (numerator == null || denominator == null) return null;
+        if (denominator.compareTo(BigDecimal.ZERO) <= 0) return null;
+        return numerator.divide(denominator, 4, RoundingMode.HALF_UP);
+    }
+
+    private Double calcCashFlowRate(FcCashflowEntity cashflow) {
+        if (cashflow == null || cashflow.getIncome() == null) return null;
+        BigDecimal income = cashflow.getIncome();
+        if (income.compareTo(BigDecimal.ZERO) <= 0) return null;
+        BigDecimal essential = BigDecimal.ZERO;
+        if (cashflow.getFixedExpense() != null) essential = essential.add(cashflow.getFixedExpense());
+        if (cashflow.getVariableExpense() != null) essential = essential.add(cashflow.getVariableExpense());
+        if (cashflow.getMonthlyDebtPayment() != null) essential = essential.add(cashflow.getMonthlyDebtPayment());
+        BigDecimal surplus = income.subtract(essential);
+        return surplus.divide(income, 4, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    private int weightPercent(double weight, double total) {
+        if (total <= 0) return 0;
+        return (int) Math.round((weight / total) * 100.0);
+    }
+
+    private ScoreRuleSnapshot defaultSnapshot() {
+        Map<String, com.fincoach.core.healthv2.rules.ScoreRuleParamValue> params = new LinkedHashMap<>();
+        for (com.fincoach.core.healthv2.rules.ScoreRuleParamDefinition def : ScoreRuleDefaults.defaultParams().values()) {
+            params.put(def.getKey(), com.fincoach.core.healthv2.rules.ScoreRuleParamValue.fromDefinition(def, "DEFAULT"));
+        }
+        return new ScoreRuleSnapshot(null,
+                ScoreRuleDefaults.DEFAULT_CODE,
+                ScoreRuleDefaults.DEFAULT_VERSION,
+                ScoreRuleSnapshot.SOURCE_FALLBACK_DEFAULT,
+                params,
+                new ArrayList<>(),
+                new ArrayList<>());
     }
 
     private int intValue(Map<String, Object> stats, String key) {

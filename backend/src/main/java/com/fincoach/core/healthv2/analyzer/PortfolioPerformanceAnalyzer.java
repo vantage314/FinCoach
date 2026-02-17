@@ -110,8 +110,10 @@ public class PortfolioPerformanceAnalyzer {
         double stdReturn = calcStd(returns, meanReturn);
 
         Double sharpe = null;
+        Double volatility = null;
         if (stdReturn > 1e-9) {
             sharpe = Math.round(((meanReturn - rfPeriod) / stdReturn) * 100.0) / 100.0;
+            volatility = Math.round(stdReturn * 10000.0) / 10000.0;
         }
 
         // MaxDrawdown
@@ -119,6 +121,7 @@ public class PortfolioPerformanceAnalyzer {
 
         result.put("sharpe", sharpe);
         result.put("maxDrawdown", Math.round(maxDrawdown * 10000.0) / 10000.0);
+        result.put("volatility", volatility);
 
         // corrMatrix 即使走 HISTORY，也用参数表（M2 简化：历史序列无法按类别拆分）
         result.put("corrMatrix", buildCorrMatrix(allocation));
@@ -196,6 +199,7 @@ public class PortfolioPerformanceAnalyzer {
 
         result.put("sharpe", sharpe);
         result.put("maxDrawdown", maxDrawdown);
+        result.put("volatility", Math.round(portfolioVol * 10000.0) / 10000.0);
         result.put("corrMatrix", buildCorrMatrix(allocation));
         result.put("method", "PARAM");
         return result;

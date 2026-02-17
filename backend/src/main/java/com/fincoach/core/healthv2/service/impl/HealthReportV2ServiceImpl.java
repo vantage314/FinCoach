@@ -17,6 +17,8 @@ import com.fincoach.core.healthv2.analyzer.InsuranceGapAnalyzer;
 import com.fincoach.core.healthv2.dto.HealthReportV2VO;
 import com.fincoach.core.healthv2.entity.*;
 import com.fincoach.core.healthv2.mapper.*;
+import com.fincoach.core.healthv2.rules.ScoreRuleSetRegistry;
+import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
 import com.fincoach.core.healthv2.service.AuditService;
 import com.fincoach.core.healthv2.service.HealthReportV2Service;
 import com.fincoach.core.healthv2.util.CanonicalJsonHelper;
@@ -69,6 +71,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     private RebalanceAdvisor rebalanceAdvisor;
     @Autowired
     private ScoreEngine scoreEngine;
+    @Autowired
+    private ScoreRuleSetRegistry scoreRuleSetRegistry;
     @Autowired
     private DebtOptimizer debtOptimizer;
     @Autowired
@@ -330,11 +334,12 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         }
 
         Map<String, Object> scoreResult;
+        ScoreRuleSnapshot scoreRuleSnapshot = scoreRuleSetRegistry == null ? null : scoreRuleSetRegistry.get();
         try {
             scoreResult = scoreEngine.compute(
                     assets, liabilities, cashflow, goals, insurance,
                     performance, allocation, concentration,
-                    emergencyMonths, dti, totalAssets, totalDebt, behaviorStats);
+                    emergencyMonths, dti, totalAssets, totalDebt, behaviorStats, scoreRuleSnapshot);
         } catch (Exception e) {
             log.error("[HealthV2-Report] ScoreEngine 计算异常, fallback", e);
             scoreResult = new LinkedHashMap<>();
@@ -349,6 +354,9 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
         // scoreBreakdown 写入 metrics
         metrics.put("scoreBreakdown", scoreResult.get("breakdown"));
+        if (scoreResult.get("ruleSet") != null) {
+            metrics.put("scoreRuleSet", scoreResult.get("ruleSet"));
+        }
 
         // ========= 4. M4 策略开关 + 生成建议 =========
         Map<String, Boolean> flags = loadStrategyFlags();
@@ -437,7 +445,11 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         entity.setRiskScore(riskScore);
         entity.setHealthScore(healthScore);
         entity.setBehaviorScore(behaviorScore);
-        entity.setRuleVersion("M4");
+        if (scoreRuleSnapshot != null) {
+            entity.setRuleVersion(scoreRuleSnapshot.getCode() + "@" + scoreRuleSnapshot.getVersion());
+        } else {
+            entity.setRuleVersion("M4");
+        }
         entity.setCreateTime(LocalDateTime.now());
         entity.setUpdateTime(LocalDateTime.now());
 
