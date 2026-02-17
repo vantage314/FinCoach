@@ -58,6 +58,25 @@ public final class ScoreRuleDefaults {
     public static final String INS_LIFE_DEPENDENT_BONUS_MULTIPLIER = "INS_LIFE_DEPENDENT_BONUS_MULTIPLIER";
     public static final String INS_CRITICAL_ILLNESS_MULTIPLIER = "INS_CRITICAL_ILLNESS_MULTIPLIER";
     public static final String INS_ACCIDENT_MULTIPLIER = "INS_ACCIDENT_MULTIPLIER";
+    public static final String ALERT_RISK_HIGH_ENABLED = "ALERT_RISK_HIGH_ENABLED";
+    public static final String ALERT_MDD_HIGH_ENABLED = "ALERT_MDD_HIGH_ENABLED";
+    public static final String ALERT_REBAL_TRIGGERED_ENABLED = "ALERT_REBAL_TRIGGERED_ENABLED";
+    public static final String ALERT_CASHFLOW_NEGATIVE_ENABLED = "ALERT_CASHFLOW_NEGATIVE_ENABLED";
+    public static final String ALERT_EMERGENCY_FUND_LOW_ENABLED = "ALERT_EMERGENCY_FUND_LOW_ENABLED";
+    public static final String ALERT_DTI_HIGH_ENABLED = "ALERT_DTI_HIGH_ENABLED";
+    public static final String ALERT_DEBT_TO_ASSETS_HIGH_ENABLED = "ALERT_DEBT_TO_ASSETS_HIGH_ENABLED";
+    public static final String ALERT_INSURANCE_GAP_HIGH_ENABLED = "ALERT_INSURANCE_GAP_HIGH_ENABLED";
+    public static final String ALERT_RISK_HIGH_SEVERITY = "ALERT_RISK_HIGH_SEVERITY";
+    public static final String ALERT_MDD_HIGH_SEVERITY = "ALERT_MDD_HIGH_SEVERITY";
+    public static final String ALERT_REBAL_TRIGGERED_SEVERITY = "ALERT_REBAL_TRIGGERED_SEVERITY";
+    public static final String ALERT_CASHFLOW_NEGATIVE_SEVERITY = "ALERT_CASHFLOW_NEGATIVE_SEVERITY";
+    public static final String ALERT_EMERGENCY_FUND_LOW_SEVERITY = "ALERT_EMERGENCY_FUND_LOW_SEVERITY";
+    public static final String ALERT_DTI_HIGH_SEVERITY = "ALERT_DTI_HIGH_SEVERITY";
+    public static final String ALERT_DEBT_TO_ASSETS_HIGH_SEVERITY = "ALERT_DEBT_TO_ASSETS_HIGH_SEVERITY";
+    public static final String ALERT_INSURANCE_GAP_HIGH_SEVERITY = "ALERT_INSURANCE_GAP_HIGH_SEVERITY";
+    public static final String ALERT_RISK_HIGH_MIN = "ALERT_RISK_HIGH_MIN";
+    public static final String ALERT_MDD_HIGH = "ALERT_MDD_HIGH";
+    public static final String ALERT_INSURANCE_GAP_VALUE_MIN = "ALERT_INSURANCE_GAP_VALUE_MIN";
 
     private static final Map<String, ScoreRuleParamDefinition> DEFAULT_PARAMS;
 
@@ -195,6 +214,63 @@ public final class ScoreRuleDefaults {
         map.put(INS_ACCIDENT_MULTIPLIER, new ScoreRuleParamDefinition(
                 INS_ACCIDENT_MULTIPLIER, ScoreRuleValueType.DECIMAL, "1",
                 BigDecimal.ZERO, new BigDecimal("10"), "Accident insurance income multiplier"));
+        map.put(ALERT_RISK_HIGH_ENABLED, new ScoreRuleParamDefinition(
+                ALERT_RISK_HIGH_ENABLED, ScoreRuleValueType.BOOL, "1",
+                null, null, "Enable alert for risk score high"));
+        map.put(ALERT_MDD_HIGH_ENABLED, new ScoreRuleParamDefinition(
+                ALERT_MDD_HIGH_ENABLED, ScoreRuleValueType.BOOL, "1",
+                null, null, "Enable alert for max drawdown high"));
+        map.put(ALERT_REBAL_TRIGGERED_ENABLED, new ScoreRuleParamDefinition(
+                ALERT_REBAL_TRIGGERED_ENABLED, ScoreRuleValueType.BOOL, "1",
+                null, null, "Enable alert for rebalance triggered"));
+        map.put(ALERT_CASHFLOW_NEGATIVE_ENABLED, new ScoreRuleParamDefinition(
+                ALERT_CASHFLOW_NEGATIVE_ENABLED, ScoreRuleValueType.BOOL, "1",
+                null, null, "Enable alert for negative cashflow"));
+        map.put(ALERT_EMERGENCY_FUND_LOW_ENABLED, new ScoreRuleParamDefinition(
+                ALERT_EMERGENCY_FUND_LOW_ENABLED, ScoreRuleValueType.BOOL, "1",
+                null, null, "Enable alert for emergency fund low"));
+        map.put(ALERT_DTI_HIGH_ENABLED, new ScoreRuleParamDefinition(
+                ALERT_DTI_HIGH_ENABLED, ScoreRuleValueType.BOOL, "1",
+                null, null, "Enable alert for DTI high"));
+        map.put(ALERT_DEBT_TO_ASSETS_HIGH_ENABLED, new ScoreRuleParamDefinition(
+                ALERT_DEBT_TO_ASSETS_HIGH_ENABLED, ScoreRuleValueType.BOOL, "1",
+                null, null, "Enable alert for debt-to-assets high"));
+        map.put(ALERT_INSURANCE_GAP_HIGH_ENABLED, new ScoreRuleParamDefinition(
+                ALERT_INSURANCE_GAP_HIGH_ENABLED, ScoreRuleValueType.BOOL, "1",
+                null, null, "Enable alert for insurance gap high"));
+        map.put(ALERT_RISK_HIGH_SEVERITY, new ScoreRuleParamDefinition(
+                ALERT_RISK_HIGH_SEVERITY, ScoreRuleValueType.STRING, "CRITICAL",
+                null, null, "Severity for risk score high"));
+        map.put(ALERT_MDD_HIGH_SEVERITY, new ScoreRuleParamDefinition(
+                ALERT_MDD_HIGH_SEVERITY, ScoreRuleValueType.STRING, "CRITICAL",
+                null, null, "Severity for max drawdown high"));
+        map.put(ALERT_REBAL_TRIGGERED_SEVERITY, new ScoreRuleParamDefinition(
+                ALERT_REBAL_TRIGGERED_SEVERITY, ScoreRuleValueType.STRING, "WARN",
+                null, null, "Severity for rebalance triggered"));
+        map.put(ALERT_CASHFLOW_NEGATIVE_SEVERITY, new ScoreRuleParamDefinition(
+                ALERT_CASHFLOW_NEGATIVE_SEVERITY, ScoreRuleValueType.STRING, "CRITICAL",
+                null, null, "Severity for negative cashflow"));
+        map.put(ALERT_EMERGENCY_FUND_LOW_SEVERITY, new ScoreRuleParamDefinition(
+                ALERT_EMERGENCY_FUND_LOW_SEVERITY, ScoreRuleValueType.STRING, "WARN",
+                null, null, "Severity for emergency fund low"));
+        map.put(ALERT_DTI_HIGH_SEVERITY, new ScoreRuleParamDefinition(
+                ALERT_DTI_HIGH_SEVERITY, ScoreRuleValueType.STRING, "WARN",
+                null, null, "Severity for DTI high"));
+        map.put(ALERT_DEBT_TO_ASSETS_HIGH_SEVERITY, new ScoreRuleParamDefinition(
+                ALERT_DEBT_TO_ASSETS_HIGH_SEVERITY, ScoreRuleValueType.STRING, "WARN",
+                null, null, "Severity for debt-to-assets high"));
+        map.put(ALERT_INSURANCE_GAP_HIGH_SEVERITY, new ScoreRuleParamDefinition(
+                ALERT_INSURANCE_GAP_HIGH_SEVERITY, ScoreRuleValueType.STRING, "INFO",
+                null, null, "Severity for insurance gap high"));
+        map.put(ALERT_RISK_HIGH_MIN, new ScoreRuleParamDefinition(
+                ALERT_RISK_HIGH_MIN, ScoreRuleValueType.INT, "70",
+                BigDecimal.ZERO, new BigDecimal("100"), "Risk score high alert threshold"));
+        map.put(ALERT_MDD_HIGH, new ScoreRuleParamDefinition(
+                ALERT_MDD_HIGH, ScoreRuleValueType.DECIMAL, "0.30",
+                BigDecimal.ZERO, BigDecimal.ONE, "Max drawdown high alert threshold"));
+        map.put(ALERT_INSURANCE_GAP_VALUE_MIN, new ScoreRuleParamDefinition(
+                ALERT_INSURANCE_GAP_VALUE_MIN, ScoreRuleValueType.DECIMAL, "100000",
+                BigDecimal.ZERO, new BigDecimal("1000000000"), "Insurance gap value threshold"));
 
         DEFAULT_PARAMS = Collections.unmodifiableMap(map);
     }
