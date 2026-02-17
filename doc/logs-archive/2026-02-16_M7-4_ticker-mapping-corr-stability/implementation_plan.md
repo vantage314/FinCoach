@@ -30,3 +30,7 @@
     ## 6. Testing
     - [x] Unit Tests for Registry, Aligner.
     - [x] MockMVCTest for Admin API.
+
+    ## 7. Admin Ticker Mapping CRUD
+    - [x] Admin CRUD endpoints (page/save/enable/disable/reload).
+    - [x] Registry reload uses in-memory snapshot (no per-request DB hit).

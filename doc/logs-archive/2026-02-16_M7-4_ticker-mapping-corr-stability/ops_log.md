@@ -43,9 +43,19 @@ Enhance Market Data History (M7-3) with:
   - Added `FcTickerMappingEntity` + `FcTickerMappingMapper`.
   - Added `TickerMappingDbService` (DB exact match with priority ordering).
   - `TickerMappingRegistry` now resolves DB first and falls back to YAML with warnings.
+  - Registry now uses in-memory snapshot + explicit `reload()` to avoid per-request DB hits.
 - **Verification**:
   - `TICKER_MAPPING_SOURCE_DB` emitted on DB hit.
   - `TICKER_MAPPING_DB_UNAVAILABLE_FALLBACK_FILE` emitted on DB failure.
+
+### Step 6: Admin Ticker Mapping CRUD
+- **Status**: Completed
+- **Changes**:
+  - Added Admin CRUD endpoints: page/save/enable/disable/reload.
+  - Added `AdminTickerMappingService` (validation + normalize + CRUD).
+  - Registry reload is atomic and immediate (no restart).
+- **Verification**:
+  - Admin controller tests and registry reload test passing.
 
 ### Step 3: Correlation Stability
 - **Status**: Completed

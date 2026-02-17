@@ -15,6 +15,29 @@
    ```
 2. Request Portfolio Metrics with "茅台".
 3. Verify warning: `TICKER_MAPPING_SOURCE_DB`.
+4. (Optional) Call admin reload to refresh cache if you updated DB:
+   - `POST /api/admin/ticker-mapping/reload`
+
+### Ticker Mapping (Admin CRUD)
+1. Page query:
+   - `GET /api/admin/ticker-mapping/page?keyword=AA&enabled=1&page=1&size=20`
+2. Save (insert/update):
+   - `POST /api/admin/ticker-mapping/save`
+   - Body example:
+     ```json
+     {
+       "keyword": "AAPL",
+       "ticker": "AAPL.US",
+       "priority": 100,
+       "enabled": 1
+     }
+     ```
+3. Enable/Disable:
+   - `POST /api/admin/ticker-mapping/enable?id=123`
+   - `POST /api/admin/ticker-mapping/disable?id=123`
+4. Reload registry:
+   - `POST /api/admin/ticker-mapping/reload`
+5. Verify `TickerMappingRegistry.resolve` now hits DB and warnings include `TICKER_MAPPING_SOURCE_DB`.
 
 ### Correlation Stability
 1. Create portfolio with assets having different trading calendars (e.g. CN vs US, or one with gaps).
