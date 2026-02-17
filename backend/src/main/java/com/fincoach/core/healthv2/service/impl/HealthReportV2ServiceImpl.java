@@ -696,12 +696,12 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                 alertWarningDetails = alertsV1.getWarningDetails();
                 AlertV1Result alertsFinal = alertsV1;
                 PortfolioDebugContextHolder.record(snapshot -> {
-                    PortfolioMarketDebugSnapshot.AlertsSummary summary = new PortfolioMarketDebugSnapshot.AlertsSummary();
-                    summary.setOpenCount(alertsFinal.getOpenCount());
-                    summary.setCriticalCount(alertsFinal.getCriticalCount());
-                    summary.setTopCodes(new ArrayList<>(alertsFinal.getTopCodes()));
-                    summary.setLastCreatedAt(alertsFinal.getLastCreatedAt());
-                    snapshot.setAlertsSummary(summary);
+                    PortfolioMarketDebugSnapshot.AlertsSummary alertsSummary = new PortfolioMarketDebugSnapshot.AlertsSummary();
+                    alertsSummary.setOpenCount(alertsFinal.getOpenCount());
+                    alertsSummary.setCriticalCount(alertsFinal.getCriticalCount());
+                    alertsSummary.setTopCodes(new ArrayList<>(alertsFinal.getTopCodes()));
+                    alertsSummary.setLastCreatedAt(alertsFinal.getLastCreatedAt());
+                    snapshot.setAlertsSummary(alertsSummary);
                 });
             } else {
                 metrics.put("alertsV1", new LinkedHashMap<>());
@@ -715,10 +715,12 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             if (adviceV2Obj instanceof Map<?, ?> v2Map) {
                 Object metaObj = v2Map.get("meta");
                 if (metaObj instanceof Map<?, ?> metaMap) {
-                    List<String> mergedCodes = mergeWarningCodes(metaMap.get("warnings"), alertWarnings);
-                    List<Map<String, Object>> mergedDetails = mergeWarningDetails(metaMap.get("warningDetails"), alertWarningDetails);
-                    metaMap.put("warnings", mergedCodes);
-                    metaMap.put("warningDetails", mergedDetails);
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> meta = (Map<String, Object>) metaMap;
+                    List<String> mergedCodes = mergeWarningCodes(meta.get("warnings"), alertWarnings);
+                    List<Map<String, Object>> mergedDetails = mergeWarningDetails(meta.get("warningDetails"), alertWarningDetails);
+                    meta.put("warnings", mergedCodes);
+                    meta.put("warningDetails", mergedDetails);
                 }
             }
             adviceV2Warnings = mergeWarningCodes(adviceV2Warnings, alertWarnings);
