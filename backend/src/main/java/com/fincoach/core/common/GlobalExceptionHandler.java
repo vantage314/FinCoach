@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.fincoach.core.security.ForbiddenException;
 
 import java.sql.SQLException;
 
@@ -46,6 +47,11 @@ public class GlobalExceptionHandler {
     public Result<String> handleRuntimeException(RuntimeException e) {
         log.error("系统业务异常: ", e);
         return Result.error(500, e.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Result<String>> handleForbiddenException(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Result.error(403, e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

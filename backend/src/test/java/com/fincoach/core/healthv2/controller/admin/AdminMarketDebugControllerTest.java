@@ -1,12 +1,15 @@
 package com.fincoach.core.healthv2.controller.admin;
 
+import com.fincoach.core.common.UserContext;
+import com.fincoach.core.common.GlobalExceptionHandler;
 import com.fincoach.core.healthv2.debug.PortfolioDebugContextHolder;
 import com.fincoach.core.healthv2.debug.PortfolioMarketDebugSnapshot;
-import com.fincoach.core.common.UserContext;
 import com.fincoach.core.repository.entity.User;
 import com.fincoach.core.repository.mapper.UserMapper;
+import com.fincoach.core.security.AdminOnlyAspect;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,8 +32,14 @@ public class AdminMarketDebugControllerTest {
         admin.setRole("ADMIN");
         when(userMapper.selectById(1L)).thenReturn(admin);
 
-        AdminMarketDebugController controller = new AdminMarketDebugController(userMapper);
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller)
+        AdminMarketDebugController controller = new AdminMarketDebugController();
+        AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
+        AspectJProxyFactory factory = new AspectJProxyFactory(controller);
+        factory.addAspect(aspect);
+        AdminMarketDebugController proxy = factory.getProxy();
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(proxy)
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter())
                 .build();
 
@@ -46,6 +55,7 @@ public class AdminMarketDebugControllerTest {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.historySource").value("MARKET_DATA_DAILY_CLOSE"));
         UserContext.clear();
+        PortfolioDebugContextHolder.clear();
     }
 
     @Test
@@ -56,8 +66,14 @@ public class AdminMarketDebugControllerTest {
         user.setRole("USER");
         when(userMapper.selectById(2L)).thenReturn(user);
 
-        AdminMarketDebugController controller = new AdminMarketDebugController(userMapper);
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller)
+        AdminMarketDebugController controller = new AdminMarketDebugController();
+        AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
+        AspectJProxyFactory factory = new AspectJProxyFactory(controller);
+        factory.addAspect(aspect);
+        AdminMarketDebugController proxy = factory.getProxy();
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(proxy)
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter())
                 .build();
 
@@ -66,5 +82,27 @@ public class AdminMarketDebugControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(403));
         UserContext.clear();
+        PortfolioDebugContextHolder.clear();
+    }
+
+    @Test
+    public void testNoUserContextForbidden() throws Exception {
+        UserMapper userMapper = Mockito.mock(UserMapper.class);
+
+        AdminMarketDebugController controller = new AdminMarketDebugController();
+        AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
+        AspectJProxyFactory factory = new AspectJProxyFactory(controller);
+        factory.addAspect(aspect);
+        AdminMarketDebugController proxy = factory.getProxy();
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(proxy)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .setMessageConverters(new MappingJackson2HttpMessageConverter())
+                .build();
+
+        mockMvc.perform(get("/api/admin/portfolio/market-debug/latest"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+        PortfolioDebugContextHolder.clear();
     }
 }
