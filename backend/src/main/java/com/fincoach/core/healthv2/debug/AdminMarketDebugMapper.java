@@ -54,6 +54,7 @@ public class AdminMarketDebugMapper {
         }
         dto.setScoreSummary(mapScoreSummary(snapshot.getScoreSummary()));
         dto.setDebtCashflowSummary(mapDebtCashflowSummary(snapshot.getDebtCashflowSummary()));
+        dto.setDebtOptimizerSummary(mapDebtOptimizerSummary(snapshot.getDebtOptimizerSummary()));
 
         return dto;
     }
@@ -241,6 +242,19 @@ public class AdminMarketDebugMapper {
         dto.setSurplusRate(summary.getSurplusRate());
         dto.setEmergencyFundMonths(summary.getEmergencyFundMonths());
         dto.setStressLevel(summary.getStressLevel());
+        dto.setWarningsCount(summary.getWarningsCount());
+        return dto;
+    }
+
+    private AdminMarketDebugLatestDTO.DebtOptimizerSummaryDTO mapDebtOptimizerSummary(
+            PortfolioMarketDebugSnapshot.DebtOptimizerSummary summary) {
+        AdminMarketDebugLatestDTO.DebtOptimizerSummaryDTO dto = new AdminMarketDebugLatestDTO.DebtOptimizerSummaryDTO();
+        if (summary == null) {
+            return dto;
+        }
+        dto.setStrategy(summary.getStrategy());
+        dto.setTopDebtName(summary.getTopDebtName());
+        dto.setBudgetForExtraPayment(summary.getBudgetForExtraPayment());
         dto.setWarningsCount(summary.getWarningsCount());
         return dto;
     }

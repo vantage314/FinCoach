@@ -18,6 +18,7 @@ public class AdminMarketDebugLatestDTO {
     private CorrelationMatrixDTO correlationMatrix;
     private ScoreSummaryDTO scoreSummary;
     private DebtCashflowSummaryDTO debtCashflowSummary;
+    private DebtOptimizerSummaryDTO debtOptimizerSummary;
     private List<String> warnings = new ArrayList<>();
     private String ruleSetCode;
     private Integer ruleSetVersion;
@@ -58,6 +59,8 @@ public class AdminMarketDebugLatestDTO {
     public void setScoreSummary(ScoreSummaryDTO scoreSummary) { this.scoreSummary = scoreSummary; }
     public DebtCashflowSummaryDTO getDebtCashflowSummary() { return debtCashflowSummary; }
     public void setDebtCashflowSummary(DebtCashflowSummaryDTO debtCashflowSummary) { this.debtCashflowSummary = debtCashflowSummary; }
+    public DebtOptimizerSummaryDTO getDebtOptimizerSummary() { return debtOptimizerSummary; }
+    public void setDebtOptimizerSummary(DebtOptimizerSummaryDTO debtOptimizerSummary) { this.debtOptimizerSummary = debtOptimizerSummary; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public String getRuleSetCode() { return ruleSetCode; }
@@ -271,6 +274,22 @@ public class AdminMarketDebugLatestDTO {
         public void setEmergencyFundMonths(Double emergencyFundMonths) { this.emergencyFundMonths = emergencyFundMonths; }
         public String getStressLevel() { return stressLevel; }
         public void setStressLevel(String stressLevel) { this.stressLevel = stressLevel; }
+        public int getWarningsCount() { return warningsCount; }
+        public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
+    }
+
+    public static class DebtOptimizerSummaryDTO {
+        private String strategy;
+        private String topDebtName;
+        private Double budgetForExtraPayment;
+        private int warningsCount;
+
+        public String getStrategy() { return strategy; }
+        public void setStrategy(String strategy) { this.strategy = strategy; }
+        public String getTopDebtName() { return topDebtName; }
+        public void setTopDebtName(String topDebtName) { this.topDebtName = topDebtName; }
+        public Double getBudgetForExtraPayment() { return budgetForExtraPayment; }
+        public void setBudgetForExtraPayment(Double budgetForExtraPayment) { this.budgetForExtraPayment = budgetForExtraPayment; }
         public int getWarningsCount() { return warningsCount; }
         public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
     }
