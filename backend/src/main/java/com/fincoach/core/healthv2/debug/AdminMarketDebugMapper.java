@@ -1,6 +1,9 @@
 package com.fincoach.core.healthv2.debug;
 
+import com.fincoach.core.healthv2.advice.AdviceThresholds;
 import com.fincoach.core.healthv2.dto.admin.AdminMarketDebugLatestDTO;
+import com.fincoach.core.healthv2.rebalance.RebalanceTemplateRegistry;
+import com.fincoach.core.healthv2.rebalance.RebalanceTemplateSnapshot;
 import com.fincoach.core.healthv2.rules.ScoreRuleSetRegistry;
 import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
 import org.slf4j.MDC;
@@ -16,6 +19,8 @@ public class AdminMarketDebugMapper {
 
     @Autowired(required = false)
     private ScoreRuleSetRegistry scoreRuleSetRegistry;
+    @Autowired(required = false)
+    private RebalanceTemplateRegistry rebalanceTemplateRegistry;
 
     public AdminMarketDebugLatestDTO toDto(PortfolioMarketDebugSnapshot snapshot, Long userId) {
         AdminMarketDebugLatestDTO dto = new AdminMarketDebugLatestDTO();
@@ -27,6 +32,7 @@ public class AdminMarketDebugMapper {
         dto.setResolvedTickers(new ArrayList<>());
 
         attachRuleSet(dto);
+        attachAdviceMeta(dto);
 
         if (snapshot == null) {
             dto.getWarnings().add("DEBUG_SNAPSHOT_EMPTY");
@@ -55,6 +61,28 @@ public class AdminMarketDebugMapper {
         dto.setRuleSetSource(snapshot.getSource());
         dto.setRuleSetMissingParams(new ArrayList<>(safeList(snapshot.getMissingParams())));
         dto.setRuleSetWarnings(new ArrayList<>(safeList(snapshot.getWarnings())));
+    }
+
+    private void attachAdviceMeta(AdminMarketDebugLatestDTO dto) {
+        if (dto == null) return;
+        ScoreRuleSnapshot scoreSnapshot = scoreRuleSetRegistry == null ? null : scoreRuleSetRegistry.get();
+        AdviceThresholds thresholds = AdviceThresholds.fromSnapshot(scoreSnapshot);
+        dto.setAdviceThresholds(thresholds.toMap());
+        dto.setAdviceWarnings(new ArrayList<>(safeList(thresholds.getWarnings())));
+
+        if (rebalanceTemplateRegistry == null) return;
+        RebalanceTemplateSnapshot templateSnapshot = rebalanceTemplateRegistry.getActive();
+        if (templateSnapshot == null) return;
+        dto.setRebalanceTemplateCode(templateSnapshot.getCode());
+        dto.setRebalanceTemplateVersion(templateSnapshot.getVersion());
+        dto.setRebalanceTemplateSource(templateSnapshot.getSource());
+        if (templateSnapshot.getWarnings() != null) {
+            List<String> merged = new ArrayList<>(safeList(dto.getAdviceWarnings()));
+            for (String w : templateSnapshot.getWarnings()) {
+                if (!merged.contains(w)) merged.add(w);
+            }
+            dto.setAdviceWarnings(merged);
+        }
     }
 
     private String resolveRequestId() {

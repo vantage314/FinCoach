@@ -20,6 +20,11 @@ public class AdminMarketDebugLatestDTO {
     private String ruleSetSource;
     private List<String> ruleSetMissingParams = new ArrayList<>();
     private List<String> ruleSetWarnings = new ArrayList<>();
+    private String rebalanceTemplateCode;
+    private Integer rebalanceTemplateVersion;
+    private String rebalanceTemplateSource;
+    private java.util.Map<String, Object> adviceThresholds = new java.util.LinkedHashMap<>();
+    private List<String> adviceWarnings = new ArrayList<>();
 
     public String getRequestId() { return requestId; }
     public void setRequestId(String requestId) { this.requestId = requestId; }
@@ -53,6 +58,16 @@ public class AdminMarketDebugLatestDTO {
     public void setRuleSetMissingParams(List<String> ruleSetMissingParams) { this.ruleSetMissingParams = ruleSetMissingParams; }
     public List<String> getRuleSetWarnings() { return ruleSetWarnings; }
     public void setRuleSetWarnings(List<String> ruleSetWarnings) { this.ruleSetWarnings = ruleSetWarnings; }
+    public String getRebalanceTemplateCode() { return rebalanceTemplateCode; }
+    public void setRebalanceTemplateCode(String rebalanceTemplateCode) { this.rebalanceTemplateCode = rebalanceTemplateCode; }
+    public Integer getRebalanceTemplateVersion() { return rebalanceTemplateVersion; }
+    public void setRebalanceTemplateVersion(Integer rebalanceTemplateVersion) { this.rebalanceTemplateVersion = rebalanceTemplateVersion; }
+    public String getRebalanceTemplateSource() { return rebalanceTemplateSource; }
+    public void setRebalanceTemplateSource(String rebalanceTemplateSource) { this.rebalanceTemplateSource = rebalanceTemplateSource; }
+    public java.util.Map<String, Object> getAdviceThresholds() { return adviceThresholds; }
+    public void setAdviceThresholds(java.util.Map<String, Object> adviceThresholds) { this.adviceThresholds = adviceThresholds; }
+    public List<String> getAdviceWarnings() { return adviceWarnings; }
+    public void setAdviceWarnings(List<String> adviceWarnings) { this.adviceWarnings = adviceWarnings; }
 
     public static class ResolvedTickerDTO {
         private String keyword;

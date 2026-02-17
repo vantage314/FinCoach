@@ -14,6 +14,8 @@ import com.fincoach.core.healthv2.analyzer.DebtOptimizer;
 import com.fincoach.core.healthv2.analyzer.CashflowPlanner;
 import com.fincoach.core.healthv2.analyzer.GoalPlanner;
 import com.fincoach.core.healthv2.analyzer.InsuranceGapAnalyzer;
+import com.fincoach.core.healthv2.advice.AdviceEngineResult;
+import com.fincoach.core.healthv2.advice.AdviceEngineV2;
 import com.fincoach.core.healthv2.dto.HealthReportV2VO;
 import com.fincoach.core.healthv2.entity.*;
 import com.fincoach.core.healthv2.mapper.*;
@@ -71,6 +73,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     private RebalanceAdvisor rebalanceAdvisor;
     @Autowired
     private ScoreEngine scoreEngine;
+    @Autowired
+    private AdviceEngineV2 adviceEngineV2;
     @Autowired
     private ScoreRuleSetRegistry scoreRuleSetRegistry;
     @Autowired
@@ -437,6 +441,16 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         // 4f. Summary 提炼（Top 关键结论）
         List<String> summary = buildSummary(emergencyMonths, dti, goals, insurance, goalAdvice, debtPlan);
         advice.put("summary", summary);
+
+        // ========= 4g. Advice Engine V2 =========
+        if (adviceEngineV2 != null) {
+            AdviceEngineResult adviceV2 = adviceEngineV2.build(
+                    assets, liabilities, cashflow, allocation, totalAssets);
+            Map<String, Object> adviceV2Payload = new LinkedHashMap<>();
+            adviceV2Payload.put("advices", adviceV2.getAdvices());
+            adviceV2Payload.put("meta", adviceV2.getMeta());
+            advice.put("adviceV2", adviceV2Payload);
+        }
 
         // ========= 5. 落库 =========
         FcHealthReportEntity entity = new FcHealthReportEntity();

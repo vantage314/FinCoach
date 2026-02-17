@@ -26,6 +26,9 @@ public final class ScoreRuleDefaults {
     public static final String CASH_FLOW_RATE_MIN = "CASH_FLOW_RATE_MIN";
     public static final String DEBT_RATIO_MAX = "DEBT_RATIO_MAX";
     public static final String EMERGENCY_MONTHS_MIN = "EMERGENCY_MONTHS_MIN";
+    public static final String DEBT_PAYMENT_RATIO_MAX = "DEBT_PAYMENT_RATIO_MAX";
+    public static final String SURPLUS_RATE_MIN = "SURPLUS_RATE_MIN";
+    public static final String REB_THRESHOLD = "REB_THRESHOLD";
 
     public static final String ASSET_LIABILITY_RATIO_GOOD = "ASSET_LIABILITY_RATIO_GOOD";
     public static final String LIQUIDITY_RATIO_GOOD = "LIQUIDITY_RATIO_GOOD";
@@ -67,8 +70,17 @@ public final class ScoreRuleDefaults {
                 DEBT_RATIO_MAX, ScoreRuleValueType.DECIMAL, "0.50",
                 BigDecimal.ZERO, BigDecimal.ONE, "Max debt ratio"));
         map.put(EMERGENCY_MONTHS_MIN, new ScoreRuleParamDefinition(
-                EMERGENCY_MONTHS_MIN, ScoreRuleValueType.INT, "3",
+                EMERGENCY_MONTHS_MIN, ScoreRuleValueType.INT, "6",
                 BigDecimal.ZERO, new BigDecimal("24"), "Min emergency months"));
+        map.put(DEBT_PAYMENT_RATIO_MAX, new ScoreRuleParamDefinition(
+                DEBT_PAYMENT_RATIO_MAX, ScoreRuleValueType.DECIMAL, "0.35",
+                BigDecimal.ZERO, BigDecimal.ONE, "Max debt payment ratio"));
+        map.put(SURPLUS_RATE_MIN, new ScoreRuleParamDefinition(
+                SURPLUS_RATE_MIN, ScoreRuleValueType.DECIMAL, "0.10",
+                BigDecimal.ZERO, BigDecimal.ONE, "Min surplus rate"));
+        map.put(REB_THRESHOLD, new ScoreRuleParamDefinition(
+                REB_THRESHOLD, ScoreRuleValueType.DECIMAL, "0.05",
+                BigDecimal.ZERO, BigDecimal.ONE, "Rebalance deviation threshold"));
 
         map.put(ASSET_LIABILITY_RATIO_GOOD, new ScoreRuleParamDefinition(
                 ASSET_LIABILITY_RATIO_GOOD, ScoreRuleValueType.DECIMAL, "2.00",
