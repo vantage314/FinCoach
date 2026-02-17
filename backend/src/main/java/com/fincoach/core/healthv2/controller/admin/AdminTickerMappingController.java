@@ -2,7 +2,9 @@ package com.fincoach.core.healthv2.controller.admin;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fincoach.core.common.Result;
+import com.fincoach.core.rbac.RbacPermissionCodes;
 import com.fincoach.core.security.AdminOnly;
+import com.fincoach.core.security.Permission;
 import com.fincoach.core.ticker.dto.admin.AdminTickerMappingDTO;
 import com.fincoach.core.ticker.dto.admin.AdminTickerMappingQueryDTO;
 import com.fincoach.core.ticker.dto.admin.AdminTickerMappingSaveDTO;
@@ -25,6 +27,7 @@ public class AdminTickerMappingController {
 
     @GetMapping("/page")
     @Operation(summary = "分页查询 Ticker Mapping")
+    @Permission(RbacPermissionCodes.ADMIN_TICKER_MAPPING_VIEW)
     public Result<IPage<AdminTickerMappingDTO>> page(@RequestParam(required = false) String keyword,
                                                      @RequestParam(required = false) String ticker,
                                                      @RequestParam(required = false) Integer enabled,
@@ -41,12 +44,14 @@ public class AdminTickerMappingController {
 
     @PostMapping("/save")
     @Operation(summary = "新增/更新 Ticker Mapping")
+    @Permission(RbacPermissionCodes.ADMIN_TICKER_MAPPING_EDIT)
     public Result<Long> save(@RequestBody AdminTickerMappingSaveDTO dto) {
         return Result.success(service.save(dto));
     }
 
     @PostMapping("/enable")
     @Operation(summary = "启用 Ticker Mapping")
+    @Permission(RbacPermissionCodes.ADMIN_TICKER_MAPPING_EDIT)
     public Result<String> enable(@RequestParam Long id) {
         service.enable(id);
         return Result.success("enabled");
@@ -54,6 +59,7 @@ public class AdminTickerMappingController {
 
     @PostMapping("/disable")
     @Operation(summary = "停用 Ticker Mapping")
+    @Permission(RbacPermissionCodes.ADMIN_TICKER_MAPPING_EDIT)
     public Result<String> disable(@RequestParam Long id) {
         service.disable(id);
         return Result.success("disabled");
@@ -61,6 +67,7 @@ public class AdminTickerMappingController {
 
     @PostMapping("/reload")
     @Operation(summary = "重载 Ticker Mapping Registry")
+    @Permission(RbacPermissionCodes.ADMIN_TICKER_MAPPING_EDIT)
     public Result<String> reload() {
         service.reload();
         return Result.success("reloaded");

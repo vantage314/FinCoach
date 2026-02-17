@@ -6,7 +6,9 @@ import com.fincoach.core.healthv2.debug.PortfolioDebugContextHolder;
 import com.fincoach.core.healthv2.debug.PortfolioMarketDebugSnapshot;
 import com.fincoach.core.healthv2.debug.AdminMarketDebugMapper;
 import com.fincoach.core.healthv2.dto.admin.AdminMarketDebugLatestDTO;
+import com.fincoach.core.rbac.RbacPermissionCodes;
 import com.fincoach.core.security.AdminOnly;
+import com.fincoach.core.security.Permission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ public class AdminMarketDebugController {
 
     @GetMapping("/latest")
     @Operation(summary = "获取最新 Portfolio Market Debug 快照")
+    @Permission(RbacPermissionCodes.ADMIN_MARKET_DEBUG_VIEW)
     public ResponseEntity<Result<AdminMarketDebugLatestDTO>> latest() {
         PortfolioMarketDebugSnapshot snapshot = PortfolioDebugContextHolder.get();
         Long userId = UserContext.getCurrentUserId();

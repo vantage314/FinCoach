@@ -1,6 +1,7 @@
 package com.fincoach.core.healthv2.debug;
 
 import com.fincoach.core.security.AdminChecker;
+import com.fincoach.core.security.PermissionChecker;
 import com.fincoach.core.utils.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,9 @@ public class PortfolioDebugGateFilterTest {
     @Test
     public void headerMissingDoesNotEnableCapture() throws Exception {
         AdminChecker adminChecker = Mockito.mock(AdminChecker.class);
+        PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
         JwtUtils jwtUtils = Mockito.mock(JwtUtils.class);
-        PortfolioDebugGateFilter filter = new PortfolioDebugGateFilter(adminChecker, jwtUtils);
+        PortfolioDebugGateFilter filter = new PortfolioDebugGateFilter(adminChecker, permissionChecker, jwtUtils);
         filter.setCaptureEnabled(true);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/app/portfolio/metrics");
@@ -38,8 +40,9 @@ public class PortfolioDebugGateFilterTest {
     @Test
     public void headerOnAdminEnablesCapture() throws Exception {
         AdminChecker adminChecker = Mockito.mock(AdminChecker.class);
+        PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
         JwtUtils jwtUtils = Mockito.mock(JwtUtils.class);
-        PortfolioDebugGateFilter filter = new PortfolioDebugGateFilter(adminChecker, jwtUtils);
+        PortfolioDebugGateFilter filter = new PortfolioDebugGateFilter(adminChecker, permissionChecker, jwtUtils);
         filter.setCaptureEnabled(true);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/app/portfolio/metrics");
@@ -50,6 +53,7 @@ public class PortfolioDebugGateFilterTest {
 
         when(jwtUtils.getUserIdFromToken("test-token")).thenReturn(1L);
         when(adminChecker.isAdmin(1L)).thenReturn(true);
+        when(permissionChecker.hasPermission(1L, "ADMIN_MARKET_DEBUG_CAPTURE")).thenReturn(true);
 
         filter.doFilter(request, response, chain);
         assertTrue(PortfolioDebugContextHolder.isCaptureEnabled());
@@ -58,8 +62,9 @@ public class PortfolioDebugGateFilterTest {
     @Test
     public void headerOnNonAdminDoesNotEnableCapture() throws Exception {
         AdminChecker adminChecker = Mockito.mock(AdminChecker.class);
+        PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
         JwtUtils jwtUtils = Mockito.mock(JwtUtils.class);
-        PortfolioDebugGateFilter filter = new PortfolioDebugGateFilter(adminChecker, jwtUtils);
+        PortfolioDebugGateFilter filter = new PortfolioDebugGateFilter(adminChecker, permissionChecker, jwtUtils);
         filter.setCaptureEnabled(true);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/app/portfolio/metrics");

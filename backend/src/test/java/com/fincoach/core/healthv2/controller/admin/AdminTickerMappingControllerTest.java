@@ -8,6 +8,8 @@ import com.fincoach.core.repository.entity.User;
 import com.fincoach.core.repository.mapper.UserMapper;
 import com.fincoach.core.security.AdminChecker;
 import com.fincoach.core.security.AdminOnlyAspect;
+import com.fincoach.core.security.PermissionAspect;
+import com.fincoach.core.security.PermissionChecker;
 import com.fincoach.core.ticker.dto.admin.AdminTickerMappingDTO;
 import com.fincoach.core.ticker.dto.admin.AdminTickerMappingSaveDTO;
 import com.fincoach.core.ticker.service.admin.AdminTickerMappingService;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,8 +56,12 @@ public class AdminTickerMappingControllerTest {
         AdminTickerMappingController controller = new AdminTickerMappingController(service);
         AdminChecker adminChecker = new AdminChecker(userMapper);
         AdminOnlyAspect aspect = new AdminOnlyAspect(adminChecker);
+        PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
+        when(permissionChecker.hasPermission(eq(1L), any())).thenReturn(true);
+        PermissionAspect permissionAspect = new PermissionAspect(permissionChecker);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
+        factory.addAspect(permissionAspect);
         AdminTickerMappingController proxy = factory.getProxy();
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(proxy)
@@ -99,8 +106,11 @@ public class AdminTickerMappingControllerTest {
         AdminTickerMappingController controller = new AdminTickerMappingController(service);
         AdminChecker adminChecker = new AdminChecker(userMapper);
         AdminOnlyAspect aspect = new AdminOnlyAspect(adminChecker);
+        PermissionChecker permissionChecker = Mockito.mock(PermissionChecker.class);
+        PermissionAspect permissionAspect = new PermissionAspect(permissionChecker);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
+        factory.addAspect(permissionAspect);
         AdminTickerMappingController proxy = factory.getProxy();
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(proxy)
