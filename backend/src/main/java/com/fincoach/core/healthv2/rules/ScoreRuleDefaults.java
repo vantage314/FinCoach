@@ -43,6 +43,12 @@ public final class ScoreRuleDefaults {
     public static final String HEALTH_LEVEL_MED_MIN = "HEALTH_LEVEL_MED_MIN";
     public static final String BEHAVIOR_LEVEL_HIGH_MIN = "BEHAVIOR_LEVEL_HIGH_MIN";
     public static final String BEHAVIOR_LEVEL_MED_MIN = "BEHAVIOR_LEVEL_MED_MIN";
+    public static final String DTI_HIGH = "DTI_HIGH";
+    public static final String DTI_MED = "DTI_MED";
+    public static final String EMERGENCY_MONTHS_LOW = "EMERGENCY_MONTHS_LOW";
+    public static final String EMERGENCY_MONTHS_OK = "EMERGENCY_MONTHS_OK";
+    public static final String DEBT_TO_ASSETS_HIGH = "DEBT_TO_ASSETS_HIGH";
+    public static final String LIQUID_ASSET_ESTIMATE_RATIO = "LIQUID_ASSET_ESTIMATE_RATIO";
 
     private static final Map<String, ScoreRuleParamDefinition> DEFAULT_PARAMS;
 
@@ -134,6 +140,25 @@ public final class ScoreRuleDefaults {
         map.put(BEHAVIOR_LEVEL_MED_MIN, new ScoreRuleParamDefinition(
                 BEHAVIOR_LEVEL_MED_MIN, ScoreRuleValueType.INT, "40",
                 BigDecimal.ZERO, new BigDecimal("100"), "Behavior score medium level min"));
+
+        map.put(DTI_HIGH, new ScoreRuleParamDefinition(
+                DTI_HIGH, ScoreRuleValueType.DECIMAL, "0.40",
+                BigDecimal.ZERO, BigDecimal.ONE, "DTI high threshold"));
+        map.put(DTI_MED, new ScoreRuleParamDefinition(
+                DTI_MED, ScoreRuleValueType.DECIMAL, "0.20",
+                BigDecimal.ZERO, BigDecimal.ONE, "DTI medium threshold"));
+        map.put(EMERGENCY_MONTHS_LOW, new ScoreRuleParamDefinition(
+                EMERGENCY_MONTHS_LOW, ScoreRuleValueType.DECIMAL, "3.0",
+                BigDecimal.ZERO, new BigDecimal("24"), "Emergency fund low threshold"));
+        map.put(EMERGENCY_MONTHS_OK, new ScoreRuleParamDefinition(
+                EMERGENCY_MONTHS_OK, ScoreRuleValueType.DECIMAL, "6.0",
+                BigDecimal.ZERO, new BigDecimal("24"), "Emergency fund ok threshold"));
+        map.put(DEBT_TO_ASSETS_HIGH, new ScoreRuleParamDefinition(
+                DEBT_TO_ASSETS_HIGH, ScoreRuleValueType.DECIMAL, "0.60",
+                BigDecimal.ZERO, BigDecimal.ONE, "Debt to assets high threshold"));
+        map.put(LIQUID_ASSET_ESTIMATE_RATIO, new ScoreRuleParamDefinition(
+                LIQUID_ASSET_ESTIMATE_RATIO, ScoreRuleValueType.DECIMAL, "0.10",
+                BigDecimal.ZERO, BigDecimal.ONE, "Liquid asset estimate ratio"));
 
         DEFAULT_PARAMS = Collections.unmodifiableMap(map);
     }
