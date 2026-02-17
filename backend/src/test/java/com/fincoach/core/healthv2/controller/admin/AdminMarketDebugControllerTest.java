@@ -88,6 +88,12 @@ public class AdminMarketDebugControllerTest {
         insuranceGapSummary.setTopGapValue(120000.0);
         insuranceGapSummary.setWarningsCount(1);
         snapshot.setInsuranceGapSummary(insuranceGapSummary);
+        PortfolioMarketDebugSnapshot.AlertsSummary alertsSummary = new PortfolioMarketDebugSnapshot.AlertsSummary();
+        alertsSummary.setOpenCount(3);
+        alertsSummary.setCriticalCount(1);
+        alertsSummary.setTopCodes(List.of("ALERT_RISK_HIGH", "ALERT_DTI_HIGH"));
+        alertsSummary.setLastCreatedAt("2026-02-18T09:30:00");
+        snapshot.setAlertsSummary(alertsSummary);
         PortfolioDebugContextHolder.enableCapture();
         PortfolioDebugContextHolder.set(snapshot);
 
@@ -114,6 +120,10 @@ public class AdminMarketDebugControllerTest {
                 .andExpect(jsonPath("$.data.insuranceGapSummary.topGapType").value("LIFE"))
                 .andExpect(jsonPath("$.data.insuranceGapSummary.topGapValue").value(120000.0))
                 .andExpect(jsonPath("$.data.insuranceGapSummary.warningsCount").value(1))
+                .andExpect(jsonPath("$.data.alertsSummary.openCount").value(3))
+                .andExpect(jsonPath("$.data.alertsSummary.criticalCount").value(1))
+                .andExpect(jsonPath("$.data.alertsSummary.topCodes[0]").value("ALERT_RISK_HIGH"))
+                .andExpect(jsonPath("$.data.alertsSummary.lastCreatedAt").value("2026-02-18T09:30:00"))
                 .andExpect(jsonPath("$.data.requestId").exists())
                 .andExpect(jsonPath("$.data.timestamp").exists());
         UserContext.clear();

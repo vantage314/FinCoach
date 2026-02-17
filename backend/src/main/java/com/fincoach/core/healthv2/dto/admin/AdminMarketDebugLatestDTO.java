@@ -20,6 +20,7 @@ public class AdminMarketDebugLatestDTO {
     private DebtCashflowSummaryDTO debtCashflowSummary;
     private DebtOptimizerSummaryDTO debtOptimizerSummary;
     private InsuranceGapSummaryDTO insuranceGapSummary;
+    private AlertsSummaryDTO alertsSummary;
     private List<String> warnings = new ArrayList<>();
     private String ruleSetCode;
     private Integer ruleSetVersion;
@@ -64,6 +65,8 @@ public class AdminMarketDebugLatestDTO {
     public void setDebtOptimizerSummary(DebtOptimizerSummaryDTO debtOptimizerSummary) { this.debtOptimizerSummary = debtOptimizerSummary; }
     public InsuranceGapSummaryDTO getInsuranceGapSummary() { return insuranceGapSummary; }
     public void setInsuranceGapSummary(InsuranceGapSummaryDTO insuranceGapSummary) { this.insuranceGapSummary = insuranceGapSummary; }
+    public AlertsSummaryDTO getAlertsSummary() { return alertsSummary; }
+    public void setAlertsSummary(AlertsSummaryDTO alertsSummary) { this.alertsSummary = alertsSummary; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public String getRuleSetCode() { return ruleSetCode; }
@@ -311,5 +314,21 @@ public class AdminMarketDebugLatestDTO {
         public void setTopGapValue(Double topGapValue) { this.topGapValue = topGapValue; }
         public int getWarningsCount() { return warningsCount; }
         public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
+    }
+
+    public static class AlertsSummaryDTO {
+        private int openCount;
+        private int criticalCount;
+        private List<String> topCodes = new ArrayList<>();
+        private String lastCreatedAt;
+
+        public int getOpenCount() { return openCount; }
+        public void setOpenCount(int openCount) { this.openCount = openCount; }
+        public int getCriticalCount() { return criticalCount; }
+        public void setCriticalCount(int criticalCount) { this.criticalCount = criticalCount; }
+        public List<String> getTopCodes() { return topCodes; }
+        public void setTopCodes(List<String> topCodes) { this.topCodes = topCodes; }
+        public String getLastCreatedAt() { return lastCreatedAt; }
+        public void setLastCreatedAt(String lastCreatedAt) { this.lastCreatedAt = lastCreatedAt; }
     }
 }
