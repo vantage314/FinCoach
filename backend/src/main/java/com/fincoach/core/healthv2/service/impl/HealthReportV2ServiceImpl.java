@@ -20,6 +20,8 @@ import com.fincoach.core.healthv2.analyzer.DebtCashflowV1Builder;
 import com.fincoach.core.healthv2.analyzer.DebtCashflowV1Result;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizerV1Builder;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizerV1Result;
+import com.fincoach.core.healthv2.analyzer.InsuranceGapV1Builder;
+import com.fincoach.core.healthv2.analyzer.InsuranceGapV1Result;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizer;
 import com.fincoach.core.healthv2.analyzer.CashflowPlanner;
 import com.fincoach.core.healthv2.analyzer.GoalPlanner;
@@ -205,6 +207,9 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         List<String> debtOptimizerWarnings = new ArrayList<>();
         List<Map<String, Object>> debtOptimizerWarningDetails = new ArrayList<>();
         DebtOptimizerV1Result debtOptimizerV1 = null;
+        List<String> insuranceGapWarnings = new ArrayList<>();
+        List<Map<String, Object>> insuranceGapWarningDetails = new ArrayList<>();
+        InsuranceGapV1Result insuranceGapV1 = null;
 
         // 资产类别占比（M1 简版）
         Map<String, Object> allocation = new LinkedHashMap<>();
@@ -448,6 +453,25 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         if (debtCashflowResult != null) {
             metrics.put("debtCashflowV1", debtCashflowResult.toMetricsMap());
         }
+        insuranceGapV1 = buildInsuranceGapV1(
+                insurance, cashflow, totalDebt, debtCashflowResult, scoreRuleSnapshot);
+        if (insuranceGapV1 != null) {
+            metrics.put("insuranceGapV1", insuranceGapV1.getMetrics());
+            insuranceGapWarnings = insuranceGapV1.getWarnings();
+            insuranceGapWarningDetails = insuranceGapV1.getWarningDetails();
+            InsuranceGapV1Result finalGap = insuranceGapV1;
+            List<String> insuranceGapWarningsFinal = insuranceGapWarnings == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(insuranceGapWarnings);
+            PortfolioDebugContextHolder.record(snapshot -> {
+                PortfolioMarketDebugSnapshot.InsuranceGapSummary summary = new PortfolioMarketDebugSnapshot.InsuranceGapSummary();
+                summary.setPremiumRatio(finalGap.getPremiumRatio());
+                summary.setTopGapType(finalGap.getTopGapType());
+                summary.setTopGapValue(finalGap.getTopGapValue());
+                summary.setWarningsCount(insuranceGapWarningsFinal.size());
+                snapshot.setInsuranceGapSummary(summary);
+            });
+        }
 
         // ========= 3. M3 评分引擎（多维加权 + 可解释 breakdown） =========
         // M5: 准备行为数据
@@ -595,16 +619,21 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             if (debtOptimizerV1 != null) {
                 adviceV2Payload.put("debtOptimizerV1", debtOptimizerV1.toAdviceMap());
             }
+            if (insuranceGapV1 != null) {
+                adviceV2Payload.put("insuranceAdviceV1", insuranceGapV1.getAdvice());
+            }
             Map<String, Object> meta = adviceV2.getMeta();
             if (meta != null) {
                 List<String> mergedCodes = mergeWarningCodes(meta.get("warnings"), corrWarnings);
                 mergedCodes = mergeWarningCodes(mergedCodes, rebalanceV1Warnings);
                 mergedCodes = mergeWarningCodes(mergedCodes, debtCashflowWarnings);
                 mergedCodes = mergeWarningCodes(mergedCodes, debtOptimizerWarnings);
+                mergedCodes = mergeWarningCodes(mergedCodes, insuranceGapWarnings);
                 List<Map<String, Object>> mergedDetails = mergeWarningDetails(meta.get("warningDetails"), corrWarningDetails);
                 mergedDetails = mergeWarningDetails(mergedDetails, rebalanceV1WarningDetails);
                 mergedDetails = mergeWarningDetails(mergedDetails, debtCashflowWarningDetails);
                 mergedDetails = mergeWarningDetails(mergedDetails, debtOptimizerWarningDetails);
+                mergedDetails = mergeWarningDetails(mergedDetails, insuranceGapWarningDetails);
                 meta.put("warnings", mergedCodes);
                 meta.put("warningDetails", mergedDetails);
             }
@@ -658,6 +687,14 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                     debtOptimizerV1.getTopDebtName(),
                     debtOptimizerWarnings,
                     debtOptimizerV1.getTradeoffHint() == null ? null : debtOptimizerV1.getTradeoffHint().get("recommendation"));
+        }
+        if (insuranceGapV1 != null) {
+            log.info("[HealthV2-Report] event=INSURANCE_GAP_V1 userId={} reportId={} premiumRatio={} topGapType={} summaryLevel={} warnings={}",
+                    userId, entity.getId(),
+                    insuranceGapV1.getPremiumRatio(),
+                    insuranceGapV1.getTopGapType(),
+                    insuranceGapV1.getSummaryLevel(),
+                    insuranceGapWarnings);
         }
 
         // ========= 5.1 写入行为事件（M5-A） =========
@@ -1054,6 +1091,41 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             return Double.parseDouble(obj.toString());
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    private InsuranceGapV1Result buildInsuranceGapV1(FcInsuranceProfileEntity profile,
+                                                     FcCashflowEntity cashflow,
+                                                     BigDecimal totalDebt,
+                                                     DebtCashflowV1Result debtCashflowV1,
+                                                     ScoreRuleSnapshot snapshot) {
+        Map<String, Object> coverage = parseInsuranceCoverage(profile == null ? null : profile.getExistingCoverageJson());
+        BigDecimal annualIncome = profile == null ? null : profile.getAnnualIncome();
+        BigDecimal monthlyIncome = cashflow == null ? null : cashflow.getIncome();
+        BigDecimal emergencyMonths = debtCashflowV1 == null ? null :
+                debtCashflowV1.getEmergencyFundMonths() == null
+                        ? null
+                        : BigDecimal.valueOf(debtCashflowV1.getEmergencyFundMonths());
+        return new InsuranceGapV1Builder().build(
+                profile,
+                coverage,
+                annualIncome,
+                monthlyIncome,
+                totalDebt,
+                emergencyMonths,
+                snapshot
+        );
+    }
+
+    private Map<String, Object> parseInsuranceCoverage(String rawJson) {
+        if (rawJson == null || rawJson.isBlank()) {
+            return new LinkedHashMap<>();
+        }
+        try {
+            return objectMapper.readValue(rawJson, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            log.warn("[HealthV2-Report] insurance coverage json parse failed", e);
+            return new LinkedHashMap<>();
         }
     }
 

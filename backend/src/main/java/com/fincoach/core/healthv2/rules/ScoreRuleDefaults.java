@@ -53,6 +53,11 @@ public final class ScoreRuleDefaults {
     public static final String DEBT_OPTIMIZER_EXTRA_PAY_RATIO = "DEBT_OPTIMIZER_EXTRA_PAY_RATIO";
     public static final String DEBT_OPTIMIZER_EXPECTED_RETURN = "DEBT_OPTIMIZER_EXPECTED_RETURN";
     public static final String DEBT_OPTIMIZER_RETURN_MARGIN = "DEBT_OPTIMIZER_RETURN_MARGIN";
+    public static final String INS_PREMIUM_RATIO_MAX = "INS_PREMIUM_RATIO_MAX";
+    public static final String INS_LIFE_MULTIPLIER = "INS_LIFE_MULTIPLIER";
+    public static final String INS_LIFE_DEPENDENT_BONUS_MULTIPLIER = "INS_LIFE_DEPENDENT_BONUS_MULTIPLIER";
+    public static final String INS_CRITICAL_ILLNESS_MULTIPLIER = "INS_CRITICAL_ILLNESS_MULTIPLIER";
+    public static final String INS_ACCIDENT_MULTIPLIER = "INS_ACCIDENT_MULTIPLIER";
 
     private static final Map<String, ScoreRuleParamDefinition> DEFAULT_PARAMS;
 
@@ -175,6 +180,21 @@ public final class ScoreRuleDefaults {
         map.put(DEBT_OPTIMIZER_RETURN_MARGIN, new ScoreRuleParamDefinition(
                 DEBT_OPTIMIZER_RETURN_MARGIN, ScoreRuleValueType.DECIMAL, "0.01",
                 BigDecimal.ZERO, BigDecimal.ONE, "Debt vs investment margin"));
+        map.put(INS_PREMIUM_RATIO_MAX, new ScoreRuleParamDefinition(
+                INS_PREMIUM_RATIO_MAX, ScoreRuleValueType.DECIMAL, "0.10",
+                BigDecimal.ZERO, BigDecimal.ONE, "Insurance premium ratio max"));
+        map.put(INS_LIFE_MULTIPLIER, new ScoreRuleParamDefinition(
+                INS_LIFE_MULTIPLIER, ScoreRuleValueType.DECIMAL, "10",
+                BigDecimal.ZERO, new BigDecimal("50"), "Life insurance income multiplier"));
+        map.put(INS_LIFE_DEPENDENT_BONUS_MULTIPLIER, new ScoreRuleParamDefinition(
+                INS_LIFE_DEPENDENT_BONUS_MULTIPLIER, ScoreRuleValueType.DECIMAL, "1",
+                BigDecimal.ZERO, new BigDecimal("10"), "Life insurance dependent bonus multiplier"));
+        map.put(INS_CRITICAL_ILLNESS_MULTIPLIER, new ScoreRuleParamDefinition(
+                INS_CRITICAL_ILLNESS_MULTIPLIER, ScoreRuleValueType.DECIMAL, "3",
+                BigDecimal.ZERO, new BigDecimal("20"), "Critical illness income multiplier"));
+        map.put(INS_ACCIDENT_MULTIPLIER, new ScoreRuleParamDefinition(
+                INS_ACCIDENT_MULTIPLIER, ScoreRuleValueType.DECIMAL, "1",
+                BigDecimal.ZERO, new BigDecimal("10"), "Accident insurance income multiplier"));
 
         DEFAULT_PARAMS = Collections.unmodifiableMap(map);
     }
