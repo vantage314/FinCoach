@@ -1,0 +1,22 @@
+version: 1
+defaults:
+  market: US
+  usSuffix: ".US"
+  cnSuffix:
+    sh: ".SS"
+    sz: ".SZ"
+
+aliases:
+  "贵州茅台": "600519.SS"
+  "茅台": "600519.SS"
+  "腾讯": "0700.HK"
+  "阿里": "BABA.US"
+  "苹果": "AAPL.US"
+  "AAPL": "AAPL.US"
+  "600519": "600519.SS"
+
+overrides: {}
+
+rules:
+  enableNumericCnHeuristics: true
+  enableAlphaUsHeuristics: true
