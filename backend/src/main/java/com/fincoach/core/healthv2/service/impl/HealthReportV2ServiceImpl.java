@@ -298,19 +298,23 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             corrSampleSize = corrResult.getSampleSize();
             log.info("[HealthV2-Report] event=PORTFOLIO_CORR_MATRIX userId={} assetsCount={} sampleSize={} warnings={}",
                     userId, corrAssetsCount, corrSampleSize, corrWarnings);
+            int assetsCountFinal = corrAssetsCount;
+            int sampleSizeFinal = corrSampleSize;
+            List<String> corrWarningsFinal = new ArrayList<>(corrWarnings);
+            CorrelationMatrixResult corrResultFinal = corrResult;
             PortfolioDebugContextHolder.record(snapshot -> {
                 PortfolioMarketDebugSnapshot.CorrelationMatrixSummary summary = new PortfolioMarketDebugSnapshot.CorrelationMatrixSummary();
-                summary.setAssetsCount(corrAssetsCount);
-                summary.setSampleSize(corrSampleSize);
-                summary.setWarnings(new ArrayList<>(corrWarnings));
+                summary.setAssetsCount(assetsCountFinal);
+                summary.setSampleSize(sampleSizeFinal);
+                summary.setWarnings(new ArrayList<>(corrWarningsFinal));
                 snapshot.setCorrelationMatrixSummary(summary);
                 PortfolioMarketDebugSnapshot.CorrelationMatrixData data = new PortfolioMarketDebugSnapshot.CorrelationMatrixData();
-                data.setAssets(corrResult.getAssets() == null ? new ArrayList<>() : new ArrayList<>(corrResult.getAssets()));
-                data.setMatrix(corrResult.getMatrix());
-                data.setMethod(corrResult.getMethod());
-                data.setSampleSize(corrResult.getSampleSize());
-                data.setStartDate(corrResult.getStartDate());
-                data.setEndDate(corrResult.getEndDate());
+                data.setAssets(corrResultFinal.getAssets() == null ? new ArrayList<>() : new ArrayList<>(corrResultFinal.getAssets()));
+                data.setMatrix(corrResultFinal.getMatrix());
+                data.setMethod(corrResultFinal.getMethod());
+                data.setSampleSize(corrResultFinal.getSampleSize());
+                data.setStartDate(corrResultFinal.getStartDate());
+                data.setEndDate(corrResultFinal.getEndDate());
                 snapshot.setCorrelationMatrix(data);
             });
 
