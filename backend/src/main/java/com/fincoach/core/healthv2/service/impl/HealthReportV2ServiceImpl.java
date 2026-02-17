@@ -443,6 +443,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         advice.put("summary", summary);
 
         // ========= 4g. Advice Engine V2 =========
+        List<String> adviceV2Warnings = new ArrayList<>();
+        List<Map<String, Object>> adviceV2WarningDetails = new ArrayList<>();
         if (adviceEngineV2 != null) {
             AdviceEngineResult adviceV2 = adviceEngineV2.build(
                     assets, liabilities, cashflow, allocation, totalAssets);
@@ -450,6 +452,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             adviceV2Payload.put("advices", adviceV2.getAdvices());
             adviceV2Payload.put("meta", adviceV2.getMeta());
             advice.put("adviceV2", adviceV2Payload);
+            adviceV2Warnings = extractWarningCodes(adviceV2.getMeta().get("warnings"));
+            adviceV2WarningDetails = extractWarningDetails(adviceV2.getMeta().get("warningDetails"));
         }
 
         // ========= 5. 落库 =========
@@ -477,6 +481,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         }
 
         reportMapper.insert(entity);
+        log.info("[HealthV2-Report] event=ADVICE_V2_WARNINGS userId={} reportId={} warnings={} warningDetails={}",
+                userId, entity.getId(), adviceV2Warnings, adviceV2WarningDetails);
 
         // ========= 5.1 写入行为事件（M5-A） =========
         try {
@@ -873,5 +879,40 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private List<String> extractWarningCodes(Object raw) {
+        List<String> result = new ArrayList<>();
+        if (raw instanceof List<?> list) {
+            for (Object item : list) {
+                if (item == null) continue;
+                result.add(item.toString());
+            }
+        }
+        return result;
+    }
+
+    private List<Map<String, Object>> extractWarningDetails(Object raw) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (raw instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    Object code = map.get("code");
+                    Object detail = map.get("detail");
+                    Map<String, Object> entry = new LinkedHashMap<>();
+                    entry.put("code", code == null ? "" : code.toString());
+                    entry.put("detail", truncate(detail == null ? "" : detail.toString(), 200));
+                    result.add(entry);
+                }
+            }
+        }
+        return result;
+    }
+
+    private String truncate(String input, int max) {
+        if (input == null) return "";
+        if (input.length() <= max) return input;
+        if (max <= 3) return input.substring(0, max);
+        return input.substring(0, max - 3) + "...";
     }
 }
