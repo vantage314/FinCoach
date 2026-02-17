@@ -82,6 +82,12 @@ public class AdminMarketDebugControllerTest {
         debtOptimizerSummary.setBudgetForExtraPayment(500.0);
         debtOptimizerSummary.setWarningsCount(1);
         snapshot.setDebtOptimizerSummary(debtOptimizerSummary);
+        PortfolioMarketDebugSnapshot.InsuranceGapSummary insuranceGapSummary = new PortfolioMarketDebugSnapshot.InsuranceGapSummary();
+        insuranceGapSummary.setPremiumRatio(0.08);
+        insuranceGapSummary.setTopGapType("LIFE");
+        insuranceGapSummary.setTopGapValue(120000.0);
+        insuranceGapSummary.setWarningsCount(1);
+        snapshot.setInsuranceGapSummary(insuranceGapSummary);
         PortfolioDebugContextHolder.enableCapture();
         PortfolioDebugContextHolder.set(snapshot);
 
@@ -104,6 +110,10 @@ public class AdminMarketDebugControllerTest {
                 .andExpect(jsonPath("$.data.debtOptimizerSummary.topDebtName").value("CREDIT_CARD"))
                 .andExpect(jsonPath("$.data.debtOptimizerSummary.budgetForExtraPayment").value(500.0))
                 .andExpect(jsonPath("$.data.debtOptimizerSummary.warningsCount").value(1))
+                .andExpect(jsonPath("$.data.insuranceGapSummary.premiumRatio").value(0.08))
+                .andExpect(jsonPath("$.data.insuranceGapSummary.topGapType").value("LIFE"))
+                .andExpect(jsonPath("$.data.insuranceGapSummary.topGapValue").value(120000.0))
+                .andExpect(jsonPath("$.data.insuranceGapSummary.warningsCount").value(1))
                 .andExpect(jsonPath("$.data.requestId").exists())
                 .andExpect(jsonPath("$.data.timestamp").exists());
         UserContext.clear();
