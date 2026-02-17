@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fincoach.core.healthv2.analyzer.PortfolioPerformanceAnalyzer;
+import com.fincoach.core.healthv2.analyzer.AlertEngineV1;
+import com.fincoach.core.healthv2.analyzer.AlertV1Input;
+import com.fincoach.core.healthv2.analyzer.AlertV1Result;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioAnalyzer;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioHistoryFacade;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioInput;
@@ -123,6 +126,7 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     @Override
     public HealthReportV2VO generate(Long userId) {
         log.info("[HealthV2-Report] 开始生成体检报告, userId={}", userId);
+        LocalDateTime reportTime = LocalDateTime.now();
 
         // ========= 1. 拉取用户最新数据 =========
         List<FcAssetEntity> assets = assetMapper.selectList(
@@ -202,6 +206,7 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         int corrSampleSize = 0;
         List<String> rebalanceV1Warnings = new ArrayList<>();
         List<Map<String, Object>> rebalanceV1WarningDetails = new ArrayList<>();
+        RebalanceAdviceV1Result rebalanceV1Result = null;
         List<String> debtCashflowWarnings = new ArrayList<>();
         List<Map<String, Object>> debtCashflowWarningDetails = new ArrayList<>();
         List<String> debtOptimizerWarnings = new ArrayList<>();
@@ -210,6 +215,9 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         List<String> insuranceGapWarnings = new ArrayList<>();
         List<Map<String, Object>> insuranceGapWarningDetails = new ArrayList<>();
         InsuranceGapV1Result insuranceGapV1 = null;
+        List<String> alertWarnings = new ArrayList<>();
+        List<Map<String, Object>> alertWarningDetails = new ArrayList<>();
+        AlertV1Result alertsV1 = null;
 
         // 资产类别占比（M1 简版）
         Map<String, Object> allocation = new LinkedHashMap<>();
@@ -334,13 +342,13 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
             RebalanceTemplateSnapshot rebalanceSnapshot = rebalanceTemplateRegistry == null ? null : rebalanceTemplateRegistry.getActive();
             Map<String, Double> targetWeights = rebalanceSnapshot == null ? null : rebalanceSnapshot.getTargets();
-            RebalanceAdviceV1Result rebalanceV1 = new RebalanceAdviceV1Builder()
+            rebalanceV1Result = new RebalanceAdviceV1Builder()
                     .build(allocation, targetWeights, corrResult);
-            rebalanceV1Warnings = rebalanceV1.getWarnings();
-            rebalanceV1WarningDetails = rebalanceV1.getWarningDetails();
-            portfolioMetrics.put("rebalanceAdviceV1", rebalanceV1.toMap());
+            rebalanceV1Warnings = rebalanceV1Result.getWarnings();
+            rebalanceV1WarningDetails = rebalanceV1Result.getWarningDetails();
+            portfolioMetrics.put("rebalanceAdviceV1", rebalanceV1Result.toMap());
             log.info("[HealthV2-Report] event=PORTFOLIO_REBAL_V1 userId={} triggered={} threshold={} warnings={}",
-                    userId, rebalanceV1.isTriggered(), rebalanceV1.getThreshold(), rebalanceV1Warnings);
+                    userId, rebalanceV1Result.isTriggered(), rebalanceV1Result.getThreshold(), rebalanceV1Warnings);
 
             // Add Source Info & Warnings
             List<String> w = pm != null && pm.getWarnings() != null ? new ArrayList<>(pm.getWarnings()) : new ArrayList<>();
@@ -359,14 +367,14 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             }
             portfolioMetrics.put("warnings", w);
             portfolioMetrics.put("correlationMatrix", new CorrelationMatrixResult().toMap());
-            RebalanceAdviceV1Result rebalanceV1 = new RebalanceAdviceV1Builder()
+            rebalanceV1Result = new RebalanceAdviceV1Builder()
                     .build(allocation, null, null);
-            if (!rebalanceV1.getWarnings().contains(RebalanceAdviceV1WarningCodes.REBAL_TARGET_MISSING)) {
-                rebalanceV1.getWarnings().add(RebalanceAdviceV1WarningCodes.REBAL_TARGET_MISSING);
+            if (!rebalanceV1Result.getWarnings().contains(RebalanceAdviceV1WarningCodes.REBAL_TARGET_MISSING)) {
+                rebalanceV1Result.getWarnings().add(RebalanceAdviceV1WarningCodes.REBAL_TARGET_MISSING);
             }
-            rebalanceV1Warnings = rebalanceV1.getWarnings();
-            rebalanceV1WarningDetails = rebalanceV1.getWarningDetails();
-            portfolioMetrics.put("rebalanceAdviceV1", rebalanceV1.toMap());
+            rebalanceV1Warnings = rebalanceV1Result.getWarnings();
+            rebalanceV1WarningDetails = rebalanceV1Result.getWarningDetails();
+            portfolioMetrics.put("rebalanceAdviceV1", rebalanceV1Result.toMap());
         }
         portfolioMetrics.put("performance", performance);
 
@@ -643,10 +651,84 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             adviceV2WarningDetails = extractWarningDetails(meta == null ? null : meta.get("warningDetails"));
         }
 
+        // ========= 4h. Alerts V1 =========
+        try {
+            AlertV1Input alertInput = new AlertV1Input();
+            if (scoresPayload instanceof Map<?, ?> scoresMap) {
+                Object riskObj = scoresMap.get("riskScore");
+                if (riskObj instanceof Map<?, ?> riskMap) {
+                    Object valueObj = riskMap.get("value");
+                    if (valueObj instanceof Number number) {
+                        alertInput.setRiskScoreValue(number.intValue());
+                    } else if (valueObj != null) {
+                        try {
+                            alertInput.setRiskScoreValue(Integer.parseInt(valueObj.toString()));
+                        } catch (Exception ignored) {
+                            alertInput.setRiskScoreValue(null);
+                        }
+                    }
+                    Object levelObj = riskMap.get("level");
+                    alertInput.setRiskScoreLevel(levelObj == null ? null : levelObj.toString());
+                }
+            }
+            Double maxDrawdown = null;
+            if (performance != null) {
+                maxDrawdown = toDoubleObj(performance.get("maxDrawdown"));
+            }
+            alertInput.setMaxDrawdown(maxDrawdown);
+            alertInput.setRebalanceTriggered(rebalanceV1Result == null ? null : rebalanceV1Result.isTriggered());
+            if (debtCashflowResult != null) {
+                Map<String, Object> cashflowMap = debtCashflowResult.getCashflowMetrics();
+                alertInput.setMonthlySurplus(toDoubleObj(cashflowMap == null ? null : cashflowMap.get("monthlySurplus")));
+                alertInput.setEmergencyFundMonths(debtCashflowResult.getEmergencyFundMonths());
+                alertInput.setDti(debtCashflowResult.getDti());
+                Map<String, Object> debtMap = debtCashflowResult.getDebtMetrics();
+                alertInput.setDebtToAssets(toDoubleObj(debtMap == null ? null : debtMap.get("debtToAssets")));
+            }
+            if (insuranceGapV1 != null) {
+                alertInput.setInsuranceSummaryLevel(insuranceGapV1.getSummaryLevel());
+                alertInput.setInsuranceTopGapValue(insuranceGapV1.getTopGapValue());
+            }
+            alertsV1 = new AlertEngineV1().build(alertInput, scoreRuleSnapshot, reportTime);
+            if (alertsV1 != null) {
+                metrics.put("alertsV1", alertsV1.toMetricsMap());
+                alertWarnings = alertsV1.getWarnings();
+                alertWarningDetails = alertsV1.getWarningDetails();
+                AlertV1Result alertsFinal = alertsV1;
+                PortfolioDebugContextHolder.record(snapshot -> {
+                    PortfolioMarketDebugSnapshot.AlertsSummary summary = new PortfolioMarketDebugSnapshot.AlertsSummary();
+                    summary.setOpenCount(alertsFinal.getOpenCount());
+                    summary.setCriticalCount(alertsFinal.getCriticalCount());
+                    summary.setTopCodes(new ArrayList<>(alertsFinal.getTopCodes()));
+                    summary.setLastCreatedAt(alertsFinal.getLastCreatedAt());
+                    snapshot.setAlertsSummary(summary);
+                });
+            } else {
+                metrics.put("alertsV1", new LinkedHashMap<>());
+            }
+        } catch (Exception e) {
+            log.warn("[HealthV2-Report] AlertEngineV1 计算异常", e);
+            metrics.put("alertsV1", new LinkedHashMap<>());
+        }
+        if (alertsV1 != null && !alertWarnings.isEmpty()) {
+            Object adviceV2Obj = advice.get("adviceV2");
+            if (adviceV2Obj instanceof Map<?, ?> v2Map) {
+                Object metaObj = v2Map.get("meta");
+                if (metaObj instanceof Map<?, ?> metaMap) {
+                    List<String> mergedCodes = mergeWarningCodes(metaMap.get("warnings"), alertWarnings);
+                    List<Map<String, Object>> mergedDetails = mergeWarningDetails(metaMap.get("warningDetails"), alertWarningDetails);
+                    metaMap.put("warnings", mergedCodes);
+                    metaMap.put("warningDetails", mergedDetails);
+                }
+            }
+            adviceV2Warnings = mergeWarningCodes(adviceV2Warnings, alertWarnings);
+            adviceV2WarningDetails = mergeWarningDetails(adviceV2WarningDetails, alertWarningDetails);
+        }
+
         // ========= 5. 落库 =========
         FcHealthReportEntity entity = new FcHealthReportEntity();
         entity.setUserId(userId);
-        entity.setReportDate(LocalDateTime.now());
+        entity.setReportDate(reportTime);
         entity.setRiskScore(riskScore);
         entity.setHealthScore(healthScore);
         entity.setBehaviorScore(behaviorScore);
@@ -655,8 +737,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         } else {
             entity.setRuleVersion("M4");
         }
-        entity.setCreateTime(LocalDateTime.now());
-        entity.setUpdateTime(LocalDateTime.now());
+        entity.setCreateTime(reportTime);
+        entity.setUpdateTime(reportTime);
 
         try {
             entity.setMetricsJson(objectMapper.writeValueAsString(metrics));
@@ -695,6 +777,16 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                     insuranceGapV1.getTopGapType(),
                     insuranceGapV1.getSummaryLevel(),
                     insuranceGapWarnings);
+        }
+        if (alertsV1 != null) {
+            List<Map<String, Object>> topAlerts = buildTopAlerts(alertsV1.getAlerts(), 3);
+            log.info("[HealthV2-Report] event=ALERT_V1 userId={} reportId={} openAlertsCount={} topAlerts={} warnings={}",
+                    userId, entity.getId(), alertsV1.getOpenCount(), topAlerts, alertWarnings);
+            try {
+                persistAlertRecords(userId, entity.getId(), alertsV1, reportTime);
+            } catch (Exception e) {
+                log.warn("[HealthV2-Report] alerts 持久化失败, reportId={}", entity.getId(), e);
+            }
         }
 
         // ========= 5.1 写入行为事件（M5-A） =========
@@ -917,6 +1009,50 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         }
 
         return summary;
+    }
+
+    private List<Map<String, Object>> buildTopAlerts(List<Map<String, Object>> alerts, int limit) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (alerts == null || limit <= 0) return result;
+        int count = Math.min(limit, alerts.size());
+        for (int i = 0; i < count; i++) {
+            Map<String, Object> alert = alerts.get(i);
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("code", alert == null ? null : alert.get("code"));
+            item.put("severity", alert == null ? null : alert.get("severity"));
+            result.add(item);
+        }
+        return result;
+    }
+
+    private void persistAlertRecords(Long userId, Long reportId, AlertV1Result alerts, LocalDateTime createdAt) {
+        if (alerts == null || alerts.getAlerts() == null || alerts.getAlerts().isEmpty()) {
+            return;
+        }
+        for (Map<String, Object> alert : alerts.getAlerts()) {
+            if (alert == null) continue;
+            String code = alert.get("code") == null ? null : alert.get("code").toString();
+            if (code == null || code.isBlank()) continue;
+            FcAlertRecordEntity record = new FcAlertRecordEntity();
+            record.setUserId(userId);
+            record.setRuleKey(code);
+            record.setSeverity(alert.get("severity") == null ? null : alert.get("severity").toString());
+            record.setMessage(alert.get("title") == null ? null : alert.get("title").toString());
+            record.setStatus("OPEN");
+            record.setCreatedAt(createdAt == null ? LocalDateTime.now() : createdAt);
+            Map<String, Object> payload = new LinkedHashMap<>();
+            payload.put("reportId", reportId);
+            payload.put("code", code);
+            payload.put("severity", record.getSeverity());
+            payload.put("detail", alert.get("detail"));
+            payload.put("related", alert.get("related"));
+            try {
+                record.setPayloadJson(objectMapper.writeValueAsString(payload));
+            } catch (Exception e) {
+                record.setPayloadJson(\"{}\");
+            }
+            alertRecordMapper.insert(record);
+        }
     }
 
     /**

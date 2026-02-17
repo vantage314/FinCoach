@@ -19,6 +19,7 @@ public class PortfolioMarketDebugSnapshot {
     private DebtCashflowSummary debtCashflowSummary;
     private DebtOptimizerSummary debtOptimizerSummary;
     private InsuranceGapSummary insuranceGapSummary;
+    private AlertsSummary alertsSummary;
     private List<String> warnings = new ArrayList<>();
     private Instant generatedAt;
 
@@ -48,6 +49,8 @@ public class PortfolioMarketDebugSnapshot {
     public void setDebtOptimizerSummary(DebtOptimizerSummary debtOptimizerSummary) { this.debtOptimizerSummary = debtOptimizerSummary; }
     public InsuranceGapSummary getInsuranceGapSummary() { return insuranceGapSummary; }
     public void setInsuranceGapSummary(InsuranceGapSummary insuranceGapSummary) { this.insuranceGapSummary = insuranceGapSummary; }
+    public AlertsSummary getAlertsSummary() { return alertsSummary; }
+    public void setAlertsSummary(AlertsSummary alertsSummary) { this.alertsSummary = alertsSummary; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public Instant getGeneratedAt() { return generatedAt; }
@@ -245,6 +248,22 @@ public class PortfolioMarketDebugSnapshot {
         public void setTopGapValue(Double topGapValue) { this.topGapValue = topGapValue; }
         public int getWarningsCount() { return warningsCount; }
         public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
+    }
+
+    public static class AlertsSummary {
+        private int openCount;
+        private int criticalCount;
+        private List<String> topCodes = new ArrayList<>();
+        private String lastCreatedAt;
+
+        public int getOpenCount() { return openCount; }
+        public void setOpenCount(int openCount) { this.openCount = openCount; }
+        public int getCriticalCount() { return criticalCount; }
+        public void setCriticalCount(int criticalCount) { this.criticalCount = criticalCount; }
+        public List<String> getTopCodes() { return topCodes; }
+        public void setTopCodes(List<String> topCodes) { this.topCodes = topCodes; }
+        public String getLastCreatedAt() { return lastCreatedAt; }
+        public void setLastCreatedAt(String lastCreatedAt) { this.lastCreatedAt = lastCreatedAt; }
     }
 
     public static class FallbackDebug {
