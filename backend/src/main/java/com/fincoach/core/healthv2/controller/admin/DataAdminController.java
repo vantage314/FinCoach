@@ -71,4 +71,15 @@ public class DataAdminController {
         auditService.log(UserContext.getCurrentUserId(), "ADMIN_UPDATE_LIABILITY", "LIABILITY", id, existing, dto);
         return Result.success("修正成功");
     }
+
+    @PutMapping("/cashflows/{id}")
+    @Operation(summary = "修正现金流（审计记录）")
+    public Result<String> updateCashflow(@PathVariable Long id, @RequestBody FcCashflowEntity dto) {
+        FcCashflowEntity existing = cashflowMapper.selectById(id);
+        if (existing == null) return Result.error(404, "现金流不存在");
+        dto.setId(id);
+        cashflowMapper.updateById(dto);
+        auditService.log(UserContext.getCurrentUserId(), "ADMIN_UPDATE_CASHFLOW", "CASHFLOW", id, existing, dto);
+        return Result.success("修正成功");
+    }
 }
