@@ -21,6 +21,7 @@
 2. Check `correlation.matrix`. Should be valid (no NaNs).
 3. Check warnings: `CORR_SERIES_ALIGNED_INTERSECTION` or `CORR_SERIES_ALIGNED_RELAXED`.
 4. If aligned points are too few, `correlation.matrix` should be null/empty and warnings include `CORR_INSUFFICIENT_POINTS`.
+5. If alignment gap ratio is too low, `correlation.matrix` should be null/empty and warnings include `CORR_GAP_RATIO_TOO_HIGH`.
 
 ## 2. Admin Debug
 1. Enable capture (admin only):

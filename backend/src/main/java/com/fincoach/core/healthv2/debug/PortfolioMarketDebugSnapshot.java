@@ -100,6 +100,8 @@ public class PortfolioMarketDebugSnapshot {
         private int effectivePoints;
         private int minPoints;
         private boolean matrixEmitted;
+        private int maxCandidatePoints;
+        private double gapRatio;
 
         public String getAlignedMode() { return alignedMode; }
         public void setAlignedMode(String alignedMode) { this.alignedMode = alignedMode; }
@@ -109,6 +111,10 @@ public class PortfolioMarketDebugSnapshot {
         public void setMinPoints(int minPoints) { this.minPoints = minPoints; }
         public boolean isMatrixEmitted() { return matrixEmitted; }
         public void setMatrixEmitted(boolean matrixEmitted) { this.matrixEmitted = matrixEmitted; }
+        public int getMaxCandidatePoints() { return maxCandidatePoints; }
+        public void setMaxCandidatePoints(int maxCandidatePoints) { this.maxCandidatePoints = maxCandidatePoints; }
+        public double getGapRatio() { return gapRatio; }
+        public void setGapRatio(double gapRatio) { this.gapRatio = gapRatio; }
     }
 
     public static class FallbackDebug {

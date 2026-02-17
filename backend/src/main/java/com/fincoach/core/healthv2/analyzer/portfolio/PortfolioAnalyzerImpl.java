@@ -1,5 +1,6 @@
 package com.fincoach.core.healthv2.analyzer.portfolio;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.fincoach.core.healthv2.debug.PortfolioDebugContextHolder;
@@ -16,6 +17,10 @@ import java.util.NavigableMap;
 public class PortfolioAnalyzerImpl implements PortfolioAnalyzer {
 
     private static final int MIN_CORR_POINTS = 20;
+    private static final double DEFAULT_MIN_GAP_RATIO = 0.6;
+
+    @Value("${fincoach.portfolio.correlation.min-gap-ratio:0.6}")
+    private double minGapRatio = DEFAULT_MIN_GAP_RATIO;
 
     @Override
     public PortfolioMetrics analyze(PortfolioInput input) {
@@ -146,6 +151,13 @@ public class PortfolioAnalyzerImpl implements PortfolioAnalyzer {
             return;
         }
 
+        if (aligned.getGapRatio() > 0.0 && aligned.getGapRatio() < minGapRatio) {
+            addWarning(metrics, ReturnSeriesAligner.WARN_GAP_RATIO_TOO_HIGH);
+            metrics.setCorrelation(null);
+            updateCorrelationDebug(aligned, false);
+            return;
+        }
+
         List<String> symbols = aligned.getSymbols();
         double[][] returns = aligned.getReturns();
         Map<String, Map<String, Double>> matrix = new LinkedHashMap<>();
@@ -230,15 +242,9 @@ public class PortfolioAnalyzerImpl implements PortfolioAnalyzer {
             debug.setEffectivePoints(aligned != null ? aligned.getEffectivePoints() : 0);
             debug.setMinPoints(MIN_CORR_POINTS);
             debug.setMatrixEmitted(matrixEmitted);
-            String mode = "NONE";
-            List<String> warnings = aligned != null ? aligned.getWarnings() : null;
-            if (warnings != null) {
-                if (warnings.contains(ReturnSeriesAligner.WARN_INTERSECTION)) {
-                    mode = "INTERSECTION";
-                } else if (warnings.contains(ReturnSeriesAligner.WARN_RELAXED)) {
-                    mode = "RELAXED";
-                }
-            }
+            debug.setMaxCandidatePoints(aligned != null ? aligned.getMaxCandidatePoints() : 0);
+            debug.setGapRatio(aligned != null ? aligned.getGapRatio() : 0.0);
+            String mode = aligned != null && aligned.getAlignmentMode() != null ? aligned.getAlignmentMode() : "NONE";
             debug.setAlignedMode(mode);
             snapshot.setCorrelation(debug);
         });

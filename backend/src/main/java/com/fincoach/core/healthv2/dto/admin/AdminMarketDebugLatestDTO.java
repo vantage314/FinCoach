@@ -134,16 +134,22 @@ public class AdminMarketDebugLatestDTO {
     public static class CorrelationDTO {
         private int minPoints;
         private int effectivePoints;
+        private int maxCandidatePoints;
         private String alignmentMode;
         private boolean matrixEmitted;
+        private double gapRatio;
 
         public int getMinPoints() { return minPoints; }
         public void setMinPoints(int minPoints) { this.minPoints = minPoints; }
         public int getEffectivePoints() { return effectivePoints; }
         public void setEffectivePoints(int effectivePoints) { this.effectivePoints = effectivePoints; }
+        public int getMaxCandidatePoints() { return maxCandidatePoints; }
+        public void setMaxCandidatePoints(int maxCandidatePoints) { this.maxCandidatePoints = maxCandidatePoints; }
         public String getAlignmentMode() { return alignmentMode; }
         public void setAlignmentMode(String alignmentMode) { this.alignmentMode = alignmentMode; }
         public boolean isMatrixEmitted() { return matrixEmitted; }
         public void setMatrixEmitted(boolean matrixEmitted) { this.matrixEmitted = matrixEmitted; }
+        public double getGapRatio() { return gapRatio; }
+        public void setGapRatio(double gapRatio) { this.gapRatio = gapRatio; }
     }
 }

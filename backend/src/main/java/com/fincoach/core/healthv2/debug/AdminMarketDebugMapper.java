@@ -123,6 +123,8 @@ public class AdminMarketDebugMapper {
         dto.setEffectivePoints(correlation.getEffectivePoints());
         dto.setMinPoints(correlation.getMinPoints());
         dto.setMatrixEmitted(correlation.isMatrixEmitted());
+        dto.setMaxCandidatePoints(correlation.getMaxCandidatePoints());
+        dto.setGapRatio(correlation.getGapRatio());
         return dto;
     }
 

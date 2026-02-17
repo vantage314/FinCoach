@@ -15,6 +15,7 @@
     - [x] `ReturnSeriesAligner` (Helper class).
     - [x] Update `PortfolioAnalyzer` to use Aligner.
     - [x] Add Warnings for exclusions.
+    - [x] Guard correlation by gap ratio (`CORR_GAP_RATIO_TOO_HIGH`).
 
     ## 4. Snapshot Replay
     - [x] Update `PortfolioHistoryFacade`: Check DB first if `preferCache=true`.

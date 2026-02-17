@@ -53,10 +53,12 @@ Enhance Market Data History (M7-3) with:
   - Added `ReturnSeriesAligner` for intersection/relaxed alignment.
   - `PortfolioAnalyzerImpl` now aligns series before correlation calc.
   - Warnings: `CORR_SERIES_ALIGNED_INTERSECTION`, `CORR_SERIES_ALIGNED_RELAXED`, `CORR_INSUFFICIENT_POINTS`.
+  - Added gap ratio guard (`CORR_GAP_RATIO_TOO_HIGH`) to prevent spurious correlation when alignment drops too many points.
   - Min points policy: `MIN_CORR_POINTS=20` (below this, correlation omitted).
   - `PortfolioInput` extended with dated return series for alignment.
 - **Verification**:
   - Tests cover intersection, relaxed fallback, and insufficient points.
+  - Tests cover gap ratio too high vs normal correlation output.
 
 ### Step 4: Snapshot Replay (Prefer Cache)
 - **Status**: Completed
