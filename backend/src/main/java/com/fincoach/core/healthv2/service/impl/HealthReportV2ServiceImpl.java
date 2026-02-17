@@ -1049,7 +1049,7 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             try {
                 record.setPayloadJson(objectMapper.writeValueAsString(payload));
             } catch (Exception e) {
-                record.setPayloadJson(\"{}\");
+                record.setPayloadJson("{}");
             }
             alertRecordMapper.insert(record);
         }
