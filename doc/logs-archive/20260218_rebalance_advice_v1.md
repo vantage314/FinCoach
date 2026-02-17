@@ -20,6 +20,7 @@ Provide a minimal drift-based rebalance suggestion with warnings and safe degrad
 
 ## How to verify
 - `cd backend && mvn clean test`
+- Latest run: `Tests run: 56, Failures: 0, Errors: 0, Skipped: 0` + `BUILD SUCCESS`
 
 ## Rollback
-- `git revert <commit_sha>`
+- `git revert df0e513d 393f535a 0d758bcd 9d7b33cd`
