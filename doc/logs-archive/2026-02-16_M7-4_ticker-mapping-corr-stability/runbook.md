@@ -25,14 +25,16 @@
 ## 2. Admin Debug
 1. Call `GET /api/admin/portfolio/market-debug/latest`.
 2. Review JSON response for:
-   - `mappedTickers`: Which rule applied?
-   - `fetchStats`: Success/Fail counts.
+   - `resolvedTickers`: Which rule applied (keyword -> ticker + source + warnings).
+   - `marketFetch`: Success/Fail counts and failed symbols.
 3. Verify fields:
+   - `requestId`, `timestamp`, `userId`
    - `historyPath` and `historySource`
    - `cache.hit` / `cache.snapshotsCount`
    - `marketFetch.failedSymbols`
    - `correlation.effectivePoints` / `correlation.matrixEmitted`
    - `warnings`
+4. If no snapshot exists yet, response should still be 200 and include warning `DEBUG_SNAPSHOT_EMPTY` (schema remains stable).
 
 ## 3. Fallback Scenarios
 - **DB Down**: Should use `ticker-mapping.yml`. Warning `TICKER_MAPPING_DB_UNAVAILABLE_FALLBACK_FILE`.

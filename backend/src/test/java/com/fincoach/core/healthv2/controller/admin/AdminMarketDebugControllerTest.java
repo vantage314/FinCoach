@@ -1,7 +1,8 @@
 package com.fincoach.core.healthv2.controller.admin;
 
-import com.fincoach.core.common.UserContext;
 import com.fincoach.core.common.GlobalExceptionHandler;
+import com.fincoach.core.common.UserContext;
+import com.fincoach.core.healthv2.debug.AdminMarketDebugMapper;
 import com.fincoach.core.healthv2.debug.PortfolioDebugContextHolder;
 import com.fincoach.core.healthv2.debug.PortfolioMarketDebugSnapshot;
 import com.fincoach.core.repository.entity.User;
@@ -32,7 +33,7 @@ public class AdminMarketDebugControllerTest {
         admin.setRole("ADMIN");
         when(userMapper.selectById(1L)).thenReturn(admin);
 
-        AdminMarketDebugController controller = new AdminMarketDebugController();
+        AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
         AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
@@ -53,7 +54,10 @@ public class AdminMarketDebugControllerTest {
         mockMvc.perform(get("/api/admin/portfolio/market-debug/latest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.historySource").value("MARKET_DATA_DAILY_CLOSE"));
+                .andExpect(jsonPath("$.data.history.source").value("MARKET_DATA_DAILY_CLOSE"))
+                .andExpect(jsonPath("$.data.warnings").isArray())
+                .andExpect(jsonPath("$.data.requestId").exists())
+                .andExpect(jsonPath("$.data.timestamp").exists());
         UserContext.clear();
         PortfolioDebugContextHolder.clear();
     }
@@ -66,7 +70,7 @@ public class AdminMarketDebugControllerTest {
         user.setRole("USER");
         when(userMapper.selectById(2L)).thenReturn(user);
 
-        AdminMarketDebugController controller = new AdminMarketDebugController();
+        AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
         AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
@@ -89,7 +93,7 @@ public class AdminMarketDebugControllerTest {
     public void testNoUserContextForbidden() throws Exception {
         UserMapper userMapper = Mockito.mock(UserMapper.class);
 
-        AdminMarketDebugController controller = new AdminMarketDebugController();
+        AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
         AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
@@ -104,5 +108,33 @@ public class AdminMarketDebugControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(403));
         PortfolioDebugContextHolder.clear();
+    }
+
+    @Test
+    public void testEmptySnapshotReturnsStableSchema() throws Exception {
+        UserMapper userMapper = Mockito.mock(UserMapper.class);
+        User admin = new User();
+        admin.setId(1L);
+        admin.setRole("ADMIN");
+        when(userMapper.selectById(1L)).thenReturn(admin);
+
+        AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
+        AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
+        AspectJProxyFactory factory = new AspectJProxyFactory(controller);
+        factory.addAspect(aspect);
+        AdminMarketDebugController proxy = factory.getProxy();
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(proxy)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .setMessageConverters(new MappingJackson2HttpMessageConverter())
+                .build();
+
+        UserContext.setUserId(1L);
+        mockMvc.perform(get("/api/admin/portfolio/market-debug/latest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.warnings").isArray())
+                .andExpect(jsonPath("$.data.warnings[0]").value("DEBUG_SNAPSHOT_EMPTY"))
+                .andExpect(jsonPath("$.data.resolvedTickers").isArray());
+        UserContext.clear();
     }
 }

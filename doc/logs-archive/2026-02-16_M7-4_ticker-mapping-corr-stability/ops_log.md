@@ -75,9 +75,11 @@ Enhance Market Data History (M7-3) with:
 - **Changes**:
   - Added `/api/admin/portfolio/market-debug/latest` with admin-only guard.
   - Added debug context snapshot + ThreadLocal holder and cleanup filter.
+  - Normalized response schema via `AdminMarketDebugLatestDTO` + mapper (stable fields + defaults).
   - Debug fields: resolvedTickers, historySource/path, cache, marketFetch, fallback, correlation, warnings.
 - **Verification**:
   - MockMvc tests cover admin 200 and non-admin 403.
+  - Empty snapshot returns `DEBUG_SNAPSHOT_EMPTY` with stable DTO shape.
 
 ## 5. Build Fix (Lombok & JDK 21)
 - **Status**: In Progress
