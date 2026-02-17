@@ -52,6 +52,7 @@ public class AdminMarketDebugMapper {
         if (includeMatrix) {
             dto.setCorrelationMatrix(mapCorrelationMatrix(snapshot.getCorrelationMatrix()));
         }
+        dto.setScoreSummary(mapScoreSummary(snapshot.getScoreSummary()));
 
         return dto;
     }
@@ -203,6 +204,29 @@ public class AdminMarketDebugMapper {
         dto.setSampleSize(data.getSampleSize());
         dto.setStartDate(data.getStartDate());
         dto.setEndDate(data.getEndDate());
+        return dto;
+    }
+
+    private AdminMarketDebugLatestDTO.ScoreSummaryDTO mapScoreSummary(PortfolioMarketDebugSnapshot.ScoreSummary summary) {
+        AdminMarketDebugLatestDTO.ScoreSummaryDTO dto = new AdminMarketDebugLatestDTO.ScoreSummaryDTO();
+        if (summary == null) {
+            return dto;
+        }
+        dto.setRisk(mapScoreSummaryItem(summary.getRisk()));
+        dto.setAssetHealth(mapScoreSummaryItem(summary.getAssetHealth()));
+        dto.setBehavior(mapScoreSummaryItem(summary.getBehavior()));
+        return dto;
+    }
+
+    private AdminMarketDebugLatestDTO.ScoreSummaryItemDTO mapScoreSummaryItem(
+            PortfolioMarketDebugSnapshot.ScoreSummaryItem item) {
+        AdminMarketDebugLatestDTO.ScoreSummaryItemDTO dto = new AdminMarketDebugLatestDTO.ScoreSummaryItemDTO();
+        if (item == null) {
+            return dto;
+        }
+        dto.setValue(item.getValue());
+        dto.setLevel(item.getLevel());
+        dto.setWarningsCount(item.getWarnings() == null ? 0 : item.getWarnings().size());
         return dto;
     }
 

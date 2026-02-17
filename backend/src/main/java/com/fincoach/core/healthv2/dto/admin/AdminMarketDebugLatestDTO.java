@@ -16,6 +16,7 @@ public class AdminMarketDebugLatestDTO {
     private CorrelationDTO correlation;
     private CorrelationMatrixSummaryDTO correlationMatrixSummary;
     private CorrelationMatrixDTO correlationMatrix;
+    private ScoreSummaryDTO scoreSummary;
     private List<String> warnings = new ArrayList<>();
     private String ruleSetCode;
     private Integer ruleSetVersion;
@@ -52,6 +53,8 @@ public class AdminMarketDebugLatestDTO {
     public void setCorrelationMatrixSummary(CorrelationMatrixSummaryDTO correlationMatrixSummary) { this.correlationMatrixSummary = correlationMatrixSummary; }
     public CorrelationMatrixDTO getCorrelationMatrix() { return correlationMatrix; }
     public void setCorrelationMatrix(CorrelationMatrixDTO correlationMatrix) { this.correlationMatrix = correlationMatrix; }
+    public ScoreSummaryDTO getScoreSummary() { return scoreSummary; }
+    public void setScoreSummary(ScoreSummaryDTO scoreSummary) { this.scoreSummary = scoreSummary; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public String getRuleSetCode() { return ruleSetCode; }
@@ -222,5 +225,31 @@ public class AdminMarketDebugLatestDTO {
         public void setStartDate(String startDate) { this.startDate = startDate; }
         public String getEndDate() { return endDate; }
         public void setEndDate(String endDate) { this.endDate = endDate; }
+    }
+
+    public static class ScoreSummaryDTO {
+        private ScoreSummaryItemDTO risk;
+        private ScoreSummaryItemDTO assetHealth;
+        private ScoreSummaryItemDTO behavior;
+
+        public ScoreSummaryItemDTO getRisk() { return risk; }
+        public void setRisk(ScoreSummaryItemDTO risk) { this.risk = risk; }
+        public ScoreSummaryItemDTO getAssetHealth() { return assetHealth; }
+        public void setAssetHealth(ScoreSummaryItemDTO assetHealth) { this.assetHealth = assetHealth; }
+        public ScoreSummaryItemDTO getBehavior() { return behavior; }
+        public void setBehavior(ScoreSummaryItemDTO behavior) { this.behavior = behavior; }
+    }
+
+    public static class ScoreSummaryItemDTO {
+        private Integer value;
+        private String level;
+        private int warningsCount;
+
+        public Integer getValue() { return value; }
+        public void setValue(Integer value) { this.value = value; }
+        public String getLevel() { return level; }
+        public void setLevel(String level) { this.level = level; }
+        public int getWarningsCount() { return warningsCount; }
+        public void setWarningsCount(int warningsCount) { this.warningsCount = warningsCount; }
     }
 }
