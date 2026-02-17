@@ -35,7 +35,10 @@ public class AdviceEngineV2 {
                                     Map<String, Object> allocation,
                                     BigDecimal totalAssets) {
         AdviceEngineResult result = new AdviceEngineResult();
-        List<String> warnings = new ArrayList<>();
+        WarningCollector warnings = new WarningCollector();
+
+        AdviceInputQuality inputQuality = AdviceInputQuality.evaluate(
+                assets, liabilities, cashflow, allocation, totalAssets, warnings);
 
         ScoreRuleSnapshot scoreSnapshot = scoreRuleSetRegistry == null ? null : scoreRuleSetRegistry.get();
         AdviceThresholds thresholds = AdviceThresholds.fromSnapshot(scoreSnapshot);
@@ -48,42 +51,41 @@ public class AdviceEngineV2 {
             warnings.addAll(templateSnapshot.getWarnings());
         }
 
-        BigDecimal liquidAssets = sumCashAssets(assets);
-        if (liquidAssets.compareTo(BigDecimal.ZERO) == 0 && totalAssets != null && totalAssets.compareTo(BigDecimal.ZERO) > 0) {
-            liquidAssets = totalAssets;
-            warnings.add("LIQUID_ASSET_FALLBACK_TOTAL");
+        List<FcAssetEntity> safeAssets = inputQuality.getAssets();
+        Map<String, Object> safeAllocation = inputQuality.getAllocation();
+        FcCashflowEntity safeCashflow = inputQuality.getCashflow();
+        BigDecimal safeTotalAssets = inputQuality.getTotalAssets();
+
+        BigDecimal liquidAssets = sumCashAssets(safeAssets);
+        if (liquidAssets.compareTo(BigDecimal.ZERO) == 0 && safeTotalAssets != null && safeTotalAssets.compareTo(BigDecimal.ZERO) > 0) {
+            liquidAssets = safeTotalAssets;
+            warnings.add(AdviceWarningCodes.LIQUID_ASSET_FALLBACK_TOTAL, "fallback to totalAssets");
         }
 
-        BigDecimal monthlyExpense = calcMonthlyExpense(cashflow);
-        BigDecimal income = cashflow == null ? null : cashflow.getIncome();
-        BigDecimal monthlyDebtPayment = cashflow == null ? null : cashflow.getMonthlyDebtPayment();
+        BigDecimal monthlyExpense = calcMonthlyExpense(safeCashflow);
+        BigDecimal income = safeCashflow == null ? null : safeCashflow.getIncome();
+        BigDecimal monthlyDebtPayment = safeCashflow == null ? null : safeCashflow.getMonthlyDebtPayment();
 
         Double emergencyMonths = null;
         if (monthlyExpense != null && monthlyExpense.compareTo(BigDecimal.ZERO) > 0) {
             emergencyMonths = liquidAssets.divide(monthlyExpense, 2, RoundingMode.HALF_UP).doubleValue();
-        } else {
-            warnings.add("EMERGENCY_MONTHS_UNAVAILABLE");
         }
 
         Double debtPaymentRatio = null;
         if (income != null && income.compareTo(BigDecimal.ZERO) > 0 && monthlyDebtPayment != null) {
             debtPaymentRatio = monthlyDebtPayment.divide(income, 4, RoundingMode.HALF_UP).doubleValue();
-        } else {
-            warnings.add("DEBT_PAYMENT_RATIO_UNAVAILABLE");
         }
 
         Double surplusRate = null;
         if (income != null && income.compareTo(BigDecimal.ZERO) > 0 && monthlyExpense != null) {
             BigDecimal surplus = income.subtract(monthlyExpense);
             surplusRate = surplus.divide(income, 4, RoundingMode.HALF_UP).doubleValue();
-        } else {
-            warnings.add("SURPLUS_RATE_UNAVAILABLE");
         }
 
-        result.getAdvices().add(buildEmergencyAdvice(emergencyMonths, thresholds.getEmergencyMonthsMin()));
-        result.getAdvices().add(buildDebtAdvice(debtPaymentRatio, thresholds.getDebtPaymentRatioMax()));
-        result.getAdvices().add(buildSurplusAdvice(surplusRate, thresholds.getSurplusRateMin()));
-        result.getAdvices().add(buildRebalanceAdvice(allocation, templateSnapshot, thresholds.getRebalanceThreshold(), warnings));
+        result.getAdvices().add(buildEmergencyAdvice(emergencyMonths, thresholds.getEmergencyMonthsMin(), warnings));
+        result.getAdvices().add(buildDebtAdvice(debtPaymentRatio, thresholds.getDebtPaymentRatioMax(), warnings));
+        result.getAdvices().add(buildSurplusAdvice(surplusRate, thresholds.getSurplusRateMin(), warnings));
+        result.getAdvices().add(buildRebalanceAdvice(safeAllocation, templateSnapshot, thresholds.getRebalanceThreshold(), warnings));
 
         Map<String, Object> meta = result.getMeta();
         if (scoreSnapshot != null) {
@@ -97,14 +99,16 @@ public class AdviceEngineV2 {
             meta.put("templateSource", templateSnapshot.getSource());
         }
         meta.put("thresholds", thresholds.toMap());
-        meta.put("warnings", dedup(warnings));
+        meta.put("warnings", warnings.codes());
+        meta.put("warningDetails", warnings.detailMaps());
 
         return result;
     }
 
-    private AdviceDTO buildEmergencyAdvice(Double emergencyMonths, int minMonths) {
+    private AdviceDTO buildEmergencyAdvice(Double emergencyMonths, int minMonths, WarningCollector warnings) {
         AdviceDTO advice = base("EMERGENCY_FUND_LOW", "应急金储备");
         if (emergencyMonths == null) {
+            warnings.add(AdviceWarningCodes.EMERGENCY_MONTHS_UNAVAILABLE, "monthlyExpense missing or zero");
             advice.setPriority("P1");
             advice.setReason("现金流或资产数据缺失，无法评估应急金覆盖月数");
             advice.setImpact("可能低估短期流动性风险");
@@ -127,9 +131,10 @@ public class AdviceEngineV2 {
         return advice;
     }
 
-    private AdviceDTO buildDebtAdvice(Double debtPaymentRatio, double maxRatio) {
+    private AdviceDTO buildDebtAdvice(Double debtPaymentRatio, double maxRatio, WarningCollector warnings) {
         AdviceDTO advice = base("DEBT_PAYMENT_RATIO_HIGH", "债务压力");
         if (debtPaymentRatio == null) {
+            warnings.add(AdviceWarningCodes.DEBT_PAYMENT_RATIO_UNAVAILABLE, "income or monthlyDebtPayment missing");
             advice.setPriority("P1");
             advice.setReason("缺少收入或负债月供数据，无法评估债务压力");
             advice.setImpact("可能低估债务风险");
@@ -152,9 +157,10 @@ public class AdviceEngineV2 {
         return advice;
     }
 
-    private AdviceDTO buildSurplusAdvice(Double surplusRate, double minRate) {
+    private AdviceDTO buildSurplusAdvice(Double surplusRate, double minRate, WarningCollector warnings) {
         AdviceDTO advice = base("SURPLUS_RATE_LOW", "结余率");
         if (surplusRate == null) {
+            warnings.add(AdviceWarningCodes.SURPLUS_RATE_UNAVAILABLE, "income or expense missing");
             advice.setPriority("P1");
             advice.setReason("缺少收入或支出数据，无法计算结余率");
             advice.setImpact("难以判断长期储蓄能力");
@@ -180,10 +186,10 @@ public class AdviceEngineV2 {
     private AdviceDTO buildRebalanceAdvice(Map<String, Object> allocation,
                                            RebalanceTemplateSnapshot templateSnapshot,
                                            double threshold,
-                                           List<String> warnings) {
+                                           WarningCollector warnings) {
         AdviceDTO advice = base("REBALANCE_RECOMMENDATION", "再平衡建议");
         if (templateSnapshot == null || templateSnapshot.getTargets().isEmpty()) {
-            warnings.add("REBALANCE_TEMPLATE_MISSING");
+            warnings.add(AdviceWarningCodes.REBALANCE_TEMPLATE_MISSING, "template missing or empty");
             advice.setPriority("P2");
             advice.setReason("未找到可用的再平衡模板");
             advice.setImpact("无法生成目标配置建议");
@@ -191,7 +197,7 @@ public class AdviceEngineV2 {
             return advice;
         }
         if (allocation == null || allocation.isEmpty()) {
-            warnings.add("REBALANCE_INPUT_MISSING");
+            warnings.add(AdviceWarningCodes.REBALANCE_INPUT_MISSING, "allocation missing or empty");
             advice.setPriority("P2");
             advice.setReason("当前资产配置数据缺失");
             advice.setImpact("无法判断偏离情况");
@@ -298,17 +304,8 @@ public class AdviceEngineV2 {
 
     private Map<String, Object> buildEvidence(String key1, Object value1, String key2, Object value2) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put(key1, value1);
-        map.put(key2, value2);
+        map.put(key1, SafeValue.valueOrNA(value1));
+        map.put(key2, SafeValue.valueOrNA(value2));
         return map;
-    }
-
-    private List<String> dedup(List<String> input) {
-        List<String> result = new ArrayList<>();
-        for (String w : input) {
-            if (w == null) continue;
-            if (!result.contains(w)) result.add(w);
-        }
-        return result;
     }
 }
