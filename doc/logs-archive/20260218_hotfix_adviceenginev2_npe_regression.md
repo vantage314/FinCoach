@@ -20,4 +20,4 @@
 - Notes: ByteBuddy/CDS warnings present; safe to ignore.
 
 ## Rollback
-- `git revert <this_test_docs_commit_sha>`
+- `git revert 24e3d5d0`
