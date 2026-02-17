@@ -14,6 +14,8 @@ public class AdminMarketDebugLatestDTO {
     private MarketFetchDTO marketFetch;
     private FallbackDTO fallback;
     private CorrelationDTO correlation;
+    private CorrelationMatrixSummaryDTO correlationMatrixSummary;
+    private CorrelationMatrixDTO correlationMatrix;
     private List<String> warnings = new ArrayList<>();
     private String ruleSetCode;
     private Integer ruleSetVersion;
@@ -46,6 +48,10 @@ public class AdminMarketDebugLatestDTO {
     public void setFallback(FallbackDTO fallback) { this.fallback = fallback; }
     public CorrelationDTO getCorrelation() { return correlation; }
     public void setCorrelation(CorrelationDTO correlation) { this.correlation = correlation; }
+    public CorrelationMatrixSummaryDTO getCorrelationMatrixSummary() { return correlationMatrixSummary; }
+    public void setCorrelationMatrixSummary(CorrelationMatrixSummaryDTO correlationMatrixSummary) { this.correlationMatrixSummary = correlationMatrixSummary; }
+    public CorrelationMatrixDTO getCorrelationMatrix() { return correlationMatrix; }
+    public void setCorrelationMatrix(CorrelationMatrixDTO correlationMatrix) { this.correlationMatrix = correlationMatrix; }
     public List<String> getWarnings() { return warnings; }
     public void setWarnings(List<String> warnings) { this.warnings = warnings; }
     public String getRuleSetCode() { return ruleSetCode; }
@@ -181,5 +187,40 @@ public class AdminMarketDebugLatestDTO {
         public void setMatrixEmitted(boolean matrixEmitted) { this.matrixEmitted = matrixEmitted; }
         public double getGapRatio() { return gapRatio; }
         public void setGapRatio(double gapRatio) { this.gapRatio = gapRatio; }
+    }
+
+    public static class CorrelationMatrixSummaryDTO {
+        private int assetsCount;
+        private int sampleSize;
+        private List<String> warnings = new ArrayList<>();
+
+        public int getAssetsCount() { return assetsCount; }
+        public void setAssetsCount(int assetsCount) { this.assetsCount = assetsCount; }
+        public int getSampleSize() { return sampleSize; }
+        public void setSampleSize(int sampleSize) { this.sampleSize = sampleSize; }
+        public List<String> getWarnings() { return warnings; }
+        public void setWarnings(List<String> warnings) { this.warnings = warnings; }
+    }
+
+    public static class CorrelationMatrixDTO {
+        private List<String> assets = new ArrayList<>();
+        private List<List<Double>> matrix = new ArrayList<>();
+        private String method;
+        private int sampleSize;
+        private String startDate;
+        private String endDate;
+
+        public List<String> getAssets() { return assets; }
+        public void setAssets(List<String> assets) { this.assets = assets; }
+        public List<List<Double>> getMatrix() { return matrix; }
+        public void setMatrix(List<List<Double>> matrix) { this.matrix = matrix; }
+        public String getMethod() { return method; }
+        public void setMethod(String method) { this.method = method; }
+        public int getSampleSize() { return sampleSize; }
+        public void setSampleSize(int sampleSize) { this.sampleSize = sampleSize; }
+        public String getStartDate() { return startDate; }
+        public void setStartDate(String startDate) { this.startDate = startDate; }
+        public String getEndDate() { return endDate; }
+        public void setEndDate(String endDate) { this.endDate = endDate; }
     }
 }

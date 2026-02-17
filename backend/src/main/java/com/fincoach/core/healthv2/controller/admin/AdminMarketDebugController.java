@@ -12,6 +12,7 @@ import com.fincoach.core.security.Permission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,10 +33,11 @@ public class AdminMarketDebugController {
     @GetMapping("/latest")
     @Operation(summary = "获取最新 Portfolio Market Debug 快照")
     @Permission(RbacPermissionCodes.ADMIN_MARKET_DEBUG_VIEW)
-    public ResponseEntity<Result<AdminMarketDebugLatestDTO>> latest() {
+    public ResponseEntity<Result<AdminMarketDebugLatestDTO>> latest(
+            @RequestParam(required = false) Boolean includeMatrix) {
         PortfolioMarketDebugSnapshot snapshot = PortfolioDebugContextHolder.get();
         Long userId = UserContext.getCurrentUserId();
-        AdminMarketDebugLatestDTO dto = mapper.toDto(snapshot, userId);
+        AdminMarketDebugLatestDTO dto = mapper.toDto(snapshot, userId, Boolean.TRUE.equals(includeMatrix));
         if (snapshot == null) {
             if (dto.getWarnings() == null) {
                 dto.setWarnings(new ArrayList<>());

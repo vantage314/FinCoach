@@ -11,6 +11,9 @@ import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioMetrics;
 import com.fincoach.core.healthv2.analyzer.portfolio.CorrelationMatrixBuilder;
 import com.fincoach.core.healthv2.analyzer.portfolio.CorrelationMatrixResult;
 import com.fincoach.core.healthv2.analyzer.portfolio.CorrelationWarningCodes;
+import com.fincoach.core.healthv2.analyzer.portfolio.RebalanceAdviceV1Builder;
+import com.fincoach.core.healthv2.analyzer.portfolio.RebalanceAdviceV1Result;
+import com.fincoach.core.healthv2.analyzer.portfolio.RebalanceAdviceV1WarningCodes;
 import com.fincoach.core.healthv2.analyzer.RebalanceAdvisor;
 import com.fincoach.core.healthv2.analyzer.ScoreEngine;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizer;
@@ -19,9 +22,13 @@ import com.fincoach.core.healthv2.analyzer.GoalPlanner;
 import com.fincoach.core.healthv2.analyzer.InsuranceGapAnalyzer;
 import com.fincoach.core.healthv2.advice.AdviceEngineResult;
 import com.fincoach.core.healthv2.advice.AdviceEngineV2;
+import com.fincoach.core.healthv2.debug.PortfolioDebugContextHolder;
+import com.fincoach.core.healthv2.debug.PortfolioMarketDebugSnapshot;
 import com.fincoach.core.healthv2.dto.HealthReportV2VO;
 import com.fincoach.core.healthv2.entity.*;
 import com.fincoach.core.healthv2.mapper.*;
+import com.fincoach.core.healthv2.rebalance.RebalanceTemplateRegistry;
+import com.fincoach.core.healthv2.rebalance.RebalanceTemplateSnapshot;
 import com.fincoach.core.healthv2.rules.ScoreRuleSetRegistry;
 import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
 import com.fincoach.core.healthv2.service.AuditService;
@@ -74,6 +81,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     // Removed direct use of PortfolioHistoryBuilder, using Facade instead
     @Autowired
     private RebalanceAdvisor rebalanceAdvisor;
+    @Autowired(required = false)
+    private RebalanceTemplateRegistry rebalanceTemplateRegistry;
     @Autowired
     private ScoreEngine scoreEngine;
     @Autowired
@@ -185,6 +194,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         List<Map<String, Object>> corrWarningDetails = new ArrayList<>();
         int corrAssetsCount = 0;
         int corrSampleSize = 0;
+        List<String> rebalanceV1Warnings = new ArrayList<>();
+        List<Map<String, Object>> rebalanceV1WarningDetails = new ArrayList<>();
 
         // 资产类别占比（M1 简版）
         Map<String, Object> allocation = new LinkedHashMap<>();
@@ -287,10 +298,36 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             corrSampleSize = corrResult.getSampleSize();
             log.info("[HealthV2-Report] event=PORTFOLIO_CORR_MATRIX userId={} assetsCount={} sampleSize={} warnings={}",
                     userId, corrAssetsCount, corrSampleSize, corrWarnings);
+            PortfolioDebugContextHolder.record(snapshot -> {
+                PortfolioMarketDebugSnapshot.CorrelationMatrixSummary summary = new PortfolioMarketDebugSnapshot.CorrelationMatrixSummary();
+                summary.setAssetsCount(corrAssetsCount);
+                summary.setSampleSize(corrSampleSize);
+                summary.setWarnings(new ArrayList<>(corrWarnings));
+                snapshot.setCorrelationMatrixSummary(summary);
+                PortfolioMarketDebugSnapshot.CorrelationMatrixData data = new PortfolioMarketDebugSnapshot.CorrelationMatrixData();
+                data.setAssets(corrResult.getAssets() == null ? new ArrayList<>() : new ArrayList<>(corrResult.getAssets()));
+                data.setMatrix(corrResult.getMatrix());
+                data.setMethod(corrResult.getMethod());
+                data.setSampleSize(corrResult.getSampleSize());
+                data.setStartDate(corrResult.getStartDate());
+                data.setEndDate(corrResult.getEndDate());
+                snapshot.setCorrelationMatrix(data);
+            });
+
+            RebalanceTemplateSnapshot rebalanceSnapshot = rebalanceTemplateRegistry == null ? null : rebalanceTemplateRegistry.getActive();
+            Map<String, Double> targetWeights = rebalanceSnapshot == null ? null : rebalanceSnapshot.getTargets();
+            RebalanceAdviceV1Result rebalanceV1 = new RebalanceAdviceV1Builder()
+                    .build(allocation, targetWeights, corrResult);
+            rebalanceV1Warnings = rebalanceV1.getWarnings();
+            rebalanceV1WarningDetails = rebalanceV1.getWarningDetails();
+            portfolioMetrics.put("rebalanceAdviceV1", rebalanceV1.toMap());
+            log.info("[HealthV2-Report] event=PORTFOLIO_REBAL_V1 userId={} triggered={} threshold={} warnings={}",
+                    userId, rebalanceV1.isTriggered(), rebalanceV1.getThreshold(), rebalanceV1Warnings);
 
             // Add Source Info & Warnings
             List<String> w = pm != null && pm.getWarnings() != null ? new ArrayList<>(pm.getWarnings()) : new ArrayList<>();
             mergeWarnings(w, corrWarnings);
+            mergeWarnings(w, rebalanceV1Warnings);
             // Facade handles fallback warning. We just need to ensure source is correct.
             portfolioMetrics.put("warnings", w);
             portfolioMetrics.put("source", result.source);
@@ -299,11 +336,19 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
              @SuppressWarnings("unchecked")
              List<String> w = (List<String>) portfolioMetrics.getOrDefault("warnings", new ArrayList<>());
              w.add("PORTFOLIO_METRICS_ERROR: " + e.getMessage());
-             if (!w.contains(CorrelationWarningCodes.CORR_HISTORY_UNAVAILABLE)) {
-                 w.add(CorrelationWarningCodes.CORR_HISTORY_UNAVAILABLE);
-             }
-             portfolioMetrics.put("warnings", w);
-             portfolioMetrics.put("correlationMatrix", new CorrelationMatrixResult().toMap());
+            if (!w.contains(CorrelationWarningCodes.CORR_HISTORY_UNAVAILABLE)) {
+                w.add(CorrelationWarningCodes.CORR_HISTORY_UNAVAILABLE);
+            }
+            portfolioMetrics.put("warnings", w);
+            portfolioMetrics.put("correlationMatrix", new CorrelationMatrixResult().toMap());
+            RebalanceAdviceV1Result rebalanceV1 = new RebalanceAdviceV1Builder()
+                    .build(allocation, null, null);
+            if (!rebalanceV1.getWarnings().contains(RebalanceAdviceV1WarningCodes.REBAL_TARGET_MISSING)) {
+                rebalanceV1.getWarnings().add(RebalanceAdviceV1WarningCodes.REBAL_TARGET_MISSING);
+            }
+            rebalanceV1Warnings = rebalanceV1.getWarnings();
+            rebalanceV1WarningDetails = rebalanceV1.getWarningDetails();
+            portfolioMetrics.put("rebalanceAdviceV1", rebalanceV1.toMap());
         }
         portfolioMetrics.put("performance", performance);
 
@@ -474,7 +519,9 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
             Map<String, Object> meta = adviceV2.getMeta();
             if (meta != null) {
                 List<String> mergedCodes = mergeWarningCodes(meta.get("warnings"), corrWarnings);
+                mergedCodes = mergeWarningCodes(mergedCodes, rebalanceV1Warnings);
                 List<Map<String, Object>> mergedDetails = mergeWarningDetails(meta.get("warningDetails"), corrWarningDetails);
+                mergedDetails = mergeWarningDetails(mergedDetails, rebalanceV1WarningDetails);
                 meta.put("warnings", mergedCodes);
                 meta.put("warningDetails", mergedDetails);
             }

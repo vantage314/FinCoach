@@ -22,7 +22,7 @@ public class AdminMarketDebugMapper {
     @Autowired(required = false)
     private RebalanceTemplateRegistry rebalanceTemplateRegistry;
 
-    public AdminMarketDebugLatestDTO toDto(PortfolioMarketDebugSnapshot snapshot, Long userId) {
+    public AdminMarketDebugLatestDTO toDto(PortfolioMarketDebugSnapshot snapshot, Long userId, boolean includeMatrix) {
         AdminMarketDebugLatestDTO dto = new AdminMarketDebugLatestDTO();
         dto.setRequestId(resolveRequestId());
         dto.setTimestamp(System.currentTimeMillis());
@@ -48,6 +48,10 @@ public class AdminMarketDebugMapper {
         dto.setMarketFetch(mapMarketFetch(snapshot.getMarketFetch()));
         dto.setFallback(mapFallback(snapshot.getFallback()));
         dto.setCorrelation(mapCorrelation(snapshot.getCorrelation()));
+        dto.setCorrelationMatrixSummary(mapCorrelationMatrixSummary(snapshot.getCorrelationMatrixSummary()));
+        if (includeMatrix) {
+            dto.setCorrelationMatrix(mapCorrelationMatrix(snapshot.getCorrelationMatrix()));
+        }
 
         return dto;
     }
@@ -172,6 +176,33 @@ public class AdminMarketDebugMapper {
         dto.setMatrixEmitted(correlation.isMatrixEmitted());
         dto.setMaxCandidatePoints(correlation.getMaxCandidatePoints());
         dto.setGapRatio(correlation.getGapRatio());
+        return dto;
+    }
+
+    private AdminMarketDebugLatestDTO.CorrelationMatrixSummaryDTO mapCorrelationMatrixSummary(
+            PortfolioMarketDebugSnapshot.CorrelationMatrixSummary summary) {
+        AdminMarketDebugLatestDTO.CorrelationMatrixSummaryDTO dto = new AdminMarketDebugLatestDTO.CorrelationMatrixSummaryDTO();
+        if (summary == null) {
+            return dto;
+        }
+        dto.setAssetsCount(summary.getAssetsCount());
+        dto.setSampleSize(summary.getSampleSize());
+        dto.setWarnings(new ArrayList<>(safeList(summary.getWarnings())));
+        return dto;
+    }
+
+    private AdminMarketDebugLatestDTO.CorrelationMatrixDTO mapCorrelationMatrix(
+            PortfolioMarketDebugSnapshot.CorrelationMatrixData data) {
+        AdminMarketDebugLatestDTO.CorrelationMatrixDTO dto = new AdminMarketDebugLatestDTO.CorrelationMatrixDTO();
+        if (data == null) {
+            return dto;
+        }
+        dto.setAssets(new ArrayList<>(safeList(data.getAssets())));
+        dto.setMatrix(data.getMatrix());
+        dto.setMethod(data.getMethod());
+        dto.setSampleSize(data.getSampleSize());
+        dto.setStartDate(data.getStartDate());
+        dto.setEndDate(data.getEndDate());
         return dto;
     }
 
