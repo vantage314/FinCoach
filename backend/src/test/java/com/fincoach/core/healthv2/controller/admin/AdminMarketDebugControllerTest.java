@@ -76,6 +76,12 @@ public class AdminMarketDebugControllerTest {
         debtCashflowSummary.setStressLevel("MED");
         debtCashflowSummary.setWarningsCount(2);
         snapshot.setDebtCashflowSummary(debtCashflowSummary);
+        PortfolioMarketDebugSnapshot.DebtOptimizerSummary debtOptimizerSummary = new PortfolioMarketDebugSnapshot.DebtOptimizerSummary();
+        debtOptimizerSummary.setStrategy("AVALANCHE");
+        debtOptimizerSummary.setTopDebtName("CREDIT_CARD");
+        debtOptimizerSummary.setBudgetForExtraPayment(500.0);
+        debtOptimizerSummary.setWarningsCount(1);
+        snapshot.setDebtOptimizerSummary(debtOptimizerSummary);
         PortfolioDebugContextHolder.enableCapture();
         PortfolioDebugContextHolder.set(snapshot);
 
@@ -94,6 +100,10 @@ public class AdminMarketDebugControllerTest {
                 .andExpect(jsonPath("$.data.debtCashflowSummary.emergencyFundMonths").value(2.5))
                 .andExpect(jsonPath("$.data.debtCashflowSummary.stressLevel").value("MED"))
                 .andExpect(jsonPath("$.data.debtCashflowSummary.warningsCount").value(2))
+                .andExpect(jsonPath("$.data.debtOptimizerSummary.strategy").value("AVALANCHE"))
+                .andExpect(jsonPath("$.data.debtOptimizerSummary.topDebtName").value("CREDIT_CARD"))
+                .andExpect(jsonPath("$.data.debtOptimizerSummary.budgetForExtraPayment").value(500.0))
+                .andExpect(jsonPath("$.data.debtOptimizerSummary.warningsCount").value(1))
                 .andExpect(jsonPath("$.data.requestId").exists())
                 .andExpect(jsonPath("$.data.timestamp").exists());
         UserContext.clear();
