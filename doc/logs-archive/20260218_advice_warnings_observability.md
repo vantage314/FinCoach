@@ -14,7 +14,7 @@ AdviceEngineV2 now emits input-quality warnings. We need these warnings to be ob
 - Latest run: `Tests run: 50, Failures: 0, Errors: 0, Skipped: 0` + `BUILD SUCCESS`
 
 ## Rollback
-- `git revert <commit_sha>`
+- `git revert c5871402 4d387f8e fb9eb002`
 
 ## Security note
 - Log and API only expose warning codes and truncated detail strings; no asset detail or PII is emitted.
