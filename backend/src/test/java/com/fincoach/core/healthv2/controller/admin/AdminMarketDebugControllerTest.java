@@ -7,6 +7,7 @@ import com.fincoach.core.healthv2.debug.PortfolioDebugContextHolder;
 import com.fincoach.core.healthv2.debug.PortfolioMarketDebugSnapshot;
 import com.fincoach.core.repository.entity.User;
 import com.fincoach.core.repository.mapper.UserMapper;
+import com.fincoach.core.security.AdminChecker;
 import com.fincoach.core.security.AdminOnlyAspect;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -34,7 +35,8 @@ public class AdminMarketDebugControllerTest {
         when(userMapper.selectById(1L)).thenReturn(admin);
 
         AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
-        AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
+        AdminChecker adminChecker = new AdminChecker(userMapper);
+        AdminOnlyAspect aspect = new AdminOnlyAspect(adminChecker);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
         AdminMarketDebugController proxy = factory.getProxy();
@@ -48,6 +50,7 @@ public class AdminMarketDebugControllerTest {
         snapshot.setHistorySource("MARKET_DATA_DAILY_CLOSE");
         snapshot.setGeneratedAt(Instant.now());
         snapshot.setWarnings(new ArrayList<>());
+        PortfolioDebugContextHolder.enableCapture();
         PortfolioDebugContextHolder.set(snapshot);
 
         UserContext.setUserId(1L);
@@ -71,7 +74,8 @@ public class AdminMarketDebugControllerTest {
         when(userMapper.selectById(2L)).thenReturn(user);
 
         AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
-        AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
+        AdminChecker adminChecker = new AdminChecker(userMapper);
+        AdminOnlyAspect aspect = new AdminOnlyAspect(adminChecker);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
         AdminMarketDebugController proxy = factory.getProxy();
@@ -94,7 +98,8 @@ public class AdminMarketDebugControllerTest {
         UserMapper userMapper = Mockito.mock(UserMapper.class);
 
         AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
-        AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
+        AdminChecker adminChecker = new AdminChecker(userMapper);
+        AdminOnlyAspect aspect = new AdminOnlyAspect(adminChecker);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
         AdminMarketDebugController proxy = factory.getProxy();
@@ -119,7 +124,8 @@ public class AdminMarketDebugControllerTest {
         when(userMapper.selectById(1L)).thenReturn(admin);
 
         AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
-        AdminOnlyAspect aspect = new AdminOnlyAspect(userMapper);
+        AdminChecker adminChecker = new AdminChecker(userMapper);
+        AdminOnlyAspect aspect = new AdminOnlyAspect(adminChecker);
         AspectJProxyFactory factory = new AspectJProxyFactory(controller);
         factory.addAspect(aspect);
         AdminMarketDebugController proxy = factory.getProxy();

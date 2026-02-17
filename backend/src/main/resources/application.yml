@@ -48,3 +48,15 @@ ai:
   base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
   api-key: ${deepseek.api-key}
   model: ${DEEPSEEK_MODEL:deepseek-chat}
+
+fincoach:
+  ticker-mapping:
+    db:
+      enabled: true
+  portfolio:
+    debug:
+      capture-enabled: false
+    snapshot:
+      enabled: false
+      preferCache: false
+      lookbackDays: 90

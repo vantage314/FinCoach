@@ -76,6 +76,7 @@ Enhance Market Data History (M7-3) with:
   - Added `/api/admin/portfolio/market-debug/latest` with admin-only guard.
   - Added debug context snapshot + ThreadLocal holder and cleanup filter.
   - Normalized response schema via `AdminMarketDebugLatestDTO` + mapper (stable fields + defaults).
+  - Debug capture gated by header `X-Debug-Market: 1` + admin check + config `fincoach.portfolio.debug.capture-enabled=true`.
   - Debug fields: resolvedTickers, historySource/path, cache, marketFetch, fallback, correlation, warnings.
 - **Verification**:
   - MockMvc tests cover admin 200 and non-admin 403.

@@ -24,6 +24,7 @@
     - [x] `AdminMarketDebugController` (`/api/admin/portfolio/market-debug`).
     - [x] Service method to expose internal state (or cache last state).
     - [x] Normalize debug response via DTO schema + mapper.
+    - [x] Gate debug capture via `X-Debug-Market` + admin + config.
 
     ## 6. Testing
     - [x] Unit Tests for Registry, Aligner.

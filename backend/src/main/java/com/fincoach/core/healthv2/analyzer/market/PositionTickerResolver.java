@@ -69,16 +69,17 @@ public class PositionTickerResolver {
     }
 
     private void appendDebug(String rawKey, TickerMappingRegistry.ResolutionResult resolution) {
-        PortfolioMarketDebugSnapshot snapshot = PortfolioDebugContextHolder.getOrCreate();
-        if (snapshot.getResolvedTickers() == null) {
-            snapshot.setResolvedTickers(new ArrayList<>());
-        }
-        PortfolioMarketDebugSnapshot.ResolvedTickerDebug debug = new PortfolioMarketDebugSnapshot.ResolvedTickerDebug();
-        debug.setInput(rawKey);
-        debug.setNormalizedKey(resolution.getNormalizedInput());
-        debug.setResolvedTicker(resolution.getResolvedTicker());
-        debug.setMappingSource(resolution.getSource());
-        debug.setWarnings(resolution.getWarnings() == null ? null : new ArrayList<>(resolution.getWarnings()));
-        snapshot.getResolvedTickers().add(debug);
+        PortfolioDebugContextHolder.record(snapshot -> {
+            if (snapshot.getResolvedTickers() == null) {
+                snapshot.setResolvedTickers(new ArrayList<>());
+            }
+            PortfolioMarketDebugSnapshot.ResolvedTickerDebug debug = new PortfolioMarketDebugSnapshot.ResolvedTickerDebug();
+            debug.setInput(rawKey);
+            debug.setNormalizedKey(resolution.getNormalizedInput());
+            debug.setResolvedTicker(resolution.getResolvedTicker());
+            debug.setMappingSource(resolution.getSource());
+            debug.setWarnings(resolution.getWarnings() == null ? null : new ArrayList<>(resolution.getWarnings()));
+            snapshot.getResolvedTickers().add(debug);
+        });
     }
 }

@@ -49,7 +49,7 @@ public class PortfolioHistoryFacade {
         String source = "UNKNOWN";
         List<String> facadeWarnings = new ArrayList<>();
         PortfolioMarketDebugSnapshot debug = initDebug();
-        List<String> historyPath = debug.getHistoryPath();
+        List<String> historyPath = debug != null ? debug.getHistoryPath() : new ArrayList<>();
         String fallbackReason = null;
         
         // 0. Prefer Cache
@@ -63,11 +63,13 @@ public class PortfolioHistoryFacade {
                 if (cached != null && cached.getReturnsSeries() != null && cached.getReturnsSeries().size() >= 2) {
                     source = "SNAPSHOT_CACHE";
                     mergeWarnings(cached, facadeWarnings);
-                    debug.setHistorySource(source);
-                    debug.setWarnings(new ArrayList<>(cached.getWarnings()));
-                    debug.setHistoryPath(historyPath);
-                    fillFallbackDebug(debug, fallbackReason);
-                    fillMarketDebug(debug, null, positions);
+                    if (debug != null) {
+                        debug.setHistorySource(source);
+                        debug.setWarnings(new ArrayList<>(cached.getWarnings()));
+                        debug.setHistoryPath(historyPath);
+                        fillFallbackDebug(debug, fallbackReason);
+                        fillMarketDebug(debug, null, positions);
+                    }
                     return new FacadeResult(cached, source);
                 }
                 if (fallbackReason == null) {
@@ -97,11 +99,13 @@ public class PortfolioHistoryFacade {
                     }
                 }
                 mergeWarnings(input, facadeWarnings);
-                debug.setHistorySource(source);
-                debug.setWarnings(input.getWarnings() == null ? Collections.emptyList() : new ArrayList<>(input.getWarnings()));
-                debug.setHistoryPath(historyPath);
-                fillFallbackDebug(debug, fallbackReason);
-                fillMarketDebug(debug, input, positions);
+                if (debug != null) {
+                    debug.setHistorySource(source);
+                    debug.setWarnings(input.getWarnings() == null ? Collections.emptyList() : new ArrayList<>(input.getWarnings()));
+                    debug.setHistoryPath(historyPath);
+                    fillFallbackDebug(debug, fallbackReason);
+                    fillMarketDebug(debug, input, positions);
+                }
                 return new FacadeResult(input, source);
             } else {
                 input = null; // Insufficient data
@@ -125,11 +129,13 @@ public class PortfolioHistoryFacade {
                 }
                 mergeWarnings(input, facadeWarnings);
                 fallbackReason = "MARKET_DATA_FALLBACK_TO_REPORT_APPROX";
-                debug.setHistorySource(source);
-                debug.setWarnings(input == null || input.getWarnings() == null ? Collections.emptyList() : new ArrayList<>(input.getWarnings()));
-                debug.setHistoryPath(historyPath);
-                fillFallbackDebug(debug, fallbackReason);
-                fillMarketDebug(debug, input, positions);
+                if (debug != null) {
+                    debug.setHistorySource(source);
+                    debug.setWarnings(input == null || input.getWarnings() == null ? Collections.emptyList() : new ArrayList<>(input.getWarnings()));
+                    debug.setHistoryPath(historyPath);
+                    fillFallbackDebug(debug, fallbackReason);
+                    fillMarketDebug(debug, input, positions);
+                }
             } catch (Exception e) {
                 log.error("[PortfolioFacade] Report builder failed: {}", e.getMessage());
             }
@@ -139,6 +145,9 @@ public class PortfolioHistoryFacade {
     }
 
     private PortfolioMarketDebugSnapshot initDebug() {
+        if (!PortfolioDebugContextHolder.isCaptureEnabled()) {
+            return null;
+        }
         PortfolioMarketDebugSnapshot snapshot = new PortfolioMarketDebugSnapshot();
         snapshot.setGeneratedAt(Instant.now());
         snapshot.setHistoryPath(new ArrayList<>());

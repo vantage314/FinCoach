@@ -225,22 +225,22 @@ public class PortfolioAnalyzerImpl implements PortfolioAnalyzer {
     }
 
     private void updateCorrelationDebug(ReturnSeriesAligner.AlignedSeriesResult aligned, boolean matrixEmitted) {
-        PortfolioMarketDebugSnapshot snapshot = PortfolioDebugContextHolder.get();
-        if (snapshot == null) return;
-        PortfolioMarketDebugSnapshot.CorrelationDebug debug = new PortfolioMarketDebugSnapshot.CorrelationDebug();
-        debug.setEffectivePoints(aligned != null ? aligned.getEffectivePoints() : 0);
-        debug.setMinPoints(MIN_CORR_POINTS);
-        debug.setMatrixEmitted(matrixEmitted);
-        String mode = "NONE";
-        List<String> warnings = aligned != null ? aligned.getWarnings() : null;
-        if (warnings != null) {
-            if (warnings.contains(ReturnSeriesAligner.WARN_INTERSECTION)) {
-                mode = "INTERSECTION";
-            } else if (warnings.contains(ReturnSeriesAligner.WARN_RELAXED)) {
-                mode = "RELAXED";
+        PortfolioDebugContextHolder.record(snapshot -> {
+            PortfolioMarketDebugSnapshot.CorrelationDebug debug = new PortfolioMarketDebugSnapshot.CorrelationDebug();
+            debug.setEffectivePoints(aligned != null ? aligned.getEffectivePoints() : 0);
+            debug.setMinPoints(MIN_CORR_POINTS);
+            debug.setMatrixEmitted(matrixEmitted);
+            String mode = "NONE";
+            List<String> warnings = aligned != null ? aligned.getWarnings() : null;
+            if (warnings != null) {
+                if (warnings.contains(ReturnSeriesAligner.WARN_INTERSECTION)) {
+                    mode = "INTERSECTION";
+                } else if (warnings.contains(ReturnSeriesAligner.WARN_RELAXED)) {
+                    mode = "RELAXED";
+                }
             }
-        }
-        debug.setAlignedMode(mode);
-        snapshot.setCorrelation(debug);
+            debug.setAlignedMode(mode);
+            snapshot.setCorrelation(debug);
+        });
     }
 }
