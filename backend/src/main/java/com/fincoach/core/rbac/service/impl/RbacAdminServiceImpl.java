@@ -234,6 +234,9 @@ public class RbacAdminServiceImpl implements RbacAdminService {
         list.add(buildPerm(RbacPermissionCodes.ADMIN_SCORE_RULE_VIEW, "评分规则查看", "M8"));
         list.add(buildPerm(RbacPermissionCodes.ADMIN_SCORE_RULE_EDIT, "评分规则编辑", "M8"));
         list.add(buildPerm(RbacPermissionCodes.ADMIN_SCORE_RULE_PUBLISH, "评分规则发布", "M8"));
+        list.add(buildPerm(RbacPermissionCodes.ADMIN_REBALANCE_TEMPLATE_VIEW, "再平衡模板查看", "M8"));
+        list.add(buildPerm(RbacPermissionCodes.ADMIN_REBALANCE_TEMPLATE_EDIT, "再平衡模板编辑", "M8"));
+        list.add(buildPerm(RbacPermissionCodes.ADMIN_REBALANCE_TEMPLATE_PUBLISH, "再平衡模板发布", "M8"));
         return list;
     }
 
