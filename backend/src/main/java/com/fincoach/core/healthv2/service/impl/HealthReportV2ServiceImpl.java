@@ -8,6 +8,9 @@ import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioAnalyzer;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioHistoryFacade;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioInput;
 import com.fincoach.core.healthv2.analyzer.portfolio.PortfolioMetrics;
+import com.fincoach.core.healthv2.analyzer.portfolio.CorrelationMatrixBuilder;
+import com.fincoach.core.healthv2.analyzer.portfolio.CorrelationMatrixResult;
+import com.fincoach.core.healthv2.analyzer.portfolio.CorrelationWarningCodes;
 import com.fincoach.core.healthv2.analyzer.RebalanceAdvisor;
 import com.fincoach.core.healthv2.analyzer.ScoreEngine;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizer;
@@ -178,6 +181,10 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         portfolioMetrics.put("cashAssets", cashAssets);
         portfolioMetrics.put("totalAssets", totalAssets);
         portfolioMetrics.put("netWorth", netWorth);
+        List<String> corrWarnings = new ArrayList<>();
+        List<Map<String, Object>> corrWarningDetails = new ArrayList<>();
+        int corrAssetsCount = 0;
+        int corrSampleSize = 0;
 
         // 资产类别占比（M1 简版）
         Map<String, Object> allocation = new LinkedHashMap<>();
@@ -270,19 +277,33 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                 }
                 correlation.put("highPairs", highPairs);
                 portfolioMetrics.put("correlation", correlation);
-                
-                // Add Source Info & Warnings
-                List<String> w = pm.getWarnings() != null ? new ArrayList<>(pm.getWarnings()) : new ArrayList<>();
-                // Facade handles fallback warning. We just need to ensure source is correct.
-                portfolioMetrics.put("warnings", w);
-                portfolioMetrics.put("source", result.source);
             }
+
+            CorrelationMatrixResult corrResult = new CorrelationMatrixBuilder().build(input);
+            portfolioMetrics.put("correlationMatrix", corrResult.toMap());
+            corrWarnings = corrResult.getWarnings();
+            corrWarningDetails = corrResult.getWarningDetails();
+            corrAssetsCount = corrResult.getAssets() == null ? 0 : corrResult.getAssets().size();
+            corrSampleSize = corrResult.getSampleSize();
+            log.info("[HealthV2-Report] event=PORTFOLIO_CORR_MATRIX userId={} assetsCount={} sampleSize={} warnings={}",
+                    userId, corrAssetsCount, corrSampleSize, corrWarnings);
+
+            // Add Source Info & Warnings
+            List<String> w = pm != null && pm.getWarnings() != null ? new ArrayList<>(pm.getWarnings()) : new ArrayList<>();
+            mergeWarnings(w, corrWarnings);
+            // Facade handles fallback warning. We just need to ensure source is correct.
+            portfolioMetrics.put("warnings", w);
+            portfolioMetrics.put("source", result.source);
         } catch (Exception e) {
              log.error("[HealthV2-Report] PortfolioAnalyzer M7-1/M7-3 异常", e);
              @SuppressWarnings("unchecked")
              List<String> w = (List<String>) portfolioMetrics.getOrDefault("warnings", new ArrayList<>());
              w.add("PORTFOLIO_METRICS_ERROR: " + e.getMessage());
+             if (!w.contains(CorrelationWarningCodes.CORR_HISTORY_UNAVAILABLE)) {
+                 w.add(CorrelationWarningCodes.CORR_HISTORY_UNAVAILABLE);
+             }
              portfolioMetrics.put("warnings", w);
+             portfolioMetrics.put("correlationMatrix", new CorrelationMatrixResult().toMap());
         }
         portfolioMetrics.put("performance", performance);
 
@@ -450,10 +471,17 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                     assets, liabilities, cashflow, allocation, totalAssets);
             Map<String, Object> adviceV2Payload = new LinkedHashMap<>();
             adviceV2Payload.put("advices", adviceV2.getAdvices());
-            adviceV2Payload.put("meta", adviceV2.getMeta());
+            Map<String, Object> meta = adviceV2.getMeta();
+            if (meta != null) {
+                List<String> mergedCodes = mergeWarningCodes(meta.get("warnings"), corrWarnings);
+                List<Map<String, Object>> mergedDetails = mergeWarningDetails(meta.get("warningDetails"), corrWarningDetails);
+                meta.put("warnings", mergedCodes);
+                meta.put("warningDetails", mergedDetails);
+            }
+            adviceV2Payload.put("meta", meta);
             advice.put("adviceV2", adviceV2Payload);
-            adviceV2Warnings = extractWarningCodes(adviceV2.getMeta().get("warnings"));
-            adviceV2WarningDetails = extractWarningDetails(adviceV2.getMeta().get("warningDetails"));
+            adviceV2Warnings = extractWarningCodes(meta == null ? null : meta.get("warnings"));
+            adviceV2WarningDetails = extractWarningDetails(meta == null ? null : meta.get("warningDetails"));
         }
 
         // ========= 5. 落库 =========
@@ -914,5 +942,57 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         if (input.length() <= max) return input;
         if (max <= 3) return input.substring(0, max);
         return input.substring(0, max - 3) + "...";
+    }
+
+    private void mergeWarnings(List<String> target, List<String> source) {
+        if (target == null || source == null) return;
+        for (String w : source) {
+            if (w == null) continue;
+            if (!target.contains(w)) {
+                target.add(w);
+            }
+        }
+    }
+
+    private List<String> mergeWarningCodes(Object existing, List<String> extra) {
+        List<String> merged = extractWarningCodes(existing);
+        if (extra != null) {
+            for (String code : extra) {
+                if (code == null) continue;
+                if (!merged.contains(code)) {
+                    merged.add(code);
+                }
+            }
+        }
+        return merged;
+    }
+
+    private List<Map<String, Object>> mergeWarningDetails(Object existing, List<Map<String, Object>> extra) {
+        List<Map<String, Object>> merged = extractWarningDetails(existing);
+        if (extra == null || extra.isEmpty()) {
+            return merged;
+        }
+        List<String> existingCodes = new ArrayList<>();
+        for (Map<String, Object> item : merged) {
+            Object code = item.get("code");
+            if (code != null) {
+                existingCodes.add(code.toString());
+            }
+        }
+        for (Map<String, Object> item : extra) {
+            if (item == null) continue;
+            Object codeObj = item.get("code");
+            String code = codeObj == null ? "" : codeObj.toString();
+            if (code.isBlank() || existingCodes.contains(code)) {
+                continue;
+            }
+            Map<String, Object> safe = new LinkedHashMap<>();
+            safe.put("code", code);
+            Object detailObj = item.get("detail");
+            safe.put("detail", truncate(detailObj == null ? "" : detailObj.toString(), 200));
+            merged.add(safe);
+            existingCodes.add(code);
+        }
+        return merged;
     }
 }
