@@ -1,6 +1,10 @@
 package com.fincoach.core.security;
 
 import com.fincoach.core.rbac.service.RbacQueryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -10,10 +14,30 @@ import java.util.Set;
 @Component
 public class PermissionChecker {
 
-    private final RbacQueryService rbacQueryService;
+    private static final Logger log = LoggerFactory.getLogger(PermissionChecker.class);
 
-    public PermissionChecker(RbacQueryService rbacQueryService) {
+    private final RbacQueryService rbacQueryService;
+    private final boolean rbacFallbackEnabled;
+
+    public PermissionChecker(RbacQueryService rbacQueryService,
+                             Environment environment,
+                             @Value("${security.rbacFallbackEnabled:false}") boolean fallbackEnabled) {
         this.rbacQueryService = rbacQueryService;
+        boolean devProfile = false;
+        if (environment != null) {
+            for (String profile : environment.getActiveProfiles()) {
+                if ("dev".equalsIgnoreCase(profile)
+                        || "local".equalsIgnoreCase(profile)
+                        || "development".equalsIgnoreCase(profile)) {
+                    devProfile = true;
+                    break;
+                }
+            }
+        }
+        this.rbacFallbackEnabled = devProfile || fallbackEnabled;
+        if (this.rbacFallbackEnabled) {
+            log.warn("RBAC_FALLBACK_ENABLED");
+        }
     }
 
     public boolean hasPermission(Long userId, String code) {
@@ -23,8 +47,8 @@ public class PermissionChecker {
         try {
             return rbacQueryService.getUserPermissions(userId).contains(code);
         } catch (Exception e) {
-            // Dev fallback: treat userId=1 as admin when RBAC tables are unavailable
-            return userId == 1L;
+            // Dev/config fallback only
+            return rbacFallbackEnabled && userId == 1L;
         }
     }
 
@@ -33,7 +57,7 @@ public class PermissionChecker {
         try {
             return rbacQueryService.getUserPermissions(userId);
         } catch (Exception e) {
-            if (userId == 1L) {
+            if (rbacFallbackEnabled && userId == 1L) {
                 return Set.of("ADMIN_FALLBACK");
             }
             return Collections.emptySet();
@@ -45,11 +69,15 @@ public class PermissionChecker {
         try {
             return rbacQueryService.getUserRoleCodes(userId);
         } catch (Exception e) {
-            if (userId == 1L) {
+            if (rbacFallbackEnabled && userId == 1L) {
                 return List.of("ADMIN");
             }
             return Collections.emptyList();
         }
+    }
+
+    public boolean isFallbackEnabled() {
+        return rbacFallbackEnabled;
     }
 
     public void invalidateUser(Long userId) {

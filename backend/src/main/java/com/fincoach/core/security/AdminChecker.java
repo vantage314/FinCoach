@@ -33,7 +33,7 @@ public class AdminChecker {
                 return true;
             }
         } catch (Exception ignored) {
-            // ignore and fallback to RBAC / dev defaults
+            // ignore and fallback to RBAC role codes
         }
         if (permissionChecker != null) {
             try {
@@ -46,10 +46,9 @@ public class AdminChecker {
                     }
                 }
             } catch (Exception ignored) {
-                // ignore and fallback to dev default
+                // ignore and deny by default
             }
         }
-        // Dev fallback: userId=1 as admin when role sources unavailable
-        return userId == 1L;
+        return false;
     }
 }
