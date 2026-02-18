@@ -12,12 +12,11 @@
 ## Changes
 ### Backend
 - `WebConfig` now intercepts `/admin/**` so JWT/UserContext applies to admin APIs.
-- `AdminChecker` and `PermissionChecker` add RBAC-missing fallback (dev admin via `userId=1`).
-- Added SQL scripts for local dev tables + seeds:
-  - `backend/src/main/resources/sql/migration/20260218_alert_record_table.sql`
-  - `backend/src/main/resources/sql/migration/20260218_alert_record_seed.sql`
-  - `backend/src/main/resources/sql/migration/20260218_health_report_table.sql`
-  - `backend/src/main/resources/sql/migration/20260218_health_report_seed.sql`
+- `AdminChecker` and `PermissionChecker` RBAC fallback is now **dev profile / config gated** (default off). When enabled it logs `RBAC_FALLBACK_ENABLED`.
+- Added Flyway migrations for required tables:
+  - `backend/src/main/resources/db/migration/V20260218_01__create_fc_alert_record.sql`
+  - `backend/src/main/resources/db/migration/V20260218_02__create_fc_health_report.sql`
+- Dev seed SQL moved to `scripts/dev-seeds/` (manual execution only).
 
 ### Frontend
 - User store: robust role extraction (JWT roles + profile fallback) + dev admin fallback for `userId=1`.
@@ -26,11 +25,15 @@
 - Admin debug: correlation matrix folded by default.
 
 ## DB Actions (local)
+### Flyway migrations
+- Run backend startup or `mvn spring-boot:run` to auto-apply:
+  - `V20260218_01__create_fc_alert_record.sql`
+  - `V20260218_02__create_fc_health_report.sql`
+
+### Dev seeds (manual)
 Executed in shell:
-- `mysql -uroot -p030314 fincoach < backend/src/main/resources/sql/migration/20260218_alert_record_table.sql`
-- `mysql -uroot -p030314 fincoach < backend/src/main/resources/sql/migration/20260218_alert_record_seed.sql`
-- `mysql -uroot -p030314 fincoach < backend/src/main/resources/sql/migration/20260218_health_report_table.sql`
-- `mysql -uroot -p030314 fincoach < backend/src/main/resources/sql/migration/20260218_health_report_seed.sql`
+- `mysql -uroot -p030314 fincoach < scripts/dev-seeds/20260218_alert_record_seed.sql`
+- `mysql -uroot -p030314 fincoach < scripts/dev-seeds/20260218_health_report_seed.sql`
 
 ## Smoke Steps & Evidence
 ### Backend tests
@@ -76,9 +79,19 @@ Executed in shell:
 
 ## Notes / Caveats
 - Local DB lacks many v2 tables; admin + report flows rely on the minimal seed tables above.
-- Admin fallback is **dev-only** (`userId=1`) when RBAC tables are missing.
+- Admin fallback is **dev-only** (`userId=1`) when RBAC tables are missing and **RBAC fallback is enabled**.
+
+## Commits (integration scope)
+- 668e1593 `fix: guard rbac fallback and relocate seeds`
+- e12dfa4b `docs: add integration smoke test log`
+- 74b75389 `fix: map health report v2 data`
+- 308be86c `core: add health report seed data`
+- a94ed3d5 `fix: harden admin role detection and debug view`
+- 3318c21b `core: fix admin auth and add alert record sql`
 
 ## Rollback
+- `git revert 668e1593`
+- `git revert e12dfa4b`
 - `git revert 74b75389`
 - `git revert 308be86c`
 - `git revert a94ed3d5`
