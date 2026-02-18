@@ -5,6 +5,7 @@ import com.fincoach.core.controller.dto.AuthDTO;
 import com.fincoach.core.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +33,10 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "验证凭据并返回 JWT Token")
-    public Result<String> login(@RequestBody AuthDTO authDTO) {
+    public Result<String> login(@Valid @RequestBody AuthDTO authDTO) {
+        log.debug("[AuthController] login DTO null-check: usernameNull={}, passwordNull={}",
+                authDTO == null || authDTO.getUsername() == null,
+                authDTO == null || authDTO.getPassword() == null);
         String token = authService.login(authDTO);
         return Result.success(token);
     }

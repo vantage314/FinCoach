@@ -6,12 +6,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.fincoach.core.security.ForbiddenException;
+import com.fincoach.core.security.UnauthorizedException;
 
 import java.sql.SQLException;
 
@@ -21,6 +23,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Result<String>> handleValidationException(MethodArgumentNotValidException e) {
         FieldError fieldError = e.getBindingResult().getFieldError();
+        if (fieldError != null) {
+            log.debug("参数校验失败: field={}, rejectedValue={}", fieldError.getField(), fieldError.getRejectedValue());
+        }
         String message = fieldError != null ? fieldError.getDefaultMessage() : "请求参数校验失败";
         return ResponseEntity.badRequest().body(Result.error(400, message));
     }
@@ -30,6 +35,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(Result.error(400, e.getMessage()));
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Result<String>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.debug("请求体解析失败: {}", e.getMessage());
+        return ResponseEntity.badRequest().body(Result.error(400, "请求体不能为空或格式错误"));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Result<String>> handleUnauthorizedException(UnauthorizedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Result.error(401, e.getMessage()));
+    }
 
     @ExceptionHandler({
             CannotGetJdbcConnectionException.class,

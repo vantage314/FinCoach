@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fincoach.core.controller.dto.AuthDTO;
 import com.fincoach.core.repository.entity.User;
 import com.fincoach.core.repository.mapper.UserMapper;
+import com.fincoach.core.security.UnauthorizedException;
 import com.fincoach.core.service.AuthService;
 import com.fincoach.core.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
         
         if (user == null || !passwordEncoder.matches(authDTO.getPassword(), user.getPassword())) {
             log.warn("登录失败，用户名或密码错误: {}", authDTO.getUsername());
-            throw new RuntimeException("用户名或密码错误");
+            throw new UnauthorizedException("用户名或密码错误");
         }
 
         log.info("登录成功: {}", authDTO.getUsername());
