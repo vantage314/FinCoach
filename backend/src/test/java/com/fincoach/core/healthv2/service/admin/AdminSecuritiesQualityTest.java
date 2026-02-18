@@ -56,4 +56,30 @@ public class AdminSecuritiesQualityTest {
         assertTrue(dto.getSnapshotCoverage().getIssues().stream().anyMatch(i -> i.contains("覆盖天数不足")));
         assertTrue(dto.getSnapshotCoverage().getIssues().stream().anyMatch(i -> i.contains("滞后")));
     }
+
+    @Test
+    public void testDemoSnapshotsClearMissingDataIssue() {
+        FcTickerMappingMapper mappingMapper = Mockito.mock(FcTickerMappingMapper.class);
+        FcPortfolioPriceSnapshotMapper snapshotMapper = Mockito.mock(FcPortfolioPriceSnapshotMapper.class);
+        FcSystemConfigMapper systemConfigMapper = Mockito.mock(FcSystemConfigMapper.class);
+
+        when(systemConfigMapper.selectOne(any())).thenReturn(null);
+        when(mappingMapper.selectList(any())).thenReturn(List.of());
+
+        LocalDate d1 = LocalDate.now().minusDays(1);
+        FcPortfolioPriceSnapshotEntity s1 = new FcPortfolioPriceSnapshotEntity();
+        s1.setDataSource("STOCK");
+        s1.setAsOfDate(d1);
+        s1.setEquity(new BigDecimal("100000"));
+        when(snapshotMapper.selectList(any())).thenReturn(List.of(s1));
+
+        AdminSecuritiesQualityServiceImpl service = new AdminSecuritiesQualityServiceImpl(
+                mappingMapper, snapshotMapper, systemConfigMapper);
+
+        AdminSecuritiesQualityDTO dto = service.evaluate();
+        assertNotNull(dto);
+        assertNotNull(dto.getSnapshotCoverage());
+        assertNotNull(dto.getSnapshotCoverage().getIssues());
+        assertTrue(dto.getSnapshotCoverage().getIssues().stream().noneMatch(i -> i.contains("没有快照数据")));
+    }
 }
