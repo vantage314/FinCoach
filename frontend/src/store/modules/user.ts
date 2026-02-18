@@ -38,16 +38,33 @@ export const useUserStore = defineStore('user', () => {
         try {
             const res: any = await request.post('/auth/login', form);
             if (res.code === 200 && res.data) {
-                token.value = res.data;
+                const { token: loginToken, roles: loginRoles } = normalizeLoginResponse(res.data);
+                if (!loginToken) {
+                    return false;
+                }
+                token.value = loginToken;
                 username.value = form.username;
                 userInfo.value = { username: form.username };
-                roles.value = syncRolesFromToken(res.data);
+                roles.value = syncRolesFromToken(loginToken);
+                if (!roles.value.length && loginRoles.length) {
+                    roles.value = loginRoles;
+                    localStorage.setItem('roles', JSON.stringify(roles.value));
+                }
+                if (!roles.value.length) {
+                    const profileRoles = await tryLoadRolesFromProfile();
+                    if (profileRoles.length) {
+                        roles.value = profileRoles;
+                        localStorage.setItem('roles', JSON.stringify(roles.value));
+                    }
+                }
 
                 // 持久化
-                localStorage.setItem('token', res.data);
+                localStorage.setItem('token', loginToken);
                 localStorage.setItem('username', form.username);
 
-                console.log('[UserStore] 登录成功，Token 已保存');
+                if (import.meta.env.DEV) {
+                    console.log('[UserStore] 登录成功，roles=', roles.value);
+                }
                 return true;
             }
             return false;
@@ -105,7 +122,10 @@ export const useUserStore = defineStore('user', () => {
         const storedEmail = localStorage.getItem('email');
         if (storedToken) {
             token.value = storedToken;
-            roles.value = syncRolesFromToken(storedToken);
+            roles.value = loadRolesFromStorage();
+            if (!roles.value.length) {
+                roles.value = syncRolesFromToken(storedToken);
+            }
         }
         if (storedUsername) {
             username.value = storedUsername;
@@ -160,7 +180,7 @@ const normalizeRoles = (input: unknown): string[] => {
 const parseJwtPayload = (token: string): Record<string, unknown> | null => {
     if (!token || typeof token !== 'string') return null;
     const parts = token.split('.');
-    if (parts.length < 2) return null;
+    if (parts.length !== 3) return null;
     try {
         const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
         const padded = payload + '==='.slice((payload.length + 3) % 4);
@@ -177,13 +197,47 @@ const extractRolesFromPayload = (payload: Record<string, unknown> | null): strin
     return normalizeRoles(rawRoles);
 };
 
+const normalizeLoginResponse = (data: any): { token: string; roles: string[] } => {
+    if (!data) return { token: '', roles: [] };
+    if (typeof data === 'string') {
+        return { token: data, roles: [] };
+    }
+    const token = data.token || data.accessToken || data.jwt || data.data;
+    const roles = normalizeRoles(data.roles ?? data.authorities ?? data.role);
+    return { token: typeof token === 'string' ? token : '', roles };
+};
+
+const tryLoadRolesFromProfile = async (): Promise<string[]> => {
+    try {
+        const res: any = await request.get('/user/profile');
+        if (res?.code !== 200) return [];
+        const profile = res?.data || {};
+        return normalizeRoles(profile.roles ?? profile.authorities ?? profile.role);
+    } catch {
+        return [];
+    }
+};
+
 const syncRolesFromToken = (tokenValue: string | null): string[] => {
     if (!tokenValue) {
         return [];
     }
+    if (tokenValue.split('.').length !== 3) {
+        return [];
+    }
     const payload = parseJwtPayload(tokenValue);
-    const derived = extractRolesFromPayload(payload);
+    let derived = extractRolesFromPayload(payload);
+    if (!derived.length && import.meta.env.DEV) {
+        const subject = (payload as any)?.sub;
+        if (subject && String(subject) === '1') {
+            derived = ['ADMIN'];
+            console.warn('[UserStore] roles empty, applied dev admin fallback for userId=1');
+        }
+    }
     localStorage.setItem('roles', JSON.stringify(derived));
+    if (import.meta.env.DEV) {
+        console.log('[UserStore] roles from token', derived);
+    }
     return derived;
 };
 

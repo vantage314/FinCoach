@@ -63,24 +63,28 @@
 
     <el-card class="summary-card" shadow="never">
       <template #header>Correlation Matrix</template>
-      <div v-if="matrixAssets.length && matrixRows.length" class="matrix-table">
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th v-for="asset in matrixAssets" :key="asset">{{ asset }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row, rowIndex) in matrixRows" :key="rowIndex">
-              <td class="row-label">{{ matrixAssets[rowIndex] || `#${rowIndex + 1}` }}</td>
-              <td v-for="(value, colIndex) in row" :key="colIndex">
-                {{ formatNum(value) }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <el-collapse v-if="matrixAssets.length && matrixRows.length" v-model="matrixOpen">
+        <el-collapse-item name="matrix" :title="`Matrix (${matrixAssets.length}x${matrixAssets.length})`">
+          <div class="matrix-table">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th v-for="asset in matrixAssets" :key="asset">{{ asset }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, rowIndex) in matrixRows" :key="rowIndex">
+                  <td class="row-label">{{ matrixAssets[rowIndex] || `#${rowIndex + 1}` }}</td>
+                  <td v-for="(value, colIndex) in row" :key="colIndex">
+                    {{ formatNum(value) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </el-collapse-item>
+      </el-collapse>
       <el-empty v-else description="未启用/样本不足" />
     </el-card>
   </div>
@@ -93,6 +97,7 @@ import { fetchMarketDebugLatest } from '@/api/adminDebug';
 const snapshot = ref<any>(null);
 const loading = ref(false);
 const error = ref('');
+const matrixOpen = ref<string[]>([]);
 
 const loadSnapshot = async () => {
   loading.value = true;
