@@ -1,0 +1,2 @@
+ALTER TABLE fc_job_status
+  MODIFY COLUMN last_log VARCHAR(4000) NULL;

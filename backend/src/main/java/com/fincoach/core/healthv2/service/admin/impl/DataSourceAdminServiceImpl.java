@@ -14,6 +14,7 @@ import com.fincoach.core.healthv2.service.admin.CrawlerRunRequest;
 import com.fincoach.core.healthv2.service.admin.CrawlerRunResult;
 import com.fincoach.core.healthv2.service.admin.CrawlerRunner;
 import com.fincoach.core.healthv2.service.admin.DataSourceAdminService;
+import com.fincoach.core.healthv2.util.LogLimiter;
 import com.fincoach.core.repository.entity.FcJobStatusEntity;
 import com.fincoach.core.repository.entity.FcSystemConfigEntity;
 import com.fincoach.core.repository.mapper.FcJobStatusMapper;
@@ -21,6 +22,7 @@ import com.fincoach.core.repository.mapper.FcSystemConfigMapper;
 import com.fincoach.core.ticker.entity.FcTickerMappingEntity;
 import com.fincoach.core.ticker.mapper.FcTickerMappingMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -69,6 +71,15 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private volatile Future<?> crawlerFuture;
     private volatile AtomicBoolean crawlerStopSignal;
+
+    @Value("${crawler.staleThresholdSeconds:30}")
+    private long staleThresholdSeconds = 30;
+
+    @Value("${crawler.logMaxChars:4000}")
+    private int logMaxChars = 4000;
+
+    @Value("${crawler.selfHealEnabled:true}")
+    private boolean selfHealEnabled = true;
 
     public DataSourceAdminServiceImpl(FcSystemConfigMapper systemConfigMapper,
                                       FcJobStatusMapper jobStatusMapper,
@@ -552,9 +563,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     }
 
     private String trimLog(String logValue) {
-        if (logValue == null) return null;
-        if (logValue.length() <= 2000) return logValue;
-        return logValue.substring(logValue.length() - 2000);
+        return LogLimiter.truncate(logValue, logMaxChars);
     }
 
     private int ensureTickerMappings() {

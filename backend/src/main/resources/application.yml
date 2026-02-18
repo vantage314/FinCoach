@@ -39,6 +39,11 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
+crawler:
+  staleThresholdSeconds: 30
+  logMaxChars: 4000
+  selfHealEnabled: true
+
 # AI 配置
 deepseek:
   api-key: ${DEEPSEEK_API_KEY:sk-29b99ee5073847c89b6ccdabc9e21c27}
