@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { checkHealth, type HealthReport, type HealthSuggestion } from '@/api/health';
+import { checkHealth, getHealthReportV2Latest, generateHealthReportV2, type HealthReport, type HealthSuggestion } from '@/api/health';
 
 export const useHealthStore = defineStore('health', () => {
     const report = ref<HealthReport | null>(null);
@@ -33,6 +33,32 @@ export const useHealthStore = defineStore('health', () => {
         });
     };
 
+    const mapV2Report = (data: any): HealthReport => {
+        const metrics = data?.metrics || {};
+        const adviceV2 = data?.advice?.adviceV2 || data?.adviceV2 || {};
+        const portfolio = metrics?.portfolio || data?.portfolio;
+        const score = data?.healthScore ?? data?.score ?? 0;
+        const level =
+            metrics?.scores?.assetHealthScore?.level ||
+            metrics?.scores?.riskScore?.level ||
+            metrics?.scores?.behaviorScore?.level ||
+            data?.level ||
+            'N/A';
+
+        return {
+            score,
+            level,
+            liquidityScore: data?.liquidityScore ?? 0,
+            riskMatchScore: data?.riskScore ?? data?.riskMatchScore ?? 0,
+            protectionScore: data?.protectionScore ?? 0,
+            diversityScore: data?.diversityScore ?? 0,
+            suggestions: normalizeSuggestions(data?.suggestions),
+            metrics,
+            portfolio,
+            adviceV2
+        };
+    };
+
     /**
      * 获取健康度报告
      */
@@ -41,6 +67,26 @@ export const useHealthStore = defineStore('health', () => {
         error.value = null;
 
         try {
+            try {
+                const res: any = await getHealthReportV2Latest();
+                if (res.code === 200) {
+                    report.value = mapV2Report(res.data);
+                    return;
+                }
+            } catch {
+                // fall through to generate / legacy
+            }
+
+            try {
+                const res: any = await generateHealthReportV2();
+                if (res.code === 200) {
+                    report.value = mapV2Report(res.data);
+                    return;
+                }
+            } catch {
+                // fall through to legacy
+            }
+
             const res: any = await checkHealth();
             if (res.code === 200) {
                 report.value = {

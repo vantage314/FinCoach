@@ -304,15 +304,17 @@ const getScoreClass = (score: number) => {
 };
 
 const scores = computed(() => report.value?.metrics?.scores || (report.value as any)?.scores || {});
-const correlationSummary = computed(() => report.value?.portfolio?.correlationMatrixSummary);
-const matrixAssets = computed(() => report.value?.portfolio?.correlationMatrix?.assets || []);
-const matrixRows = computed(() => report.value?.portfolio?.correlationMatrix?.matrix || []);
-const rebalanceAdvice = computed(() => report.value?.portfolio?.rebalanceAdviceV1);
+const portfolio = computed(() => report.value?.portfolio || (report.value as any)?.metrics?.portfolio || {});
+const correlationSummary = computed(() => (portfolio.value as any)?.correlationMatrixSummary);
+const matrixAssets = computed(() => (portfolio.value as any)?.correlationMatrix?.assets || []);
+const matrixRows = computed(() => (portfolio.value as any)?.correlationMatrix?.matrix || []);
+const rebalanceAdvice = computed(() => (portfolio.value as any)?.rebalanceAdviceV1);
 const debtCashflow = computed(() => report.value?.metrics?.debtCashflowV1);
-const debtCashflowAdvice = computed(() => report.value?.adviceV2?.debtCashflowAdviceV1);
-const debtOptimizer = computed(() => report.value?.adviceV2?.debtOptimizerV1);
+const adviceV2 = computed(() => report.value?.adviceV2 || (report.value as any)?.advice?.adviceV2 || {});
+const debtCashflowAdvice = computed(() => (adviceV2.value as any)?.debtCashflowAdviceV1);
+const debtOptimizer = computed(() => (adviceV2.value as any)?.debtOptimizerV1);
 const insuranceGap = computed(() => report.value?.metrics?.insuranceGapV1);
-const insuranceAdvice = computed(() => report.value?.adviceV2?.insuranceAdviceV1);
+const insuranceAdvice = computed(() => (adviceV2.value as any)?.insuranceAdviceV1);
 const alertsV1 = computed(() => report.value?.metrics?.alertsV1);
 const openAlerts = computed(() => {
   return safeArray(alertsV1.value?.openAlerts ?? alertsV1.value?.alerts);

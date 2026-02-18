@@ -155,3 +155,11 @@ export interface HealthReport {
 export const checkHealth = () => {
     return request.get<HealthReport>('/health/check');
 };
+
+export const getHealthReportV2Latest = () => {
+    return request.get('/app/health-reports/latest');
+};
+
+export const generateHealthReportV2 = () => {
+    return request.post('/app/health-reports/generate');
+};
