@@ -59,7 +59,6 @@ public class AdminSecuritiesQualityServiceImpl implements AdminSecuritiesQuality
 
         List<FcPortfolioPriceSnapshotEntity> snapshots = snapshotMapper.selectList(
                 new QueryWrapper<FcPortfolioPriceSnapshotEntity>()
-                        .select("source", "snap_date", "portfolio_value")
                         .orderByAsc("source", "snap_date"));
 
         Set<String> assetKeys = new LinkedHashSet<>();
