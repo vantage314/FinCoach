@@ -22,6 +22,16 @@
 - crawler.logMaxChars (default: 4000)
 - crawler.selfHealEnabled (default: true)
 
+## Observability Fields
+- `recentEvents` keeps the latest 20 events (tail ring):
+  - `ts`, `type`, `msg`
+- Counters:
+  - `staleCount`, `recoverCount`, `restartCount`
+- `lastErrorAt` tracks the last failure timestamp.
+
+## Log Truncation
+- `last_log` keeps the newest tail up to `logMaxChars` (older head is dropped).
+
 ## Troubleshooting
 - If RUNNING but heartbeat stops updating:
   - call /realtime/health
