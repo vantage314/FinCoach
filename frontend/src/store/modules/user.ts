@@ -12,6 +12,9 @@ interface UserInfo {
     username: string;
     nickname?: string;
     email?: string;
+    roles?: string[];
+    authorities?: string[];
+    role?: string;
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -20,9 +23,11 @@ export const useUserStore = defineStore('user', () => {
     const username = ref<string>(localStorage.getItem('username') || '');
     const email = ref<string>(localStorage.getItem('email') || '');
     const userInfo = ref<UserInfo | null>(null);
+    const roles = ref<string[]>(loadRolesFromStorage());
 
     // 计算属性
     const isLoggedIn = computed(() => !!token.value);
+    const isAdmin = computed(() => roles.value.some((role) => isAdminRole(role)));
 
     /**
      * 登录
@@ -36,6 +41,7 @@ export const useUserStore = defineStore('user', () => {
                 token.value = res.data;
                 username.value = form.username;
                 userInfo.value = { username: form.username };
+                roles.value = syncRolesFromToken(res.data);
 
                 // 持久化
                 localStorage.setItem('token', res.data);
@@ -54,11 +60,15 @@ export const useUserStore = defineStore('user', () => {
     /**
      * 设置用户信息并持久化 (兼容旧代码)
      */
-    const setUser = (newToken: string, newUsername: string, newEmail?: string) => {
+    const setUser = (newToken: string, newUsername: string, newEmail?: string, newRoles?: string[]) => {
         token.value = newToken;
         username.value = newUsername;
         email.value = newEmail || '';
-        userInfo.value = { username: newUsername, email: newEmail };
+        userInfo.value = { username: newUsername, email: newEmail, roles: newRoles };
+        roles.value = newRoles && newRoles.length ? normalizeRoles(newRoles) : syncRolesFromToken(newToken);
+        if (newRoles && newRoles.length) {
+            localStorage.setItem('roles', JSON.stringify(roles.value));
+        }
         localStorage.setItem('token', newToken);
         localStorage.setItem('username', newUsername);
         if (newEmail !== undefined) {
@@ -76,9 +86,11 @@ export const useUserStore = defineStore('user', () => {
             username.value = '';
             email.value = '';
             userInfo.value = null;
+            roles.value = [];
             localStorage.removeItem('token');
             localStorage.removeItem('username');
             localStorage.removeItem('email');
+            localStorage.removeItem('roles');
             console.log('[UserStore] 用户已退出登录，LocalStorage 已清空');
             resolve();
         });
@@ -93,6 +105,7 @@ export const useUserStore = defineStore('user', () => {
         const storedEmail = localStorage.getItem('email');
         if (storedToken) {
             token.value = storedToken;
+            roles.value = syncRolesFromToken(storedToken);
         }
         if (storedUsername) {
             username.value = storedUsername;
@@ -108,11 +121,69 @@ export const useUserStore = defineStore('user', () => {
         username,
         email,
         userInfo,
+        roles,
         isLoggedIn,
+        isAdmin,
         login,
         setUser,
         logout,
         initFromStorage
     };
 });
+
+const isAdminRole = (role: string) => {
+    const normalized = role?.toUpperCase?.() || '';
+    return normalized === 'ADMIN' || normalized === 'ROLE_ADMIN';
+};
+
+const loadRolesFromStorage = (): string[] => {
+    const raw = localStorage.getItem('roles');
+    if (!raw) return [];
+    try {
+        const parsed = JSON.parse(raw);
+        return normalizeRoles(parsed);
+    } catch {
+        return [];
+    }
+};
+
+const normalizeRoles = (input: unknown): string[] => {
+    if (Array.isArray(input)) {
+        return input.map((item) => String(item)).filter((item) => item.length > 0);
+    }
+    if (typeof input === 'string') {
+        return input.split(',').map((item) => item.trim()).filter((item) => item.length > 0);
+    }
+    return [];
+};
+
+const parseJwtPayload = (token: string): Record<string, unknown> | null => {
+    if (!token || typeof token !== 'string') return null;
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    try {
+        const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+        const padded = payload + '==='.slice((payload.length + 3) % 4);
+        const json = atob(padded);
+        return JSON.parse(json);
+    } catch {
+        return null;
+    }
+};
+
+const extractRolesFromPayload = (payload: Record<string, unknown> | null): string[] => {
+    if (!payload) return [];
+    const rawRoles = (payload as any).roles ?? (payload as any).authorities ?? (payload as any).role;
+    return normalizeRoles(rawRoles);
+};
+
+const syncRolesFromToken = (tokenValue: string | null): string[] => {
+    if (!tokenValue) {
+        return [];
+    }
+    const payload = parseJwtPayload(tokenValue);
+    const derived = extractRolesFromPayload(payload);
+    localStorage.setItem('roles', JSON.stringify(derived));
+    return derived;
+};
 

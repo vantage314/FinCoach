@@ -47,6 +47,20 @@
         </el-menu-item>
         <el-menu-item index="/plan">投资计划</el-menu-item>
         <el-menu-item index="/chat">AI 咨询</el-menu-item>
+        <el-sub-menu v-if="isAdmin" index="admin">
+          <template #title>
+            <el-icon><Setting /></el-icon>
+            <span>后台管理</span>
+          </template>
+          <el-menu-item index="/admin/alerts">
+            <el-icon><Bell /></el-icon>
+            <span>预警管理</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/debug">
+            <el-icon><Monitor /></el-icon>
+            <span>Debug 快照</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
 
       <!-- 用户区域 -->
@@ -88,13 +102,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Monitor, ArrowDown, TrendCharts, FirstAidKit, Wallet, DataLine, EditPen, PieChart } from '@element-plus/icons-vue';
+import { Monitor, ArrowDown, TrendCharts, FirstAidKit, Wallet, DataLine, EditPen, PieChart, Setting, Bell } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '@/store/modules/user';
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+const isAdmin = computed(() => userStore.isAdmin);
 
 // 当前激活的菜单项
 const activeMenu = computed(() => route.path);

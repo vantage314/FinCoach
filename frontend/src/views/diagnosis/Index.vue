@@ -68,6 +68,195 @@
         </el-collapse-item>
       </el-collapse>
     </div>
+
+    <div class="extended-section glass-panel">
+      <h3>🔎 体检扩展模块</h3>
+      <el-row :gutter="16">
+        <el-col :xs="24" :md="12">
+          <el-card class="module-card" shadow="never">
+            <template #header>评分 v1</template>
+            <div class="score-grid">
+              <div class="score-item">
+                <div class="label">风险</div>
+                <div class="value">{{ scores?.riskScore?.value ?? '-' }}</div>
+                <el-tag size="small">{{ scores?.riskScore?.level || 'N/A' }}</el-tag>
+              </div>
+              <div class="score-item">
+                <div class="label">资产健康</div>
+                <div class="value">{{ scores?.assetHealthScore?.value ?? '-' }}</div>
+                <el-tag size="small">{{ scores?.assetHealthScore?.level || 'N/A' }}</el-tag>
+              </div>
+              <div class="score-item">
+                <div class="label">行为</div>
+                <div class="value">{{ scores?.behaviorScore?.value ?? '-' }}</div>
+                <el-tag size="small">{{ scores?.behaviorScore?.level || 'N/A' }}</el-tag>
+              </div>
+            </div>
+            <el-collapse v-model="scoreBreakdownActive" class="mini-collapse">
+              <el-collapse-item name="risk">
+                <template #title>风险拆解</template>
+                <el-table :data="safeArray(scores?.riskScore?.breakdown)" size="small" border>
+                  <el-table-column prop="code" label="Code" min-width="120" />
+                  <el-table-column prop="weight" label="Weight" width="90" />
+                  <el-table-column prop="rawValue" label="Raw" width="90" />
+                  <el-table-column prop="scoreContribution" label="Score" width="90" />
+                  <el-table-column prop="detail" label="Detail" min-width="160" />
+                </el-table>
+                <el-empty v-if="!safeArray(scores?.riskScore?.breakdown).length" description="暂无明细" />
+              </el-collapse-item>
+              <el-collapse-item name="asset">
+                <template #title>资产健康拆解</template>
+                <el-table :data="safeArray(scores?.assetHealthScore?.breakdown)" size="small" border>
+                  <el-table-column prop="code" label="Code" min-width="120" />
+                  <el-table-column prop="weight" label="Weight" width="90" />
+                  <el-table-column prop="rawValue" label="Raw" width="90" />
+                  <el-table-column prop="scoreContribution" label="Score" width="90" />
+                  <el-table-column prop="detail" label="Detail" min-width="160" />
+                </el-table>
+                <el-empty v-if="!safeArray(scores?.assetHealthScore?.breakdown).length" description="暂无明细" />
+              </el-collapse-item>
+              <el-collapse-item name="behavior">
+                <template #title>行为拆解</template>
+                <el-table :data="safeArray(scores?.behaviorScore?.breakdown)" size="small" border>
+                  <el-table-column prop="code" label="Code" min-width="120" />
+                  <el-table-column prop="weight" label="Weight" width="90" />
+                  <el-table-column prop="rawValue" label="Raw" width="90" />
+                  <el-table-column prop="scoreContribution" label="Score" width="90" />
+                  <el-table-column prop="detail" label="Detail" min-width="160" />
+                </el-table>
+                <el-empty v-if="!safeArray(scores?.behaviorScore?.breakdown).length" description="暂无明细" />
+              </el-collapse-item>
+            </el-collapse>
+          </el-card>
+        </el-col>
+
+        <el-col :xs="24" :md="12">
+          <el-card class="module-card" shadow="never">
+            <template #header>相关性矩阵</template>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item label="Assets">{{ correlationSummary?.assetsCount ?? '-' }}</el-descriptions-item>
+              <el-descriptions-item label="SampleSize">{{ correlationSummary?.sampleSize ?? '-' }}</el-descriptions-item>
+              <el-descriptions-item label="Warnings" :span="2">
+                {{ safeArray(correlationSummary?.warnings).join(', ') || '暂无' }}
+              </el-descriptions-item>
+            </el-descriptions>
+            <div v-if="matrixAssets.length && matrixRows.length" class="matrix-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th v-for="asset in matrixAssets" :key="asset">{{ asset }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(row, rowIndex) in matrixRows" :key="rowIndex">
+                    <td class="row-label">{{ matrixAssets[rowIndex] || `#${rowIndex + 1}` }}</td>
+                    <td v-for="(value, colIndex) in row" :key="colIndex">
+                      {{ formatNum(value) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <el-empty v-else description="未启用/样本不足" />
+          </el-card>
+        </el-col>
+
+        <el-col :xs="24" :md="12">
+          <el-card class="module-card" shadow="never">
+            <template #header>再平衡建议 v1</template>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item label="Threshold">{{ rebalanceAdvice?.threshold ?? '-' }}</el-descriptions-item>
+              <el-descriptions-item label="Triggered">{{ rebalanceAdvice?.triggered ? '是' : '否' }}</el-descriptions-item>
+              <el-descriptions-item label="Warnings" :span="2">
+                {{ safeArray(rebalanceAdvice?.warnings).join(', ') || '暂无' }}
+              </el-descriptions-item>
+            </el-descriptions>
+            <el-table :data="safeArray(rebalanceAdvice?.actions)" size="small" border>
+              <el-table-column prop="asset" label="Asset" min-width="120" />
+              <el-table-column prop="action" label="Action" width="100" />
+              <el-table-column prop="suggestedWeightDelta" label="Delta" width="120" />
+            </el-table>
+            <el-empty v-if="!safeArray(rebalanceAdvice?.actions).length" description="暂无建议" />
+          </el-card>
+        </el-col>
+
+        <el-col :xs="24" :md="12">
+          <el-card class="module-card" shadow="never">
+            <template #header>负债 + 现金流 v1</template>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item label="DTI">{{ formatNum(debtCashflow?.dti) }}</el-descriptions-item>
+              <el-descriptions-item label="SurplusRate">{{ formatNum(debtCashflow?.surplusRate) }}</el-descriptions-item>
+              <el-descriptions-item label="EmergencyMonths">{{ formatNum(debtCashflow?.emergencyFundMonths) }}</el-descriptions-item>
+              <el-descriptions-item label="StressLevel">{{ debtCashflow?.stressLevel ?? '-' }}</el-descriptions-item>
+            </el-descriptions>
+            <el-table :data="safeArray(debtCashflowAdvice?.list)" size="small" border>
+              <el-table-column prop="title" label="Title" min-width="140" />
+              <el-table-column prop="detail" label="Detail" min-width="200" />
+              <el-table-column prop="priority" label="Priority" width="100" />
+            </el-table>
+            <el-empty v-if="!safeArray(debtCashflowAdvice?.list).length" description="暂无建议" />
+          </el-card>
+        </el-col>
+
+        <el-col :xs="24" :md="12">
+          <el-card class="module-card" shadow="never">
+            <template #header>债务优化 v1</template>
+            <el-descriptions :column="1" border>
+              <el-descriptions-item label="Strategy">{{ debtOptimizer?.strategy ?? '-' }}</el-descriptions-item>
+              <el-descriptions-item label="Budget">{{ formatNum(debtOptimizer?.budgetForExtraPayment) }}</el-descriptions-item>
+              <el-descriptions-item label="Tradeoff">
+                {{ debtOptimizer?.tradeoffHint?.recommendation ?? '-' }}
+              </el-descriptions-item>
+            </el-descriptions>
+            <el-table :data="safeArray(debtOptimizer?.plan).slice(0, 3)" size="small" border>
+              <el-table-column prop="name" label="Name" min-width="140" />
+              <el-table-column prop="priorityRank" label="Rank" width="80" />
+              <el-table-column prop="recommendedExtraPayment" label="ExtraPay" width="120" />
+              <el-table-column prop="estimatedMonthsToPayoff" label="Months" width="100" />
+            </el-table>
+            <el-empty v-if="!safeArray(debtOptimizer?.plan).length" description="暂无计划" />
+          </el-card>
+        </el-col>
+
+        <el-col :xs="24" :md="12">
+          <el-card class="module-card" shadow="never">
+            <template #header>保险缺口 v1</template>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item label="PremiumRatio">{{ formatNum(insuranceGap?.premiumRatio?.value) }}</el-descriptions-item>
+              <el-descriptions-item label="Level">{{ insuranceGap?.premiumRatio?.level ?? '-' }}</el-descriptions-item>
+              <el-descriptions-item label="Threshold">{{ formatNum(insuranceGap?.premiumRatio?.threshold) }}</el-descriptions-item>
+              <el-descriptions-item label="TopGaps">{{ safeArray(insuranceGap?.topGaps).slice(0, 2).map((g) => g.type).join(', ') || '暂无' }}</el-descriptions-item>
+            </el-descriptions>
+            <el-table :data="safeArray(insuranceAdvice?.priorityList).slice(0, 5)" size="small" border>
+              <el-table-column prop="type" label="Type" min-width="120" />
+              <el-table-column prop="priorityRank" label="Rank" width="80" />
+              <el-table-column prop="reason" label="Reason" min-width="180" />
+            </el-table>
+            <el-table :data="safeArray(insuranceAdvice?.list)" size="small" border>
+              <el-table-column prop="title" label="Title" min-width="140" />
+              <el-table-column prop="detail" label="Detail" min-width="200" />
+              <el-table-column prop="priority" label="Priority" width="100" />
+            </el-table>
+            <el-empty v-if="!safeArray(insuranceAdvice?.list).length && !safeArray(insuranceAdvice?.priorityList).length" description="暂无建议" />
+          </el-card>
+        </el-col>
+
+        <el-col :xs="24" :md="12">
+          <el-card class="module-card" shadow="never">
+            <template #header>预警 v1</template>
+            <el-table :data="openAlerts" size="small" border>
+              <el-table-column prop="code" label="Code" min-width="140" />
+              <el-table-column prop="severity" label="Severity" width="110" />
+              <el-table-column prop="title" label="Title" min-width="200" />
+              <el-table-column prop="status" label="Status" width="100" />
+              <el-table-column prop="createdAt" label="CreatedAt" min-width="160" />
+            </el-table>
+            <el-empty v-if="!openAlerts.length" description="暂无预警" />
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
     
     <div class="action-footer">
       <el-button type="primary" size="large" round class="action-btn" @click="$router.push('/plan')">
@@ -93,6 +282,7 @@ const healthStore = useHealthStore();
 const { report } = storeToRefs(healthStore);
 
 const activeNames = ref(['1']);
+const scoreBreakdownActive = ref<string[]>([]);
 
 onMounted(() => {
   healthStore.fetchHealthReport();
@@ -111,6 +301,30 @@ const getScoreClass = (score: number) => {
     if (score >= 80) return 'excellent';
     if (score >= 60) return 'good';
     return 'risk';
+};
+
+const scores = computed(() => report.value?.metrics?.scores || (report.value as any)?.scores || {});
+const correlationSummary = computed(() => report.value?.portfolio?.correlationMatrixSummary);
+const matrixAssets = computed(() => report.value?.portfolio?.correlationMatrix?.assets || []);
+const matrixRows = computed(() => report.value?.portfolio?.correlationMatrix?.matrix || []);
+const rebalanceAdvice = computed(() => report.value?.portfolio?.rebalanceAdviceV1);
+const debtCashflow = computed(() => report.value?.metrics?.debtCashflowV1);
+const debtCashflowAdvice = computed(() => report.value?.adviceV2?.debtCashflowAdviceV1);
+const debtOptimizer = computed(() => report.value?.adviceV2?.debtOptimizerV1);
+const insuranceGap = computed(() => report.value?.metrics?.insuranceGapV1);
+const insuranceAdvice = computed(() => report.value?.adviceV2?.insuranceAdviceV1);
+const alertsV1 = computed(() => report.value?.metrics?.alertsV1);
+const openAlerts = computed(() => {
+  return safeArray(alertsV1.value?.openAlerts ?? alertsV1.value?.alerts);
+});
+
+const safeArray = <T>(value: T[] | undefined | null): T[] => {
+  return Array.isArray(value) ? value : [];
+};
+
+const formatNum = (value: any) => {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return '-';
+  return Number(value).toFixed(2);
 };
 
 // 雷达图配置
@@ -350,5 +564,77 @@ const trendOption = computed(() => ({
         font-weight: 600;
         box-shadow: 0 4px 15px rgba($primary-color, 0.4);
     }
+}
+
+.extended-section {
+  margin-bottom: 24px;
+}
+
+.module-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 16px;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.score-item .label {
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.score-item .value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.mini-collapse {
+  margin-top: 8px;
+}
+
+.matrix-table {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.matrix-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.matrix-table th,
+.matrix-table td {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.matrix-table th {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.row-label {
+  text-align: left;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .score-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

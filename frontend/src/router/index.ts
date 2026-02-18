@@ -3,6 +3,9 @@ import AuthLayout from '../layout/AuthLayout.vue';
 import TopLayout from '../layout/TopLayout.vue';
 import Login from '../pages/auth/Login.vue';
 import Register from '../pages/auth/Register.vue';
+import pinia from '../store';
+import { useUserStore } from '@/store/modules/user';
+import { ElMessage } from 'element-plus';
 
 const routes: Array<RouteRecordRaw> = [
     // 根路径重定向到资产管理（登录后默认页面）
@@ -105,6 +108,24 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'UserProfile',
                 component: () => import('../views/user/Profile.vue'),
                 meta: { requiresAuth: true, title: '个人中心 - FinCoach' }
+            },
+            {
+                path: '/admin/alerts',
+                name: 'AdminAlerts',
+                component: () => import('../views/admin/AdminAlerts.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '预警管理 - FinCoach' }
+            },
+            {
+                path: '/admin/debug',
+                name: 'AdminDebug',
+                component: () => import('../views/admin/AdminDebug.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: 'Debug 快照 - FinCoach' }
+            },
+            {
+                path: '/403',
+                name: 'Forbidden',
+                component: () => import('../views/common/Forbidden.vue'),
+                meta: { requiresAuth: true, title: '无权限 - FinCoach' }
             }
         ]
     },
@@ -131,6 +152,7 @@ const router = createRouter({
 // 全局路由守卫
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
+    const userStore = useUserStore(pinia);
 
     // 设置页面标题
     if (to.meta.title) {
@@ -150,6 +172,15 @@ router.beforeEach((to, from, next) => {
     } else if (to.meta.requiresAuth && !token) {
         // 需要认证但未登录，跳转登录页
         next('/login');
+    } else if (to.meta.roles && Array.isArray(to.meta.roles)) {
+        const required = (to.meta.roles as string[]).map((role) => role.toUpperCase());
+        const needsAdmin = required.includes('ADMIN') || required.includes('ROLE_ADMIN');
+        if (needsAdmin && !userStore.isAdmin) {
+            ElMessage.error('无权限访问该页面');
+            next('/403');
+        } else {
+            next();
+        }
     } else {
         next();
     }
