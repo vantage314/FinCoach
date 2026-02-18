@@ -10,6 +10,7 @@ import com.fincoach.core.healthv2.dto.admin.AdminDataSourceStatusDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminJobActionResultDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminJobStatusDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminRealtimeHealthDTO;
+import com.fincoach.core.healthv2.dto.admin.AdminCrawlerEventDTO;
 import com.fincoach.core.healthv2.entity.FcPortfolioPriceSnapshotEntity;
 import com.fincoach.core.healthv2.mapper.FcPortfolioPriceSnapshotMapper;
 import com.fincoach.core.healthv2.service.admin.CrawlerRunRequest;
@@ -102,7 +103,8 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     @Override
     public AdminDataSourceStatusDTO getStatus(Long actorUserId) {
         FcSystemConfigEntity config = ensureModeConfig(actorUserId);
-        FcJobStatusEntity job = ensureJobStatus();
+        ensureJobStatus();
+        FcJobStatusEntity job = loadJobStatusSnapshot();
         CrawlerConfig crawlerConfig = loadCrawlerConfig(actorUserId);
 
         AdminDataSourceStatusDTO dto = new AdminDataSourceStatusDTO();
@@ -312,7 +314,8 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
 
     @Override
     public AdminRealtimeHealthDTO getRealtimeHealth(Long actorUserId) {
-        FcJobStatusEntity job = ensureJobStatus();
+        ensureJobStatus();
+        FcJobStatusEntity job = loadJobStatusSnapshot();
         LocalDateTime now = LocalDateTime.now();
         AdminRealtimeHealthDTO dto = new AdminRealtimeHealthDTO();
         if (job == null) {
@@ -325,7 +328,12 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         dto.setSecondsSinceHeartbeat(secondsSinceHeartbeat(job, now));
         dto.setLastStartAt(formatTime(job.getLastStartAt()));
         dto.setLastEndAt(formatTime(job.getLastEndAt()));
+        dto.setLastErrorAt(formatTime(job.getLastErrorAt()));
         dto.setStale(isStale(job, now));
+        dto.setStaleCount(safeCount(job.getStaleCount()));
+        dto.setRecoverCount(safeCount(job.getRecoverCount()));
+        dto.setRestartCount(safeCount(job.getRestartCount()));
+        dto.setRecentEvents(toEventDtos(parseEvents(job.getRecentEventsJson())));
         return dto;
     }
 
@@ -637,6 +645,13 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         return created;
     }
 
+    private FcJobStatusEntity loadJobStatusSnapshot() {
+        return jobStatusMapper.selectOne(
+                new LambdaQueryWrapper<FcJobStatusEntity>()
+                        .eq(FcJobStatusEntity::getJobName, JOB_NAME)
+                        .last("LIMIT 1"));
+    }
+
     private AdminJobStatusDTO toJobDto(FcJobStatusEntity entity) {
         LocalDateTime now = LocalDateTime.now();
         if (entity == null) {
@@ -654,11 +669,16 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         dto.setLastHeartbeatAt(formatTime(entity.getLastHeartbeatAt()));
         dto.setLastEndAt(formatTime(entity.getLastEndAt()));
         dto.setLastError(trimError(entity.getLastError()));
+        dto.setLastErrorAt(formatTime(entity.getLastErrorAt()));
         dto.setLastLog(trimLog(entity.getLastLog()));
         dto.setUpdatedAt(formatTime(entity.getUpdatedAt()));
         Long seconds = secondsSinceHeartbeat(entity, now);
         dto.setSecondsSinceHeartbeat(seconds);
         dto.setStale(isStale(entity, now));
+        dto.setStaleCount(safeCount(entity.getStaleCount()));
+        dto.setRecoverCount(safeCount(entity.getRecoverCount()));
+        dto.setRestartCount(safeCount(entity.getRestartCount()));
+        dto.setRecentEvents(toEventDtos(parseEvents(entity.getRecentEventsJson())));
         return dto;
     }
 
@@ -743,6 +763,21 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         } catch (Exception ignored) {
             return "[]";
         }
+    }
+
+    private List<AdminCrawlerEventDTO> toEventDtos(List<CrawlerEvent> events) {
+        List<AdminCrawlerEventDTO> dtos = new ArrayList<>();
+        if (events == null) {
+            return dtos;
+        }
+        for (CrawlerEvent event : events) {
+            AdminCrawlerEventDTO dto = new AdminCrawlerEventDTO();
+            dto.setTs(event.getTs());
+            dto.setType(event.getType());
+            dto.setMsg(event.getMsg());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 
     private FcJobStatusEntity lockJobStatus() {

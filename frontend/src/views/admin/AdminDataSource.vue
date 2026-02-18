@@ -81,6 +81,24 @@
         {{ statusHint }}
       </div>
 
+      <div class="counter-row">
+        <el-tag type="danger">Stale: {{ staleCount }}</el-tag>
+        <el-tag type="warning">Recover: {{ recoverCount }}</el-tag>
+        <el-tag type="info">Restart: {{ restartCount }}</el-tag>
+      </div>
+
+      <el-table
+        v-if="recentEvents.length"
+        :data="recentEvents"
+        size="small"
+        class="events-table"
+        border
+      >
+        <el-table-column prop="ts" label="Time" width="180" />
+        <el-table-column prop="type" label="Type" width="140" />
+        <el-table-column prop="msg" label="Message" />
+      </el-table>
+
       <el-collapse class="log-panel" v-if="job.lastLog">
         <el-collapse-item title="最新日志">
           <pre class="job-log">{{ job.lastLog }}</pre>
@@ -257,6 +275,29 @@ const secondsSinceHeartbeat = computed(() => {
   return Number.isFinite(num) ? num : null;
 });
 
+const staleCount = computed(() => {
+  const raw = health.value?.staleCount ?? job.value?.staleCount;
+  const num = Number(raw);
+  return Number.isFinite(num) ? num : 0;
+});
+
+const recoverCount = computed(() => {
+  const raw = health.value?.recoverCount ?? job.value?.recoverCount;
+  const num = Number(raw);
+  return Number.isFinite(num) ? num : 0;
+});
+
+const restartCount = computed(() => {
+  const raw = health.value?.restartCount ?? job.value?.restartCount;
+  const num = Number(raw);
+  return Number.isFinite(num) ? num : 0;
+});
+
+const recentEvents = computed(() => {
+  const list = health.value?.recentEvents ?? job.value?.recentEvents;
+  return Array.isArray(list) ? list : [];
+});
+
 const recentlyEnded = () => {
   const endAt = job.value?.lastEndAt;
   if (!endAt) return false;
@@ -349,6 +390,17 @@ onMounted(() => {
   margin-top: 12px;
   font-size: 13px;
   color: #cbd5f5;
+}
+
+.counter-row {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.events-table {
+  margin-top: 12px;
 }
 
 .job-log {
