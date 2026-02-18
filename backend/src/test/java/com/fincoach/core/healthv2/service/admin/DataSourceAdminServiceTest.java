@@ -2,6 +2,7 @@ package com.fincoach.core.healthv2.service.admin;
 
 import com.fincoach.core.healthv2.dto.admin.AdminDataSourceImportResultDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminDataSourceStatusDTO;
+import com.fincoach.core.repository.entity.FcJobStatusEntity;
 import com.fincoach.core.healthv2.service.admin.CrawlerRunRequest;
 import com.fincoach.core.healthv2.service.admin.CrawlerRunResult;
 import com.fincoach.core.healthv2.service.admin.CrawlerRunner;
@@ -19,6 +20,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -120,6 +122,7 @@ public class DataSourceAdminServiceTest {
         maxBatchConfig.setCfgValue("1");
         Mockito.when(configMapper.selectOne(Mockito.any())).thenReturn(modeConfig, intervalConfig, maxBatchConfig);
         Mockito.when(configMapper.insert(Mockito.any())).thenReturn(1);
+        Mockito.when(jobStatusMapper.selectForUpdate(Mockito.any())).thenReturn(null);
         Mockito.when(snapshotMapper.selectOne(Mockito.any())).thenReturn(null);
         Mockito.when(snapshotMapper.insert(Mockito.any())).thenReturn(1);
 
@@ -135,6 +138,103 @@ public class DataSourceAdminServiceTest {
         assertTrue(latch.await(2, TimeUnit.SECONDS));
 
         Mockito.verify(snapshotMapper, times(1)).insert(Mockito.any());
+    }
+
+    @Test
+    public void testStartIdempotentWhenRunningFresh() {
+        FcSystemConfigMapper configMapper = Mockito.mock(FcSystemConfigMapper.class);
+        FcJobStatusMapper jobStatusMapper = Mockito.mock(FcJobStatusMapper.class);
+        FcPortfolioPriceSnapshotMapper snapshotMapper = Mockito.mock(FcPortfolioPriceSnapshotMapper.class);
+        FcTickerMappingMapper tickerMappingMapper = Mockito.mock(FcTickerMappingMapper.class);
+
+        FcSystemConfigEntity modeConfig = new FcSystemConfigEntity();
+        modeConfig.setCfgKey("CRAWLER_MODE");
+        modeConfig.setCfgValue("DAEMON");
+        FcSystemConfigEntity intervalConfig = new FcSystemConfigEntity();
+        intervalConfig.setCfgKey("CRAWLER_INTERVAL_SECONDS");
+        intervalConfig.setCfgValue("10");
+        FcSystemConfigEntity maxBatchConfig = new FcSystemConfigEntity();
+        maxBatchConfig.setCfgKey("CRAWLER_MAX_BATCHES");
+        maxBatchConfig.setCfgValue("0");
+        Mockito.when(configMapper.selectOne(Mockito.any())).thenReturn(modeConfig, intervalConfig, maxBatchConfig);
+
+        FcJobStatusEntity job = new FcJobStatusEntity();
+        job.setJobName("PY_MARKET_CRAWLER");
+        job.setStatus("RUNNING");
+        job.setLastHeartbeatAt(LocalDateTime.now());
+        Mockito.when(jobStatusMapper.selectOne(Mockito.any())).thenReturn(job);
+        Mockito.when(jobStatusMapper.selectForUpdate(Mockito.any())).thenReturn(job);
+
+        CrawlerRunner runner = Mockito.mock(CrawlerRunner.class);
+        DataSourceAdminServiceImpl service = new DataSourceAdminServiceImpl(
+                configMapper, jobStatusMapper, snapshotMapper, tickerMappingMapper, runner);
+
+        String message = service.startRealtime(1L).getMessage();
+        assertEquals("already running", message);
+        Mockito.verify(runner, times(0)).run(Mockito.any(), Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    public void testStartReplacesStaleRun() {
+        FcSystemConfigMapper configMapper = Mockito.mock(FcSystemConfigMapper.class);
+        FcJobStatusMapper jobStatusMapper = Mockito.mock(FcJobStatusMapper.class);
+        FcPortfolioPriceSnapshotMapper snapshotMapper = Mockito.mock(FcPortfolioPriceSnapshotMapper.class);
+        FcTickerMappingMapper tickerMappingMapper = Mockito.mock(FcTickerMappingMapper.class);
+
+        FcSystemConfigEntity modeConfig = new FcSystemConfigEntity();
+        modeConfig.setCfgKey("CRAWLER_MODE");
+        modeConfig.setCfgValue("RUN_ONCE");
+        FcSystemConfigEntity intervalConfig = new FcSystemConfigEntity();
+        intervalConfig.setCfgKey("CRAWLER_INTERVAL_SECONDS");
+        intervalConfig.setCfgValue("1");
+        FcSystemConfigEntity maxBatchConfig = new FcSystemConfigEntity();
+        maxBatchConfig.setCfgKey("CRAWLER_MAX_BATCHES");
+        maxBatchConfig.setCfgValue("1");
+        Mockito.when(configMapper.selectOne(Mockito.any())).thenReturn(modeConfig, intervalConfig, maxBatchConfig);
+
+        FcJobStatusEntity job = new FcJobStatusEntity();
+        job.setJobName("PY_MARKET_CRAWLER");
+        job.setStatus("RUNNING");
+        job.setLastHeartbeatAt(LocalDateTime.now().minusSeconds(120));
+        Mockito.when(jobStatusMapper.selectOne(Mockito.any())).thenReturn(job);
+        Mockito.when(jobStatusMapper.selectForUpdate(Mockito.any())).thenReturn(job);
+        Mockito.when(jobStatusMapper.update(Mockito.isNull(), Mockito.any())).thenReturn(1);
+
+        CrawlerRunner runner = Mockito.mock(CrawlerRunner.class);
+        Mockito.when(runner.run(Mockito.any(), Mockito.any(), Mockito.any())).thenAnswer(invocation -> {
+            CrawlerRunResult result = new CrawlerRunResult();
+            result.setSuccess(true);
+            result.setLines(0);
+            return result;
+        });
+
+        DataSourceAdminServiceImpl service = new DataSourceAdminServiceImpl(
+                configMapper, jobStatusMapper, snapshotMapper, tickerMappingMapper, runner);
+
+        service.startRealtime(1L);
+
+        Mockito.verify(jobStatusMapper, Mockito.atLeastOnce()).update(Mockito.isNull(), Mockito.any());
+    }
+
+    @Test
+    public void testStopIdempotentWhenStopped() {
+        FcSystemConfigMapper configMapper = Mockito.mock(FcSystemConfigMapper.class);
+        FcJobStatusMapper jobStatusMapper = Mockito.mock(FcJobStatusMapper.class);
+        FcPortfolioPriceSnapshotMapper snapshotMapper = Mockito.mock(FcPortfolioPriceSnapshotMapper.class);
+        FcTickerMappingMapper tickerMappingMapper = Mockito.mock(FcTickerMappingMapper.class);
+
+        FcJobStatusEntity job = new FcJobStatusEntity();
+        job.setJobName("PY_MARKET_CRAWLER");
+        job.setStatus("STOPPED");
+        Mockito.when(jobStatusMapper.selectOne(Mockito.any())).thenReturn(job);
+        Mockito.when(jobStatusMapper.selectForUpdate(Mockito.any())).thenReturn(job);
+
+        DataSourceAdminServiceImpl service = new DataSourceAdminServiceImpl(
+                configMapper, jobStatusMapper, snapshotMapper, tickerMappingMapper, new NoopRunner());
+
+        String message = service.stopRealtime(1L).getMessage();
+        assertEquals("already stopped", message);
+        Mockito.verify(jobStatusMapper, times(0)).update(Mockito.isNull(), Mockito.any());
     }
 
     private static class NoopRunner implements CrawlerRunner {
