@@ -16,5 +16,7 @@
 - 2026-02-18: [Layout split: user vs admin](20260218_layout_split_user_admin.md)
 - 2026-02-18: [Data source toggle + crawler control v1](20260218_data_source_toggle_and_crawler_v1.md)
 - 2026-02-18: [Securities admin v1](20260218_securities_admin_v1.md)
+- 2026-02-18: [User top nav + login routing fix](20260218_user_topnav_and_login_routing_fix.md)
+- 2026-02-18: [Realtime crawler v1](20260218_realtime_crawler_v1.md)
 - 2026-02-17: [M8-3 Advice Engine v2](2026-02-17_M8-3_advice-engine-v2/ops_log.md)
 - TODO: backfill links for historical logs (see this directory)
