@@ -219,10 +219,13 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             return dto;
         }
         if (STATUS_RUNNING.equals(status) && stale) {
+            String line = formatLogLine(now, "WARN", "STALE detected, auto-restarting");
+            String merged = mergeLog(job != null ? job.getLastLog() : null, line);
             UpdateWrapper<FcJobStatusEntity> staleUpdate = new UpdateWrapper<>();
             staleUpdate.eq("job_name", JOB_NAME)
                     .set("status", STATUS_STOPPED)
                     .set("last_end_at", now)
+                    .set("last_log", trimLog(merged))
                     .set("updated_at", now);
             jobStatusMapper.update(null, staleUpdate);
         }
@@ -616,6 +619,22 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
 
     private String trimLog(String logValue) {
         return LogLimiter.truncate(logValue, logMaxChars);
+    }
+
+    private String formatLogLine(LocalDateTime now, String level, String message) {
+        String normalized = level == null ? "INFO" : level.toUpperCase();
+        String content = message == null ? "" : message;
+        return now + " [" + normalized + "] " + content;
+    }
+
+    private String mergeLog(String existing, String line) {
+        if (line == null || line.isBlank()) {
+            return existing;
+        }
+        if (existing == null || existing.isBlank()) {
+            return line;
+        }
+        return existing + "\n" + line;
     }
 
     private FcJobStatusEntity lockJobStatus() {
