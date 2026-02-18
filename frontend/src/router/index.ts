@@ -138,19 +138,19 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: 'securities/mapping',
                 name: 'AdminSecuritiesMapping',
-                component: () => import('../views/admin/AdminPlaceholder.vue'),
+                component: () => import('../views/admin/AdminSecuritiesMapping.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: '证券映射 - FinCoach' }
             },
             {
                 path: 'securities/snapshots',
                 name: 'AdminSecuritiesSnapshots',
-                component: () => import('../views/admin/AdminPlaceholder.vue'),
+                component: () => import('../views/admin/AdminSecuritiesSnapshots.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: '行情快照 - FinCoach' }
             },
             {
                 path: 'securities/quality',
                 name: 'AdminSecuritiesQuality',
-                component: () => import('../views/admin/AdminPlaceholder.vue'),
+                component: () => import('../views/admin/AdminSecuritiesQuality.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: '数据质量 - FinCoach' }
             }
         ]
