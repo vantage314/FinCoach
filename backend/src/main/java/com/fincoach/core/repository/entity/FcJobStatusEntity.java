@@ -18,5 +18,6 @@ public class FcJobStatusEntity {
     private LocalDateTime lastHeartbeatAt;
     private LocalDateTime lastEndAt;
     private String lastError;
+    private String lastLog;
     private LocalDateTime updatedAt;
 }

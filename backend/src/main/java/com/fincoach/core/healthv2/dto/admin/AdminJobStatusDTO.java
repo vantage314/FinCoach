@@ -10,5 +10,6 @@ public class AdminJobStatusDTO {
     private String lastHeartbeatAt;
     private String lastEndAt;
     private String lastError;
+    private String lastLog;
     private String updatedAt;
 }
