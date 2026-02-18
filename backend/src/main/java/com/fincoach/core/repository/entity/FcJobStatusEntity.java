@@ -19,5 +19,10 @@ public class FcJobStatusEntity {
     private LocalDateTime lastEndAt;
     private String lastError;
     private String lastLog;
+    private String recentEventsJson;
+    private Integer staleCount;
+    private Integer recoverCount;
+    private Integer restartCount;
+    private LocalDateTime lastErrorAt;
     private LocalDateTime updatedAt;
 }

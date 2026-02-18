@@ -3,6 +3,7 @@ package com.fincoach.core.healthv2.service.admin.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fincoach.core.healthv2.dto.admin.AdminDataSourceImportResultDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminDataSourceStatusDTO;
@@ -58,6 +59,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     private static final String STATUS_STOPPED = "STOPPED";
     private static final String STATUS_STOPPING = "STOPPING";
     private static final String STATUS_FAILED = "FAILED";
+    private static final int EVENT_RING_SIZE = 20;
     private static final String LEGACY_DEMO_KEY = "DEMO_DB";
     private static final int DEMO_DAYS = 20;
     private static final List<DemoMapping> DEMO_MAPPINGS = List.of(
@@ -220,15 +222,16 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             return dto;
         }
         if (STATUS_RUNNING.equals(status) && stale) {
-        String line = formatLogLine(now, "WARN", "STALE detected, auto-restarting");
-        String merged = LogLimiter.appendAndTruncate(job != null ? job.getLastLog() : null, line, logMaxChars);
+            String line = formatLogLine(now, "WARN", "STALE detected, auto-restarting");
+            String merged = LogLimiter.appendAndTruncate(job != null ? job.getLastLog() : null, line, logMaxChars);
             UpdateWrapper<FcJobStatusEntity> staleUpdate = new UpdateWrapper<>();
             staleUpdate.eq("job_name", JOB_NAME)
                     .set("status", STATUS_STOPPED)
                     .set("last_end_at", now)
-                .set("last_log", merged)
-                .set("updated_at", now);
+                    .set("last_log", merged)
+                    .set("updated_at", now);
             jobStatusMapper.update(null, staleUpdate);
+            recordEvent(job, now, "STALE_RESTART", "stale detected, auto-restarting", 1, 0, 1, false);
         }
         CrawlerConfig crawlerConfig = loadCrawlerConfig(actorUserId);
         AtomicBoolean stopSignal = new AtomicBoolean(false);
@@ -247,6 +250,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         crawlerFuture = crawlerExecutor.submit(() -> runCrawlerLoop(actorUserId, crawlerConfig, stopSignal));
 
         log.info("event=PY_CRAWLER_START userId={} job={}", actorUserId, JOB_NAME);
+        recordEvent(job, now, "START", "start requested", 0, 0, 0, false);
         AdminJobActionResultDTO dto = new AdminJobActionResultDTO();
         dto.setJobName(JOB_NAME);
         dto.setStatus(STATUS_RUNNING);
@@ -287,6 +291,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
                     .set("status", STATUS_STOPPING)
                     .set("updated_at", now);
             jobStatusMapper.update(null, uw);
+            recordEvent(job, now, "STOP_REQUEST", "stop requested", 0, 0, 0, false);
         } else {
             UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
             uw.eq("job_name", JOB_NAME)
@@ -294,6 +299,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
                     .set("last_end_at", now)
                     .set("updated_at", now);
             jobStatusMapper.update(null, uw);
+            recordEvent(job, now, "STOPPED", "stopped", 0, 0, 0, false);
         }
 
         log.info("event=PY_CRAWLER_STOP userId={} job={}", actorUserId, JOB_NAME);
@@ -336,6 +342,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             dto.setMessage("stop in progress");
             return dto;
         }
+        recordEvent(job, LocalDateTime.now(), "MANUAL_RECOVER", "manual recover requested", 0, 1, 0, false);
         return startRealtime(actorUserId);
     }
 
@@ -418,6 +425,11 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
                 .set("last_end_at", now)
                 .set("updated_at", now);
         jobStatusMapper.update(null, uw);
+        FcJobStatusEntity job = jobStatusMapper.selectOne(
+                new LambdaQueryWrapper<FcJobStatusEntity>()
+                        .eq(FcJobStatusEntity::getJobName, JOB_NAME)
+                        .last("LIMIT 1"));
+        recordEvent(job, now, "STOPPED", "stopped", 0, 0, 0, false);
     }
 
     private void updateJobFailed(String error) {
@@ -427,8 +439,14 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
                 .set("status", STATUS_FAILED)
                 .set("last_end_at", now)
                 .set("last_error", trimError(error))
+                .set("last_error_at", now)
                 .set("updated_at", now);
         jobStatusMapper.update(null, uw);
+        FcJobStatusEntity job = jobStatusMapper.selectOne(
+                new LambdaQueryWrapper<FcJobStatusEntity>()
+                        .eq(FcJobStatusEntity::getJobName, JOB_NAME)
+                        .last("LIMIT 1"));
+        recordEvent(job, now, "FAILED", trimError(error), 0, 0, 0, true);
     }
 
     private void appendLogLine(List<String> lines, String line) {
@@ -674,6 +692,59 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         return existing + "\n" + line;
     }
 
+    private void recordEvent(FcJobStatusEntity job, LocalDateTime now, String type, String message,
+                             int staleInc, int recoverInc, int restartInc, boolean setLastErrorAt) {
+        List<CrawlerEvent> events = parseEvents(job != null ? job.getRecentEventsJson() : null);
+        events.add(new CrawlerEvent(now.toString(), type, message));
+        if (events.size() > EVENT_RING_SIZE) {
+            events = events.subList(events.size() - EVENT_RING_SIZE, events.size());
+        }
+        String eventsJson = writeEvents(events);
+        String logLine = formatLogLine(now, type, message);
+        String mergedLog = LogLimiter.appendAndTruncate(job != null ? job.getLastLog() : null, logLine, logMaxChars);
+        UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
+        uw.eq("job_name", JOB_NAME)
+                .set("recent_events_json", eventsJson)
+                .set("last_log", mergedLog)
+                .set("updated_at", now);
+        if (staleInc != 0) {
+            uw.set("stale_count", safeCount(job != null ? job.getStaleCount() : null) + staleInc);
+        }
+        if (recoverInc != 0) {
+            uw.set("recover_count", safeCount(job != null ? job.getRecoverCount() : null) + recoverInc);
+        }
+        if (restartInc != 0) {
+            uw.set("restart_count", safeCount(job != null ? job.getRestartCount() : null) + restartInc);
+        }
+        if (setLastErrorAt) {
+            uw.set("last_error_at", now);
+        }
+        jobStatusMapper.update(null, uw);
+    }
+
+    private int safeCount(Integer value) {
+        return value == null ? 0 : value;
+    }
+
+    private List<CrawlerEvent> parseEvents(String json) {
+        if (json == null || json.isBlank()) {
+            return new ArrayList<>();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<CrawlerEvent>>() {});
+        } catch (Exception ignored) {
+            return new ArrayList<>();
+        }
+    }
+
+    private String writeEvents(List<CrawlerEvent> events) {
+        try {
+            return objectMapper.writeValueAsString(events);
+        } catch (Exception ignored) {
+            return "[]";
+        }
+    }
+
     private FcJobStatusEntity lockJobStatus() {
         FcJobStatusEntity locked = jobStatusMapper.selectForUpdate(JOB_NAME);
         if (locked != null) {
@@ -834,6 +905,42 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             this.ticker = ticker;
             this.market = market;
             this.priority = priority;
+        }
+    }
+
+    private static class CrawlerEvent {
+        private String ts;
+        private String type;
+        private String msg;
+
+        private CrawlerEvent(String ts, String type, String msg) {
+            this.ts = ts;
+            this.type = type;
+            this.msg = msg;
+        }
+
+        public String getTs() {
+            return ts;
+        }
+
+        public void setTs(String ts) {
+            this.ts = ts;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
         }
     }
 }
