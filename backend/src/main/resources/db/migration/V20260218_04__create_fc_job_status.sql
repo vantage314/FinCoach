@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS fc_job_status (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  job_name VARCHAR(128) NOT NULL,
+  status VARCHAR(32) NOT NULL,
+  last_start_at DATETIME NULL,
+  last_heartbeat_at DATETIME NULL,
+  last_end_at DATETIME NULL,
+  last_error VARCHAR(512) NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_job_name (job_name)
+);
