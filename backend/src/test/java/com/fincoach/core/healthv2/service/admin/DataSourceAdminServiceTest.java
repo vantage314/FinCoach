@@ -45,7 +45,7 @@ public class DataSourceAdminServiceTest {
         assertNotNull(status.getJob());
         assertEquals("STOPPED", status.getJob().getStatus());
 
-        Mockito.verify(configMapper, times(1)).insert(Mockito.any());
+        Mockito.verify(configMapper, times(4)).insert(Mockito.any());
         Mockito.verify(jobStatusMapper, times(1)).insert(Mockito.any());
     }
 
@@ -64,7 +64,7 @@ public class DataSourceAdminServiceTest {
         updated.setCfgKey("DATA_SOURCE_MODE");
         updated.setCfgValue("REALTIME");
 
-        Mockito.when(configMapper.selectOne(Mockito.any())).thenReturn(existing, updated);
+        Mockito.when(configMapper.selectOne(Mockito.any())).thenReturn(existing, updated, null, null, null);
         Mockito.when(configMapper.update(Mockito.isNull(), Mockito.any())).thenReturn(1);
         Mockito.when(jobStatusMapper.selectOne(Mockito.any())).thenReturn(null);
 
@@ -84,8 +84,10 @@ public class DataSourceAdminServiceTest {
 
         Mockito.when(tickerMappingMapper.selectList(Mockito.any())).thenReturn(List.of());
         Mockito.when(tickerMappingMapper.insert(Mockito.any())).thenReturn(1);
+        Mockito.when(tickerMappingMapper.update(Mockito.isNull(), Mockito.any())).thenReturn(1);
         Mockito.when(snapshotMapper.selectOne(Mockito.any())).thenReturn(null);
         Mockito.when(snapshotMapper.insert(Mockito.any())).thenReturn(1);
+        Mockito.when(snapshotMapper.delete(Mockito.any())).thenReturn(1);
 
         DataSourceAdminServiceImpl service = new DataSourceAdminServiceImpl(
                 configMapper, jobStatusMapper, snapshotMapper, tickerMappingMapper, new NoopRunner());
@@ -107,6 +109,17 @@ public class DataSourceAdminServiceTest {
         FcTickerMappingMapper tickerMappingMapper = Mockito.mock(FcTickerMappingMapper.class);
 
         Mockito.when(jobStatusMapper.selectOne(Mockito.any())).thenReturn(null);
+        FcSystemConfigEntity modeConfig = new FcSystemConfigEntity();
+        modeConfig.setCfgKey("CRAWLER_MODE");
+        modeConfig.setCfgValue("RUN_ONCE");
+        FcSystemConfigEntity intervalConfig = new FcSystemConfigEntity();
+        intervalConfig.setCfgKey("CRAWLER_INTERVAL_SECONDS");
+        intervalConfig.setCfgValue("1");
+        FcSystemConfigEntity maxBatchConfig = new FcSystemConfigEntity();
+        maxBatchConfig.setCfgKey("CRAWLER_MAX_BATCHES");
+        maxBatchConfig.setCfgValue("1");
+        Mockito.when(configMapper.selectOne(Mockito.any())).thenReturn(modeConfig, intervalConfig, maxBatchConfig);
+        Mockito.when(configMapper.insert(Mockito.any())).thenReturn(1);
         Mockito.when(snapshotMapper.selectOne(Mockito.any())).thenReturn(null);
         Mockito.when(snapshotMapper.insert(Mockito.any())).thenReturn(1);
 
