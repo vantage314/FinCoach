@@ -24,8 +24,10 @@ import com.fincoach.core.ticker.mapper.FcTickerMappingMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     private static final String JOB_NAME = "PY_MARKET_CRAWLER";
     private static final String STATUS_RUNNING = "RUNNING";
     private static final String STATUS_STOPPED = "STOPPED";
+    private static final String STATUS_STOPPING = "STOPPING";
     private static final String STATUS_FAILED = "FAILED";
     private static final String LEGACY_DEMO_KEY = "DEMO_DB";
     private static final int DEMO_DAYS = 20;
@@ -194,19 +197,38 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     }
 
     @Override
+    @Transactional
     public AdminJobActionResultDTO startRealtime(Long actorUserId) {
         ensureJobStatus();
-        if (isCrawlerRunning()) {
+        FcJobStatusEntity job = lockJobStatus();
+        LocalDateTime now = LocalDateTime.now();
+        String status = normalizeStatus(job != null ? job.getStatus() : null);
+        boolean stale = isStale(job, now);
+        if (STATUS_RUNNING.equals(status) && !stale) {
             AdminJobActionResultDTO dto = new AdminJobActionResultDTO();
             dto.setJobName(JOB_NAME);
             dto.setStatus(STATUS_RUNNING);
             dto.setMessage("already running");
             return dto;
         }
+        if (STATUS_STOPPING.equals(status)) {
+            AdminJobActionResultDTO dto = new AdminJobActionResultDTO();
+            dto.setJobName(JOB_NAME);
+            dto.setStatus(STATUS_STOPPING);
+            dto.setMessage("stop in progress");
+            return dto;
+        }
+        if (STATUS_RUNNING.equals(status) && stale) {
+            UpdateWrapper<FcJobStatusEntity> staleUpdate = new UpdateWrapper<>();
+            staleUpdate.eq("job_name", JOB_NAME)
+                    .set("status", STATUS_STOPPED)
+                    .set("last_end_at", now)
+                    .set("updated_at", now);
+            jobStatusMapper.update(null, staleUpdate);
+        }
         CrawlerConfig crawlerConfig = loadCrawlerConfig(actorUserId);
         AtomicBoolean stopSignal = new AtomicBoolean(false);
         crawlerStopSignal = stopSignal;
-        LocalDateTime now = LocalDateTime.now();
         UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
         uw.eq("job_name", JOB_NAME)
                 .set("status", STATUS_RUNNING)
@@ -229,27 +251,51 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     }
 
     @Override
+    @Transactional
     public AdminJobActionResultDTO stopRealtime(Long actorUserId) {
         ensureJobStatus();
+        FcJobStatusEntity job = lockJobStatus();
+        String status = normalizeStatus(job != null ? job.getStatus() : null);
+        if (STATUS_STOPPED.equals(status)) {
+            AdminJobActionResultDTO dto = new AdminJobActionResultDTO();
+            dto.setJobName(JOB_NAME);
+            dto.setStatus(STATUS_STOPPED);
+            dto.setMessage("already stopped");
+            return dto;
+        }
+        if (STATUS_STOPPING.equals(status)) {
+            AdminJobActionResultDTO dto = new AdminJobActionResultDTO();
+            dto.setJobName(JOB_NAME);
+            dto.setStatus(STATUS_STOPPING);
+            dto.setMessage("stop in progress");
+            return dto;
+        }
         AtomicBoolean signal = crawlerStopSignal;
         if (signal != null) {
             signal.set(true);
         }
-        if (crawlerFuture != null && !crawlerFuture.isDone()) {
-            crawlerFuture.cancel(true);
-        }
         LocalDateTime now = LocalDateTime.now();
-        UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
-        uw.eq("job_name", JOB_NAME)
-                .set("status", STATUS_STOPPED)
-                .set("last_end_at", now)
-                .set("updated_at", now);
-        jobStatusMapper.update(null, uw);
+        boolean hasRunningFuture = crawlerFuture != null && !crawlerFuture.isDone();
+        if (hasRunningFuture) {
+            crawlerFuture.cancel(true);
+            UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
+            uw.eq("job_name", JOB_NAME)
+                    .set("status", STATUS_STOPPING)
+                    .set("updated_at", now);
+            jobStatusMapper.update(null, uw);
+        } else {
+            UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
+            uw.eq("job_name", JOB_NAME)
+                    .set("status", STATUS_STOPPED)
+                    .set("last_end_at", now)
+                    .set("updated_at", now);
+            jobStatusMapper.update(null, uw);
+        }
 
         log.info("event=PY_CRAWLER_STOP userId={} job={}", actorUserId, JOB_NAME);
         AdminJobActionResultDTO dto = new AdminJobActionResultDTO();
         dto.setJobName(JOB_NAME);
-        dto.setStatus(STATUS_STOPPED);
+        dto.setStatus(hasRunningFuture ? STATUS_STOPPING : STATUS_STOPPED);
         dto.setMessage("stop requested");
         return dto;
     }
@@ -534,21 +580,27 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     }
 
     private AdminJobStatusDTO toJobDto(FcJobStatusEntity entity) {
+        LocalDateTime now = LocalDateTime.now();
         if (entity == null) {
             AdminJobStatusDTO dto = new AdminJobStatusDTO();
             dto.setJobName(JOB_NAME);
             dto.setStatus(STATUS_STOPPED);
+            dto.setStale(false);
             return dto;
         }
         AdminJobStatusDTO dto = new AdminJobStatusDTO();
         dto.setJobName(entity.getJobName());
-        dto.setStatus(entity.getStatus() == null ? STATUS_STOPPED : entity.getStatus());
+        String status = normalizeStatus(entity.getStatus());
+        dto.setStatus(status);
         dto.setLastStartAt(formatTime(entity.getLastStartAt()));
         dto.setLastHeartbeatAt(formatTime(entity.getLastHeartbeatAt()));
         dto.setLastEndAt(formatTime(entity.getLastEndAt()));
         dto.setLastError(trimError(entity.getLastError()));
         dto.setLastLog(trimLog(entity.getLastLog()));
         dto.setUpdatedAt(formatTime(entity.getUpdatedAt()));
+        Long seconds = secondsSinceHeartbeat(entity, now);
+        dto.setSecondsSinceHeartbeat(seconds);
+        dto.setStale(isStale(entity, now));
         return dto;
     }
 
@@ -564,6 +616,52 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
 
     private String trimLog(String logValue) {
         return LogLimiter.truncate(logValue, logMaxChars);
+    }
+
+    private FcJobStatusEntity lockJobStatus() {
+        FcJobStatusEntity locked = jobStatusMapper.selectForUpdate(JOB_NAME);
+        if (locked != null) {
+            return locked;
+        }
+        ensureJobStatus();
+        return jobStatusMapper.selectForUpdate(JOB_NAME);
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return STATUS_STOPPED;
+        }
+        String normalized = status.trim().toUpperCase();
+        if (STATUS_RUNNING.equals(normalized)
+                || STATUS_STOPPED.equals(normalized)
+                || STATUS_STOPPING.equals(normalized)
+                || STATUS_FAILED.equals(normalized)) {
+            return normalized;
+        }
+        return STATUS_STOPPED;
+    }
+
+    private boolean isStale(FcJobStatusEntity entity, LocalDateTime now) {
+        if (entity == null) {
+            return false;
+        }
+        String status = normalizeStatus(entity.getStatus());
+        if (!STATUS_RUNNING.equals(status)) {
+            return false;
+        }
+        LocalDateTime heartbeat = entity.getLastHeartbeatAt();
+        if (heartbeat == null) {
+            return true;
+        }
+        long seconds = Duration.between(heartbeat, now).getSeconds();
+        return seconds > staleThresholdSeconds;
+    }
+
+    private Long secondsSinceHeartbeat(FcJobStatusEntity entity, LocalDateTime now) {
+        if (entity == null || entity.getLastHeartbeatAt() == null) {
+            return null;
+        }
+        return Duration.between(entity.getLastHeartbeatAt(), now).getSeconds();
     }
 
     private int ensureTickerMappings() {
