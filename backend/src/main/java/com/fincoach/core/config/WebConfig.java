@@ -20,8 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
-                // 拦截所有 /api/** 请求
-                .addPathPatterns("/api/**")
+                // 拦截所有 /api/** 与 /admin/** 请求
+                .addPathPatterns("/api/**", "/admin/**")
                 // 排除认证相关接口 (登录、注册、测试)
                 .excludePathPatterns(
                         "/api/auth/**",
