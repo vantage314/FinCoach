@@ -52,7 +52,6 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { User as UserIcon, Lock as LockIcon } from 'lucide-vue-next';
-import request from '@/api/request';
 import { useUserStore } from '@/store/modules/user';
 
 const router = useRouter();
@@ -83,16 +82,17 @@ const handleLogin = async () => {
     if (valid) {
       loading.value = true;
       try {
-        const res: any = await request.post('/auth/login', loginForm);
-        if (res.code === 200) {
-          // 使用 userStore 保存 token 和 username
-          userStore.setUser(res.data, loginForm.username);
-          ElMessage.success('登录成功');
-          const target = userStore.isAdmin ? '/admin/alerts' : '/app/diagnosis';
-          router.push(target);
-        } else {
-          ElMessage.error(res.message || '登录失败');
+        const success = await userStore.login({
+          username: loginForm.username,
+          password: loginForm.password,
+        });
+        if (!success) {
+          ElMessage.error('登录失败');
+          return;
         }
+        ElMessage.success('登录成功');
+        const target = userStore.isAdmin ? '/admin/alerts' : '/app/diagnosis';
+        router.push(target);
       } catch (error: any) {
         console.error('登录异常:', error);
         ElMessage.error(error.response?.data?.message || error.message || '登录请求失败');

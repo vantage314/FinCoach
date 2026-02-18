@@ -2,6 +2,7 @@ package com.fincoach.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fincoach.core.controller.dto.AuthDTO;
+import com.fincoach.core.rbac.service.RbacQueryService;
 import com.fincoach.core.repository.entity.User;
 import com.fincoach.core.repository.mapper.UserMapper;
 import com.fincoach.core.security.UnauthorizedException;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -27,6 +30,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired(required = false)
+    private RbacQueryService rbacQueryService;
 
     @Override
     public void register(AuthDTO authDTO) {
@@ -74,6 +80,14 @@ public class AuthServiceImpl implements AuthService {
         }
 
         log.info("登录成功: {}", authDTO.getUsername());
-        return jwtUtils.generateToken(user.getId());
+        List<String> roles = Collections.emptyList();
+        if (rbacQueryService != null) {
+            try {
+                roles = rbacQueryService.getUserRoleCodes(user.getId());
+            } catch (Exception ignored) {
+                roles = Collections.emptyList();
+            }
+        }
+        return jwtUtils.generateToken(user.getId(), roles);
     }
 }

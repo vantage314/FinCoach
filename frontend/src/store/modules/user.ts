@@ -23,11 +23,14 @@ export const useUserStore = defineStore('user', () => {
     const username = ref<string>(localStorage.getItem('username') || '');
     const email = ref<string>(localStorage.getItem('email') || '');
     const userInfo = ref<UserInfo | null>(null);
-    const roles = ref<string[]>(loadRolesFromStorage());
+    const roles = ref<string[]>([]);
 
     // 计算属性
     const isLoggedIn = computed(() => !!token.value);
-    const isAdmin = computed(() => roles.value.some((role) => isAdminRole(role)));
+    const isAdmin = computed(() => {
+        const derived = extractRolesFromPayload(parseJwtPayload(token.value || ''));
+        return derived.some((role) => isAdminRole(role));
+    });
 
     /**
      * 登录
@@ -38,7 +41,7 @@ export const useUserStore = defineStore('user', () => {
         try {
             const res: any = await request.post('/auth/login', form);
             if (res.code === 200 && res.data) {
-                const { token: loginToken, roles: loginRoles } = normalizeLoginResponse(res.data);
+                const { token: loginToken } = normalizeLoginResponse(res.data);
                 if (!loginToken) {
                     return false;
                 }
@@ -46,25 +49,12 @@ export const useUserStore = defineStore('user', () => {
                 username.value = form.username;
                 userInfo.value = { username: form.username };
                 roles.value = syncRolesFromToken(loginToken);
-                if (!roles.value.length && loginRoles.length) {
-                    roles.value = loginRoles;
-                    localStorage.setItem('roles', JSON.stringify(roles.value));
-                }
-                if (!roles.value.length) {
-                    const profileRoles = await tryLoadRolesFromProfile();
-                    if (profileRoles.length) {
-                        roles.value = profileRoles;
-                        localStorage.setItem('roles', JSON.stringify(roles.value));
-                    }
-                }
 
                 // 持久化
                 localStorage.setItem('token', loginToken);
                 localStorage.setItem('username', form.username);
 
-                if (import.meta.env.DEV) {
-                    console.log('[UserStore] 登录成功，roles=', roles.value);
-                }
+                console.debug('[UserStore] 登录成功，roles=', roles.value);
                 return true;
             }
             return false;
@@ -82,10 +72,7 @@ export const useUserStore = defineStore('user', () => {
         username.value = newUsername;
         email.value = newEmail || '';
         userInfo.value = { username: newUsername, email: newEmail, roles: newRoles };
-        roles.value = newRoles && newRoles.length ? normalizeRoles(newRoles) : syncRolesFromToken(newToken);
-        if (newRoles && newRoles.length) {
-            localStorage.setItem('roles', JSON.stringify(roles.value));
-        }
+        roles.value = syncRolesFromToken(newToken);
         localStorage.setItem('token', newToken);
         localStorage.setItem('username', newUsername);
         if (newEmail !== undefined) {
@@ -122,10 +109,7 @@ export const useUserStore = defineStore('user', () => {
         const storedEmail = localStorage.getItem('email');
         if (storedToken) {
             token.value = storedToken;
-            roles.value = loadRolesFromStorage();
-            if (!roles.value.length) {
-                roles.value = syncRolesFromToken(storedToken);
-            }
+            roles.value = syncRolesFromToken(storedToken);
         }
         if (storedUsername) {
             username.value = storedUsername;
@@ -154,17 +138,6 @@ export const useUserStore = defineStore('user', () => {
 const isAdminRole = (role: string) => {
     const normalized = role?.toUpperCase?.() || '';
     return normalized === 'ADMIN' || normalized === 'ROLE_ADMIN';
-};
-
-const loadRolesFromStorage = (): string[] => {
-    const raw = localStorage.getItem('roles');
-    if (!raw) return [];
-    try {
-        const parsed = JSON.parse(raw);
-        return normalizeRoles(parsed);
-    } catch {
-        return [];
-    }
 };
 
 const normalizeRoles = (input: unknown): string[] => {
@@ -197,25 +170,13 @@ const extractRolesFromPayload = (payload: Record<string, unknown> | null): strin
     return normalizeRoles(rawRoles);
 };
 
-const normalizeLoginResponse = (data: any): { token: string; roles: string[] } => {
-    if (!data) return { token: '', roles: [] };
+const normalizeLoginResponse = (data: any): { token: string } => {
+    if (!data) return { token: '' };
     if (typeof data === 'string') {
-        return { token: data, roles: [] };
+        return { token: data };
     }
     const token = data.token || data.accessToken || data.jwt || data.data;
-    const roles = normalizeRoles(data.roles ?? data.authorities ?? data.role);
-    return { token: typeof token === 'string' ? token : '', roles };
-};
-
-const tryLoadRolesFromProfile = async (): Promise<string[]> => {
-    try {
-        const res: any = await request.get('/user/profile');
-        if (res?.code !== 200) return [];
-        const profile = res?.data || {};
-        return normalizeRoles(profile.roles ?? profile.authorities ?? profile.role);
-    } catch {
-        return [];
-    }
+    return { token: typeof token === 'string' ? token : '' };
 };
 
 const syncRolesFromToken = (tokenValue: string | null): string[] => {
@@ -225,21 +186,10 @@ const syncRolesFromToken = (tokenValue: string | null): string[] => {
     if (tokenValue.split('.').length !== 3) {
         return [];
     }
-    const isDev = import.meta.env.MODE === 'development';
     const payload = parseJwtPayload(tokenValue);
-    let derived = extractRolesFromPayload(payload);
-    if (!derived.length && isDev) {
-        // TODO(devOnly): remove fallback in production builds
-        const subject = (payload as any)?.sub;
-        if (subject && String(subject) === '1') {
-            derived = ['ADMIN'];
-            console.warn('[UserStore] roles empty, applied dev admin fallback for userId=1');
-        }
-    }
+    const derived = extractRolesFromPayload(payload);
     localStorage.setItem('roles', JSON.stringify(derived));
-    if (isDev) {
-        console.log('[UserStore] roles from token', derived);
-    }
+    console.debug('[UserStore] roles from token', derived);
     return derived;
 };
 
