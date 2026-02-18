@@ -52,6 +52,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     private static final String STATUS_RUNNING = "RUNNING";
     private static final String STATUS_STOPPED = "STOPPED";
     private static final String STATUS_FAILED = "FAILED";
+    private static final String LEGACY_DEMO_KEY = "DEMO_DB";
     private static final int DEMO_DAYS = 20;
     private static final List<DemoMapping> DEMO_MAPPINGS = List.of(
             new DemoMapping("STOCK", "SPY.US", "US", 100),
@@ -130,6 +131,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     public AdminDataSourceImportResultDTO importDemoData(Long actorUserId) {
         long userId = actorUserId != null ? actorUserId : 1L;
         LocalDateTime now = LocalDateTime.now();
+        cleanupLegacyDemoData(now);
         int insertedMappings = ensureTickerMappings();
 
         LocalDate end = LocalDate.now();
@@ -575,6 +577,16 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             inserted++;
         }
         return inserted;
+    }
+
+    private void cleanupLegacyDemoData(LocalDateTime now) {
+        snapshotMapper.delete(new QueryWrapper<FcPortfolioPriceSnapshotEntity>()
+                .eq("source", LEGACY_DEMO_KEY));
+        UpdateWrapper<FcTickerMappingEntity> uw = new UpdateWrapper<>();
+        uw.eq("keyword", LEGACY_DEMO_KEY)
+                .set("enabled", 0)
+                .set("updated_at", now);
+        tickerMappingMapper.update(null, uw);
     }
 
     private FcTickerMappingEntity buildMapping(String keyword, String ticker, String market, int priority, LocalDateTime now) {
