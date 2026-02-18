@@ -18,6 +18,7 @@ tmp/
 # IDE files
 .idea/
 .vscode/
+.cursor/
 *.iml
 
 # OS files
