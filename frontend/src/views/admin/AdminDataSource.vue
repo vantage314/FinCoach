@@ -69,6 +69,12 @@
         <el-descriptions-item label="UpdatedAt">{{ job.updatedAt || '-' }}</el-descriptions-item>
       </el-descriptions>
 
+      <el-collapse class="log-panel" v-if="job.lastLog">
+        <el-collapse-item title="最新日志">
+          <pre class="job-log">{{ job.lastLog }}</pre>
+        </el-collapse-item>
+      </el-collapse>
+
       <div class="action-row">
         <el-button
           type="primary"
@@ -239,6 +245,18 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.log-panel {
+  margin-top: 12px;
+}
+
+.job-log {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+  color: #e2e8f0;
+  margin: 0;
 }
 
 .tips {
