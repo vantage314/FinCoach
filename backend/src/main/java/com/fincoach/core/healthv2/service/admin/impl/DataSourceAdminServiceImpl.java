@@ -41,10 +41,17 @@ import java.nio.file.Path;
 public class DataSourceAdminServiceImpl implements DataSourceAdminService {
 
     private static final String CFG_KEY_MODE = "DATA_SOURCE_MODE";
+    private static final String CFG_KEY_CRAWLER_MODE = "CRAWLER_MODE";
+    private static final String CFG_KEY_CRAWLER_INTERVAL_SECONDS = "CRAWLER_INTERVAL_SECONDS";
+    private static final String CFG_KEY_CRAWLER_MAX_BATCHES = "CRAWLER_MAX_BATCHES";
     private static final String DEFAULT_MODE = "DEMO_DB";
+    private static final String DEFAULT_CRAWLER_MODE = "DAEMON";
+    private static final int DEFAULT_CRAWLER_INTERVAL_SECONDS = 10;
+    private static final int DEFAULT_CRAWLER_MAX_BATCHES = 0;
     private static final String JOB_NAME = "PY_MARKET_CRAWLER";
     private static final String STATUS_RUNNING = "RUNNING";
     private static final String STATUS_STOPPED = "STOPPED";
+    private static final String STATUS_FAILED = "FAILED";
     private static final int DEMO_DAYS = 20;
     private static final List<DemoMapping> DEMO_MAPPINGS = List.of(
             new DemoMapping("STOCK", "SPY.US", "US", 100),
@@ -78,9 +85,13 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     public AdminDataSourceStatusDTO getStatus(Long actorUserId) {
         FcSystemConfigEntity config = ensureModeConfig(actorUserId);
         FcJobStatusEntity job = ensureJobStatus();
+        CrawlerConfig crawlerConfig = loadCrawlerConfig(actorUserId);
 
         AdminDataSourceStatusDTO dto = new AdminDataSourceStatusDTO();
         dto.setMode(config != null && config.getCfgValue() != null ? config.getCfgValue() : DEFAULT_MODE);
+        dto.setCrawlerMode(crawlerConfig.mode);
+        dto.setCrawlerIntervalSeconds(crawlerConfig.intervalSeconds);
+        dto.setCrawlerMaxBatches(crawlerConfig.maxBatches);
         dto.setJob(toJobDto(job));
         return dto;
     }
@@ -118,6 +129,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     @Override
     public AdminDataSourceImportResultDTO importDemoData(Long actorUserId) {
         long userId = actorUserId != null ? actorUserId : 1L;
+        LocalDateTime now = LocalDateTime.now();
         int insertedMappings = ensureTickerMappings();
 
         LocalDate end = LocalDate.now();
@@ -126,7 +138,6 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         int inserted = 0;
         int skipped = 0;
         BigDecimal base = new BigDecimal("100000.00");
-        LocalDateTime now = LocalDateTime.now();
 
         int assetSize = DEMO_MAPPINGS.size();
         for (int i = 0; i < DEMO_DAYS; i++) {
@@ -179,6 +190,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             dto.setMessage("already running");
             return dto;
         }
+        CrawlerConfig crawlerConfig = loadCrawlerConfig(actorUserId);
         AtomicBoolean stopSignal = new AtomicBoolean(false);
         crawlerStopSignal = stopSignal;
         LocalDateTime now = LocalDateTime.now();
@@ -193,7 +205,7 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
                 .set("updated_at", now);
         jobStatusMapper.update(null, uw);
 
-        crawlerFuture = crawlerExecutor.submit(() -> runCrawler(actorUserId, stopSignal));
+        crawlerFuture = crawlerExecutor.submit(() -> runCrawlerLoop(actorUserId, crawlerConfig, stopSignal));
 
         log.info("event=PY_CRAWLER_START userId={} job={}", actorUserId, JOB_NAME);
         AdminJobActionResultDTO dto = new AdminJobActionResultDTO();
@@ -233,9 +245,41 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         return crawlerFuture != null && !crawlerFuture.isDone();
     }
 
-    private void runCrawler(Long actorUserId, AtomicBoolean stopSignal) {
+    private void runCrawlerLoop(Long actorUserId, CrawlerConfig crawlerConfig, AtomicBoolean stopSignal) {
         long userId = actorUserId != null ? actorUserId : 1L;
         String scriptPath = resolveScriptPath();
+        int batches = 0;
+        try {
+            while (!stopSignal.get()) {
+                batches++;
+                CrawlerRunResult result = runCrawlerBatch(userId, scriptPath, stopSignal);
+                updateJobHeartbeat(LocalDateTime.now());
+                if (!result.isSuccess()) {
+                    if (stopSignal.get()) {
+                        break;
+                    }
+                    updateJobFailed(result.getError());
+                    return;
+                }
+                if (crawlerConfig.shouldStopAfterBatch(batches)) {
+                    break;
+                }
+                if (crawlerConfig.intervalSeconds > 0) {
+                    try {
+                        Thread.sleep(crawlerConfig.intervalSeconds * 1000L);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            }
+            updateJobStopped();
+        } catch (Exception e) {
+            updateJobFailed(e.getMessage());
+        }
+    }
+
+    private CrawlerRunResult runCrawlerBatch(long userId, String scriptPath, AtomicBoolean stopSignal) {
         List<String> logLines = new ArrayList<>();
         Consumer<String> lineConsumer = (line) -> {
             if (line == null || line.isBlank()) return;
@@ -244,20 +288,10 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             updateJobLog(aggregated, LocalDateTime.now());
             handleCrawlerLine(line, userId);
         };
-
         CrawlerRunResult result = crawlerRunner.run(new CrawlerRunRequest(scriptPath), lineConsumer, stopSignal);
-        LocalDateTime finishedAt = LocalDateTime.now();
-        UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
-        uw.eq("job_name", JOB_NAME)
-                .set("status", STATUS_STOPPED)
-                .set("last_end_at", finishedAt)
-                .set("updated_at", finishedAt);
-        if (!result.isSuccess()) {
-            uw.set("last_error", trimError(result.getError()));
-        }
-        jobStatusMapper.update(null, uw);
-        log.info("event=PY_CRAWLER_FINISH userId={} success={} lines={}",
-                actorUserId, result.isSuccess(), result.getLines());
+        log.info("event=PY_CRAWLER_BATCH userId={} success={} lines={}",
+                userId, result.isSuccess(), result.getLines());
+        return result;
     }
 
     private void updateJobLog(String logValue, LocalDateTime now) {
@@ -265,6 +299,35 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         uw.eq("job_name", JOB_NAME)
                 .set("last_log", trimLog(logValue))
                 .set("last_heartbeat_at", now)
+                .set("updated_at", now);
+        jobStatusMapper.update(null, uw);
+    }
+
+    private void updateJobHeartbeat(LocalDateTime now) {
+        UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
+        uw.eq("job_name", JOB_NAME)
+                .set("last_heartbeat_at", now)
+                .set("updated_at", now);
+        jobStatusMapper.update(null, uw);
+    }
+
+    private void updateJobStopped() {
+        LocalDateTime now = LocalDateTime.now();
+        UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
+        uw.eq("job_name", JOB_NAME)
+                .set("status", STATUS_STOPPED)
+                .set("last_end_at", now)
+                .set("updated_at", now);
+        jobStatusMapper.update(null, uw);
+    }
+
+    private void updateJobFailed(String error) {
+        LocalDateTime now = LocalDateTime.now();
+        UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
+        uw.eq("job_name", JOB_NAME)
+                .set("status", STATUS_FAILED)
+                .set("last_end_at", now)
+                .set("last_error", trimError(error))
                 .set("updated_at", now);
         jobStatusMapper.update(null, uw);
     }
@@ -339,6 +402,78 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             return normalized;
         }
         return null;
+    }
+
+    private CrawlerConfig loadCrawlerConfig(Long actorUserId) {
+        String modeRaw = ensureConfigValue(CFG_KEY_CRAWLER_MODE, DEFAULT_CRAWLER_MODE, actorUserId);
+        String mode = normalizeCrawlerMode(modeRaw);
+        if (mode == null) {
+            mode = DEFAULT_CRAWLER_MODE;
+        }
+        String intervalRaw = ensureConfigValue(CFG_KEY_CRAWLER_INTERVAL_SECONDS,
+                String.valueOf(DEFAULT_CRAWLER_INTERVAL_SECONDS), actorUserId);
+        String maxBatchesRaw = ensureConfigValue(CFG_KEY_CRAWLER_MAX_BATCHES,
+                String.valueOf(DEFAULT_CRAWLER_MAX_BATCHES), actorUserId);
+
+        int intervalSeconds = parseInt(intervalRaw, DEFAULT_CRAWLER_INTERVAL_SECONDS);
+        if (intervalSeconds <= 0) {
+            intervalSeconds = DEFAULT_CRAWLER_INTERVAL_SECONDS;
+        }
+        int maxBatches = parseInt(maxBatchesRaw, DEFAULT_CRAWLER_MAX_BATCHES);
+        if (maxBatches < 0) {
+            maxBatches = DEFAULT_CRAWLER_MAX_BATCHES;
+        }
+        if ("RUN_ONCE".equals(mode)) {
+            maxBatches = 1;
+        }
+        return new CrawlerConfig(mode, intervalSeconds, maxBatches);
+    }
+
+    private String normalizeCrawlerMode(String mode) {
+        if (mode == null) return null;
+        String normalized = mode.trim().toUpperCase();
+        if ("RUN_ONCE".equals(normalized) || "DAEMON".equals(normalized)) {
+            return normalized;
+        }
+        return null;
+    }
+
+    private int parseInt(String value, int defaultValue) {
+        if (value == null || value.isBlank()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (Exception ignored) {
+            return defaultValue;
+        }
+    }
+
+    private String ensureConfigValue(String key, String defaultValue, Long actorUserId) {
+        FcSystemConfigEntity existing = systemConfigMapper.selectOne(
+                new LambdaQueryWrapper<FcSystemConfigEntity>()
+                        .eq(FcSystemConfigEntity::getCfgKey, key)
+                        .last("LIMIT 1"));
+        if (existing != null && existing.getCfgValue() != null && !existing.getCfgValue().isBlank()) {
+            return existing.getCfgValue();
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (existing == null) {
+            FcSystemConfigEntity created = new FcSystemConfigEntity();
+            created.setCfgKey(key);
+            created.setCfgValue(defaultValue);
+            created.setUpdatedBy(actorUserId);
+            created.setUpdatedAt(now);
+            systemConfigMapper.insert(created);
+        } else {
+            UpdateWrapper<FcSystemConfigEntity> uw = new UpdateWrapper<>();
+            uw.eq("cfg_key", key)
+                    .set("cfg_value", defaultValue)
+                    .set("updated_by", actorUserId)
+                    .set("updated_at", now);
+            systemConfigMapper.update(null, uw);
+        }
+        return defaultValue;
     }
 
     private FcSystemConfigEntity ensureModeConfig(Long actorUserId) {
@@ -459,6 +594,28 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
                 .eq("user_id", userId)
                 .eq("snap_date", date)
                 .last("LIMIT 1"));
+    }
+
+    private static class CrawlerConfig {
+        private final String mode;
+        private final int intervalSeconds;
+        private final int maxBatches;
+
+        private CrawlerConfig(String mode, int intervalSeconds, int maxBatches) {
+            this.mode = mode;
+            this.intervalSeconds = intervalSeconds;
+            this.maxBatches = maxBatches;
+        }
+
+        private boolean shouldStopAfterBatch(int batches) {
+            if ("RUN_ONCE".equals(mode)) {
+                return true;
+            }
+            if (maxBatches > 0) {
+                return batches >= maxBatches;
+            }
+            return false;
+        }
     }
 
     private static class CrawlerPriceLine {

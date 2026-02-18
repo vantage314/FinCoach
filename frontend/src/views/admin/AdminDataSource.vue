@@ -63,11 +63,17 @@
         <el-descriptions-item label="Status">
           <el-tag :type="jobStatusTag">{{ job.status || 'STOPPED' }}</el-tag>
         </el-descriptions-item>
+        <el-descriptions-item label="CrawlerMode">{{ crawlerMode }}</el-descriptions-item>
+        <el-descriptions-item label="Interval">{{ crawlerIntervalSeconds }}s</el-descriptions-item>
         <el-descriptions-item label="LastStartAt">{{ job.lastStartAt || '-' }}</el-descriptions-item>
         <el-descriptions-item label="LastHeartbeatAt">{{ job.lastHeartbeatAt || '-' }}</el-descriptions-item>
         <el-descriptions-item label="LastEndAt">{{ job.lastEndAt || '-' }}</el-descriptions-item>
         <el-descriptions-item label="UpdatedAt">{{ job.updatedAt || '-' }}</el-descriptions-item>
       </el-descriptions>
+
+      <div class="status-hint">
+        {{ statusHint }}
+      </div>
 
       <el-collapse class="log-panel" v-if="job.lastLog">
         <el-collapse-item title="最新日志">
@@ -148,7 +154,9 @@ const runAction = async (key: string, action: () => Promise<any>) => {
   error.value = '';
   try {
     const res: any = await action();
-    if (key === 'import') {
+    if (key === 'start' && res?.data?.message?.includes('already running')) {
+      ElMessage.warning('抓取任务已在运行');
+    } else if (key === 'import') {
       const inserted = res?.data?.insertedSnapshots ?? 0;
       const skipped = res?.data?.skippedSnapshots ?? 0;
       ElMessage.success(`演示数据导入完成，新增 ${inserted} 条，跳过 ${skipped} 条`);
@@ -181,6 +189,11 @@ const stopJob = async () => {
 
 const mode = computed(() => (status.value?.mode || 'DEMO_DB').toUpperCase());
 const job = computed(() => status.value?.job || {});
+const crawlerMode = computed(() => (status.value?.crawlerMode || 'DAEMON').toUpperCase());
+const crawlerIntervalSeconds = computed(() => {
+  const raw = Number(status.value?.crawlerIntervalSeconds || 10);
+  return Number.isFinite(raw) && raw > 0 ? raw : 10;
+});
 
 const modeDescription = computed(() => {
   if (mode.value === 'REALTIME') {
@@ -195,6 +208,40 @@ const jobStatusTag = computed(() => {
   if (state === 'RUNNING') return 'success';
   if (state === 'FAILED') return 'danger';
   return 'info';
+});
+
+const recentlyEnded = () => {
+  const endAt = job.value?.lastEndAt;
+  if (!endAt) return false;
+  const parsed = new Date(endAt).getTime();
+  if (Number.isNaN(parsed)) return false;
+  const diff = Date.now() - parsed;
+  const threshold = Math.max(30, crawlerIntervalSeconds.value * 2) * 1000;
+  return diff >= 0 && diff <= threshold;
+};
+
+const statusHint = computed(() => {
+  const state = (job.value?.status || 'STOPPED').toUpperCase();
+  const modeValue = crawlerMode.value;
+  if (state === 'RUNNING') {
+    if (modeValue === 'RUN_ONCE') {
+      return '本次抓取进行中';
+    }
+    return `持续抓取中（间隔 ${crawlerIntervalSeconds.value} 秒）`;
+  }
+  if (state === 'STOPPED') {
+    if (modeValue === 'RUN_ONCE') {
+      return '本次抓取已完成';
+    }
+    if (recentlyEnded()) {
+      return '已停止/已完成';
+    }
+    return '已停止';
+  }
+  if (state === 'FAILED') {
+    return '抓取失败，请查看错误';
+  }
+  return '-';
 });
 
 onMounted(() => {
@@ -249,6 +296,12 @@ onMounted(() => {
 
 .log-panel {
   margin-top: 12px;
+}
+
+.status-hint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #cbd5f5;
 }
 
 .job-log {
