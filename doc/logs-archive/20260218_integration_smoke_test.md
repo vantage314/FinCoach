@@ -81,6 +81,14 @@ Executed in shell:
 - Local DB lacks many v2 tables; admin + report flows rely on the minimal seed tables above.
 - Admin fallback is **dev-only** (`userId=1`) when RBAC tables are missing and **RBAC fallback is enabled**.
 
+## Dev Profile RBAC Fallback
+- Enable in dev only via Spring profile:
+  - `SPRING_PROFILES_ACTIVE=dev`
+- Dev profile config sets:
+  - `security.rbacFallbackEnabled: true` (in `backend/src/main/resources/application-dev.yml`)
+- Disable by default in production:
+  - Do **not** set `security.rbacFallbackEnabled` and keep profile non-dev.
+
 ## Commits (integration scope)
 - 668e1593 `fix: guard rbac fallback and relocate seeds`
 - e12dfa4b `docs: add integration smoke test log`
