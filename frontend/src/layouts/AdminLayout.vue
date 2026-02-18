@@ -20,6 +20,28 @@
           <el-icon><Monitor /></el-icon>
           <span>Debug 快照</span>
         </el-menu-item>
+        <el-sub-menu index="data-securities">
+          <template #title>
+            <el-icon><Setting /></el-icon>
+            <span>数据与证券</span>
+          </template>
+          <el-menu-item index="/admin/securities/mapping">
+            <el-icon><Setting /></el-icon>
+            <span>证券映射</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/securities/snapshots">
+            <el-icon><Setting /></el-icon>
+            <span>行情快照</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/securities/quality">
+            <el-icon><Setting /></el-icon>
+            <span>数据质量</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/data-source">
+            <el-icon><Setting /></el-icon>
+            <span>数据源与抓取</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu>
 
       <div class="sidebar-footer">

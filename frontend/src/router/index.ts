@@ -128,6 +128,30 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'AdminDebug',
                 component: () => import('../views/admin/AdminDebug.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: 'Debug 快照 - FinCoach' }
+            },
+            {
+                path: 'data-source',
+                name: 'AdminDataSource',
+                component: () => import('../views/admin/AdminDataSource.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '数据源与抓取 - FinCoach' }
+            },
+            {
+                path: 'securities/mapping',
+                name: 'AdminSecuritiesMapping',
+                component: () => import('../views/admin/AdminPlaceholder.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '证券映射 - FinCoach' }
+            },
+            {
+                path: 'securities/snapshots',
+                name: 'AdminSecuritiesSnapshots',
+                component: () => import('../views/admin/AdminPlaceholder.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '行情快照 - FinCoach' }
+            },
+            {
+                path: 'securities/quality',
+                name: 'AdminSecuritiesQuality',
+                component: () => import('../views/admin/AdminPlaceholder.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '数据质量 - FinCoach' }
             }
         ]
     },
