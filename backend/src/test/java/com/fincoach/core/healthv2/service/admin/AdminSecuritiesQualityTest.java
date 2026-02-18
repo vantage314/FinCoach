@@ -33,11 +33,11 @@ public class AdminSecuritiesQualityTest {
         LocalDate d1 = LocalDate.now().minusDays(5);
         LocalDate d2 = LocalDate.now().minusDays(4);
         FcPortfolioPriceSnapshotEntity s1 = new FcPortfolioPriceSnapshotEntity();
-        s1.setDataSource("DEMO_DB");
+        s1.setDataSource("STOCK");
         s1.setAsOfDate(d1);
         s1.setEquity(new BigDecimal("100000"));
         FcPortfolioPriceSnapshotEntity s2 = new FcPortfolioPriceSnapshotEntity();
-        s2.setDataSource("DEMO_DB");
+        s2.setDataSource("STOCK");
         s2.setAsOfDate(d2);
         s2.setEquity(new BigDecimal("100100"));
         when(snapshotMapper.selectList(any())).thenReturn(List.of(s1, s2));
@@ -49,7 +49,7 @@ public class AdminSecuritiesQualityTest {
         assertNotNull(dto);
         assertNotNull(dto.getMissingMappings());
         assertFalse(dto.getMissingMappings().isEmpty());
-        assertTrue(dto.getMissingMappings().stream().anyMatch(m -> "DEMO_DB".equals(m.getAssetKey())));
+        assertTrue(dto.getMissingMappings().stream().anyMatch(m -> "STOCK".equals(m.getAssetKey())));
 
         assertNotNull(dto.getSnapshotCoverage());
         assertNotNull(dto.getSnapshotCoverage().getIssues());

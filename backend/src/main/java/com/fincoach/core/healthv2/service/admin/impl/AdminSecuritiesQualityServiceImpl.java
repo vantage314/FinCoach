@@ -34,6 +34,8 @@ public class AdminSecuritiesQualityServiceImpl implements AdminSecuritiesQuality
     private static final String CFG_SNAPSHOT_MAX_LAG_DAYS = "SNAPSHOT_MAX_LAG_DAYS";
     private static final String CFG_ANOMALY_CHANGE_PCT = "ANOMALY_CHANGE_PCT";
 
+    private static final String LEGACY_DEMO_KEY = "DEMO_DB";
+
     private static final long DEFAULT_MIN_DAYS = 20;
     private static final long DEFAULT_MAX_LAG_DAYS = 3;
     private static final double DEFAULT_ANOMALY_PCT = 0.2;
@@ -64,11 +66,19 @@ public class AdminSecuritiesQualityServiceImpl implements AdminSecuritiesQuality
         Set<String> assetKeys = new LinkedHashSet<>();
         Set<LocalDate> dates = new LinkedHashSet<>();
         Map<String, List<FcPortfolioPriceSnapshotEntity>> byAsset = new LinkedHashMap<>();
+        List<String> legacyDemoKeyIssues = new ArrayList<>();
+        boolean hasAnySnapshots = snapshots != null && !snapshots.isEmpty();
 
         for (FcPortfolioPriceSnapshotEntity snap : snapshots) {
             if (snap == null) continue;
             String rawKey = snap.getDataSource();
             String key = normalizeKey(rawKey);
+            if (LEGACY_DEMO_KEY.equals(key)) {
+                if (!legacyDemoKeyIssues.contains(LEGACY_DEMO_KEY)) {
+                    legacyDemoKeyIssues.add(LEGACY_DEMO_KEY);
+                }
+                continue;
+            }
             if (key.isBlank()) continue;
             assetKeys.add(key);
             if (snap.getAsOfDate() != null) {
@@ -88,16 +98,17 @@ public class AdminSecuritiesQualityServiceImpl implements AdminSecuritiesQuality
         coverage.setDaysCovered(dates.size());
         coverage.setLatestDate(latestDate == null ? null : latestDate.toString());
         coverage.setLagDays(lagDays);
-        coverage.setIssues(buildCoverageIssues(assetKeys, dates, latestDate, lagDays, minDays, maxLagDays));
+        coverage.setIssues(buildCoverageIssues(assetKeys, dates, latestDate, lagDays, minDays, maxLagDays, hasAnySnapshots));
 
         List<AdminSecuritiesQualityMissingMappingDTO> missingMappings = buildMissingMappings(assetKeys);
         List<AdminSecuritiesQualityAnomalyDTO> anomalies = detectAnomalies(byAsset, anomalyThreshold);
 
         AdminSecuritiesQualityDTO dto = new AdminSecuritiesQualityDTO();
         dto.setMissingMappings(missingMappings);
+        dto.setLegacyDemoKeyIssues(legacyDemoKeyIssues);
         dto.setSnapshotCoverage(coverage);
         dto.setAnomalies(anomalies);
-        dto.setRecommendations(buildRecommendations(missingMappings, coverage, anomalies));
+        dto.setRecommendations(buildRecommendations(missingMappings, coverage, anomalies, legacyDemoKeyIssues));
         return dto;
     }
 
@@ -176,9 +187,10 @@ public class AdminSecuritiesQualityServiceImpl implements AdminSecuritiesQuality
                                              LocalDate latestDate,
                                              long lagDays,
                                              long minDays,
-                                             long maxLagDays) {
+                                             long maxLagDays,
+                                             boolean hasAnySnapshots) {
         List<String> issues = new ArrayList<>();
-        if (dates == null || dates.isEmpty()) {
+        if (!hasAnySnapshots) {
             issues.add("没有快照数据");
         }
         if (assetKeys == null || assetKeys.isEmpty()) {
@@ -196,10 +208,14 @@ public class AdminSecuritiesQualityServiceImpl implements AdminSecuritiesQuality
 
     private List<String> buildRecommendations(List<AdminSecuritiesQualityMissingMappingDTO> missingMappings,
                                               AdminSecuritiesQualityCoverageDTO coverage,
-                                              List<AdminSecuritiesQualityAnomalyDTO> anomalies) {
+                                              List<AdminSecuritiesQualityAnomalyDTO> anomalies,
+                                              List<String> legacyDemoKeyIssues) {
         List<String> recs = new ArrayList<>();
         if (missingMappings != null && !missingMappings.isEmpty()) {
             recs.add("补齐 ticker mapping（可前往 证券映射 页面）");
+        }
+        if (legacyDemoKeyIssues != null && !legacyDemoKeyIssues.isEmpty()) {
+            recs.add("清理遗留 DEMO_DB 演示数据");
         }
         if (coverage != null) {
             boolean hasNoSnapshots = coverage.getIssues() != null && coverage.getIssues().stream().anyMatch(v -> v.contains("没有快照数据"));
