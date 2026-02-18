@@ -31,8 +31,8 @@ public class DashboardController {
     @Autowired
     private FcAlertRecordMapper alertRecordMapper;
 
-    @GetMapping("/stats")
-    @Operation(summary = "全局统计")
+    @GetMapping("/stats/simple")
+    @Operation(summary = "全局统计（简版）")
     public Result<Map<String, Object>> stats() {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("totalUsers", userMapper.selectCount(null));
