@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import AuthLayout from '../layout/AuthLayout.vue';
-import UserLayout from '../layouts/UserLayout.vue';
+import UserLayout from '../layouts/UserTopLayout.vue';
 import AdminLayout from '../layouts/AdminLayout.vue';
 import Login from '../pages/auth/Login.vue';
 import Register from '../pages/auth/Register.vue';
