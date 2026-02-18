@@ -225,9 +225,11 @@ const syncRolesFromToken = (tokenValue: string | null): string[] => {
     if (tokenValue.split('.').length !== 3) {
         return [];
     }
+    const isDev = import.meta.env.MODE === 'development';
     const payload = parseJwtPayload(tokenValue);
     let derived = extractRolesFromPayload(payload);
-    if (!derived.length && import.meta.env.DEV) {
+    if (!derived.length && isDev) {
+        // TODO(devOnly): remove fallback in production builds
         const subject = (payload as any)?.sub;
         if (subject && String(subject) === '1') {
             derived = ['ADMIN'];
@@ -235,7 +237,7 @@ const syncRolesFromToken = (tokenValue: string | null): string[] => {
         }
     }
     localStorage.setItem('roles', JSON.stringify(derived));
-    if (import.meta.env.DEV) {
+    if (isDev) {
         console.log('[UserStore] roles from token', derived);
     }
     return derived;

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import AuthLayout from '../layout/AuthLayout.vue';
-import TopLayout from '../layout/TopLayout.vue';
+import UserLayout from '../layouts/UserLayout.vue';
+import AdminLayout from '../layouts/AdminLayout.vue';
 import Login from '../pages/auth/Login.vue';
 import Register from '../pages/auth/Register.vue';
 import pinia from '../store';
@@ -8,12 +9,10 @@ import { useUserStore } from '@/store/modules/user';
 import { ElMessage } from 'element-plus';
 
 const routes: Array<RouteRecordRaw> = [
-    // 根路径重定向到资产管理（登录后默认页面）
     {
         path: '/',
-        redirect: '/dashboard',
+        redirect: '/app/diagnosis',
     },
-    // 认证相关路由（登录、注册）
     {
         path: '/auth',
         component: AuthLayout,
@@ -32,104 +31,112 @@ const routes: Array<RouteRecordRaw> = [
             }
         ]
     },
-    // 主应用路由 - 使用 TopLayout 顶部导航布局
     {
-        path: '/',
-        component: TopLayout,
+        path: '/app',
+        component: UserLayout,
         meta: { requiresAuth: true },
         children: [
             {
-                path: '/dashboard',
+                path: '',
+                redirect: '/app/diagnosis',
+            },
+            {
+                path: 'dashboard',
                 name: 'Dashboard',
                 component: () => import('../views/dashboard/Index.vue'),
                 meta: { requiresAuth: true, title: '资产管理 - FinCoach' }
             },
             {
-                path: '/market',
+                path: 'market',
                 name: 'Market',
-                // 使用 @ 别名，指向 src 目录，确保 Index.vue 首字母大写
                 component: () => import('@/views/market/Index.vue'),
                 meta: { title: '市场中心', requiresAuth: true }
             },
-            // 🔥 新增：证券详情页
             {
-                path: '/market/detail/:code',
+                path: 'market/detail/:code',
                 name: 'StockDetail',
                 component: () => import('@/views/market/StockDetail.vue'),
                 meta: { title: '证券详情', requiresAuth: true }
             },
             {
-                path: '/market/security/:id',
+                path: 'market/security/:id',
                 name: 'SecurityDetail',
                 component: () => import('../views/market/SecurityDetail.vue'),
                 meta: { requiresAuth: true, title: '证券详情 - FinCoach' }
             },
             {
-                path: '/diagnosis',
+                path: 'diagnosis',
                 name: 'Diagnosis',
                 component: () => import('../views/diagnosis/Index.vue'),
                 meta: { requiresAuth: true, title: '资产体检 - FinCoach' }
             },
             {
-                path: '/plan',
+                path: 'plan',
                 name: 'Plan',
                 component: () => import('../views/plan/Index.vue'),
                 meta: { requiresAuth: true, title: '投资计划 - FinCoach' }
             },
-            // 🔥 新增：智能投资驾驶舱
             {
-                path: '/investment',
+                path: 'investment',
                 name: 'Investment',
                 component: () => import('@/views/investment/Index.vue'),
                 meta: { title: '智能投资驾驶舱', requiresAuth: true }
             },
             {
-                path: '/chat',
+                path: 'chat',
                 name: 'AiChat',
                 component: () => import('@/views/chat/Index.vue'),
                 meta: { title: 'AI 咨询', requiresAuth: true }
             },
-            // Phase 14: 资产分析与健康体检
             {
-                path: '/asset/analysis',
+                path: 'asset/analysis',
                 name: 'AssetAnalysis',
                 component: () => import('@/views/asset/Analysis.vue'),
                 meta: { title: '资产分析 - FinCoach', requiresAuth: true }
             },
-            // Phase 14.5: 资产管理
             {
-                path: '/asset/manage',
+                path: 'asset/manage',
                 name: 'AssetManage',
                 component: () => import('@/views/asset/Index.vue'),
                 meta: { title: '资产管理 - FinCoach', requiresAuth: true }
             },
             {
-                path: '/user/profile',
+                path: 'user/profile',
                 name: 'UserProfile',
                 component: () => import('../views/user/Profile.vue'),
                 meta: { requiresAuth: true, title: '个人中心 - FinCoach' }
+            }
+        ]
+    },
+    {
+        path: '/admin',
+        component: AdminLayout,
+        meta: { requiresAuth: true, roles: ['ADMIN'] },
+        children: [
+            {
+                path: '',
+                redirect: '/admin/alerts',
             },
             {
-                path: '/admin/alerts',
+                path: 'alerts',
                 name: 'AdminAlerts',
                 component: () => import('../views/admin/AdminAlerts.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: '预警管理 - FinCoach' }
             },
             {
-                path: '/admin/debug',
+                path: 'debug',
                 name: 'AdminDebug',
                 component: () => import('../views/admin/AdminDebug.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: 'Debug 快照 - FinCoach' }
-            },
-            {
-                path: '/403',
-                name: 'Forbidden',
-                component: () => import('../views/common/Forbidden.vue'),
-                meta: { requiresAuth: true, title: '无权限 - FinCoach' }
             }
         ]
     },
-    // 风险测评路由（保持独立，不使用 TopLayout）
+    {
+        path: '/403',
+        name: 'Forbidden',
+        component: () => import('../views/common/Forbidden.vue'),
+        meta: { requiresAuth: true, title: '无权限 - FinCoach' }
+    },
     {
         path: '/risk/assessment',
         name: 'RiskAssessment',
@@ -141,6 +148,51 @@ const routes: Array<RouteRecordRaw> = [
         name: 'RiskResult',
         component: () => import('../views/risk/AssessmentResult.vue'),
         meta: { requiresAuth: true, title: '测评结果 - FinCoach' }
+    },
+    // Legacy path compatibility
+    {
+        path: '/dashboard',
+        redirect: '/app/dashboard',
+    },
+    {
+        path: '/market',
+        redirect: '/app/market',
+    },
+    {
+        path: '/market/detail/:code',
+        redirect: (to) => `/app/market/detail/${to.params.code}`,
+    },
+    {
+        path: '/market/security/:id',
+        redirect: (to) => `/app/market/security/${to.params.id}`,
+    },
+    {
+        path: '/diagnosis',
+        redirect: '/app/diagnosis',
+    },
+    {
+        path: '/plan',
+        redirect: '/app/plan',
+    },
+    {
+        path: '/investment',
+        redirect: '/app/investment',
+    },
+    {
+        path: '/chat',
+        redirect: '/app/chat',
+    },
+    {
+        path: '/asset/analysis',
+        redirect: '/app/asset/analysis',
+    },
+    {
+        path: '/asset/manage',
+        redirect: '/app/asset/manage',
+    },
+    {
+        path: '/user/profile',
+        redirect: '/app/user/profile',
     }
 ];
 
@@ -149,41 +201,46 @@ const router = createRouter({
     routes,
 });
 
-// 全局路由守卫
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
     const userStore = useUserStore(pinia);
 
-    // 设置页面标题
     if (to.meta.title) {
         document.title = to.meta.title as string;
     }
 
-    // 白名单路径 (无需登录)
     const whiteList = ['/login', '/register'];
+    const isAuthRoute = to.path.startsWith('/app') || to.path.startsWith('/admin');
+    const requiresAuth = isAuthRoute || !!to.meta.requiresAuth;
 
     if (whiteList.includes(to.path)) {
-        // 已登录用户访问登录/注册页，重定向到首页
         if (token) {
-            next('/dashboard');
+            const target = userStore.isAdmin ? '/admin/alerts' : '/app/diagnosis';
+            next(target);
         } else {
             next();
         }
-    } else if (to.meta.requiresAuth && !token) {
-        // 需要认证但未登录，跳转登录页
-        next('/login');
-    } else if (to.meta.roles && Array.isArray(to.meta.roles)) {
-        const required = (to.meta.roles as string[]).map((role) => role.toUpperCase());
-        const needsAdmin = required.includes('ADMIN') || required.includes('ROLE_ADMIN');
-        if (needsAdmin && !userStore.isAdmin) {
-            ElMessage.error('无权限访问该页面');
-            next('/403');
-        } else {
-            next();
-        }
-    } else {
-        next();
+        return;
     }
+
+    if (requiresAuth && !token) {
+        next('/login');
+        return;
+    }
+
+    const roles = Array.isArray(to.meta.roles) ? to.meta.roles : [];
+    const needsAdmin = to.path.startsWith('/admin') || roles.some((role) => {
+        const normalized = String(role).toUpperCase();
+        return normalized === 'ADMIN' || normalized === 'ROLE_ADMIN';
+    });
+
+    if (needsAdmin && !userStore.isAdmin) {
+        ElMessage.error('无权限访问该页面');
+        next('/403');
+        return;
+    }
+
+    next();
 });
 
 export default router;

@@ -88,7 +88,8 @@ const handleLogin = async () => {
           // 使用 userStore 保存 token 和 username
           userStore.setUser(res.data, loginForm.username);
           ElMessage.success('登录成功');
-          router.push('/dashboard');
+          const target = userStore.isAdmin ? '/admin/alerts' : '/app/diagnosis';
+          router.push(target);
         } else {
           ElMessage.error(res.message || '登录失败');
         }
