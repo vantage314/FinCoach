@@ -5,7 +5,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.fincoach.core.repository")
+@MapperScan({
+        "com.fincoach.core.repository.mapper",
+        "com.fincoach.core.healthv2.mapper",
+        "com.fincoach.core.rbac.mapper",
+        "com.fincoach.core.ticker.mapper"
+})
 public class CoreApplication {
     public static void main(String[] args) {
         SpringApplication.run(CoreApplication.class, args);
