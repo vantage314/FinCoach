@@ -67,6 +67,12 @@
         <el-descriptions-item label="Interval">{{ crawlerIntervalSeconds }}s</el-descriptions-item>
         <el-descriptions-item label="LastStartAt">{{ job.lastStartAt || '-' }}</el-descriptions-item>
         <el-descriptions-item label="LastHeartbeatAt">{{ job.lastHeartbeatAt || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="Stale">
+          <el-tag :type="staleTag">{{ staleLabel }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="SecondsSinceHeartbeat">
+          {{ secondsSinceHeartbeat ?? '-' }}
+        </el-descriptions-item>
         <el-descriptions-item label="LastEndAt">{{ job.lastEndAt || '-' }}</el-descriptions-item>
         <el-descriptions-item label="UpdatedAt">{{ job.updatedAt || '-' }}</el-descriptions-item>
       </el-descriptions>
@@ -89,6 +95,14 @@
           @click="startJob"
         >
           启动抓取
+        </el-button>
+        <el-button
+          type="warning"
+          :loading="actionLoading === 'recover'"
+          :disabled="job.status === 'STOPPING'"
+          @click="recoverJob"
+        >
+          恢复抓取
         </el-button>
         <el-button
           type="danger"
@@ -122,16 +136,19 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import {
   fetchDataSourceStatus,
+  fetchRealtimeHealth,
   switchDataSourceMode,
   importDemoData,
   startRealtimeJob,
   stopRealtimeJob,
+  recoverRealtimeJob,
 } from '@/api/adminDataSource';
 
 const status = ref<any>(null);
+const health = ref<any>(null);
 const loading = ref(false);
 const error = ref('');
 const actionLoading = ref('');
@@ -140,8 +157,12 @@ const loadStatus = async () => {
   loading.value = true;
   error.value = '';
   try {
-    const res: any = await fetchDataSourceStatus();
-    status.value = res?.data || null;
+    const [statusRes, healthRes]: any = await Promise.all([
+      fetchDataSourceStatus(),
+      fetchRealtimeHealth(),
+    ]);
+    status.value = statusRes?.data || null;
+    health.value = healthRes?.data || null;
   } catch (e: any) {
     error.value = e?.message || '加载状态失败';
   } finally {
@@ -187,6 +208,19 @@ const stopJob = async () => {
   await runAction('stop', () => stopRealtimeJob());
 };
 
+const recoverJob = async () => {
+  try {
+    await ElMessageBox.confirm('确认触发恢复抓取？将尝试重启实时抓取任务。', '恢复确认', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+  } catch (e) {
+    return;
+  }
+  await runAction('recover', () => recoverRealtimeJob());
+};
+
 const mode = computed(() => (status.value?.mode || 'DEMO_DB').toUpperCase());
 const job = computed(() => status.value?.job || {});
 const crawlerMode = computed(() => (status.value?.crawlerMode || 'DAEMON').toUpperCase());
@@ -208,6 +242,19 @@ const jobStatusTag = computed(() => {
   if (state === 'RUNNING') return 'success';
   if (state === 'FAILED') return 'danger';
   return 'info';
+});
+
+const staleLabel = computed(() => {
+  const stale = health.value?.stale ?? job.value?.stale;
+  return stale ? 'STALE' : 'OK';
+});
+
+const staleTag = computed(() => (staleLabel.value === 'STALE' ? 'danger' : 'success'));
+
+const secondsSinceHeartbeat = computed(() => {
+  const raw = health.value?.secondsSinceHeartbeat ?? job.value?.secondsSinceHeartbeat;
+  const num = Number(raw);
+  return Number.isFinite(num) ? num : null;
 });
 
 const recentlyEnded = () => {

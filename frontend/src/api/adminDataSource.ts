@@ -19,3 +19,11 @@ export const startRealtimeJob = () => {
 export const stopRealtimeJob = () => {
   return request.post('/admin/api/data-source/realtime/stop', {}, { baseURL: '' });
 };
+
+export const fetchRealtimeHealth = () => {
+  return request.get('/admin/api/data-source/realtime/health', { baseURL: '' });
+};
+
+export const recoverRealtimeJob = () => {
+  return request.post('/admin/api/data-source/realtime/recover', {}, { baseURL: '' });
+};

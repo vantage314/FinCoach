@@ -6,6 +6,7 @@ import com.fincoach.core.healthv2.dto.admin.AdminDataSourceImportResultDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminDataSourceStatusDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminDataSourceSwitchRequest;
 import com.fincoach.core.healthv2.dto.admin.AdminJobActionResultDTO;
+import com.fincoach.core.healthv2.dto.admin.AdminRealtimeHealthDTO;
 import com.fincoach.core.healthv2.service.admin.DataSourceAdminService;
 import com.fincoach.core.security.AdminOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,6 +65,20 @@ public class DataSourceAdminController {
     public Result<AdminJobActionResultDTO> stopRealtime() {
         Long actorUserId = UserContext.getCurrentUserId();
         AdminJobActionResultDTO dto = dataSourceAdminService.stopRealtime(actorUserId);
+        return Result.success(dto);
+    }
+
+    @GetMapping("/realtime/health")
+    public Result<AdminRealtimeHealthDTO> health() {
+        Long actorUserId = UserContext.getCurrentUserId();
+        AdminRealtimeHealthDTO dto = dataSourceAdminService.getRealtimeHealth(actorUserId);
+        return Result.success(dto);
+    }
+
+    @PostMapping("/realtime/recover")
+    public Result<AdminJobActionResultDTO> recover() {
+        Long actorUserId = UserContext.getCurrentUserId();
+        AdminJobActionResultDTO dto = dataSourceAdminService.recoverRealtime(actorUserId);
         return Result.success(dto);
     }
 }

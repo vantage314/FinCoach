@@ -8,6 +8,7 @@ import com.fincoach.core.healthv2.dto.admin.AdminDataSourceImportResultDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminDataSourceStatusDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminJobActionResultDTO;
 import com.fincoach.core.healthv2.dto.admin.AdminJobStatusDTO;
+import com.fincoach.core.healthv2.dto.admin.AdminRealtimeHealthDTO;
 import com.fincoach.core.healthv2.entity.FcPortfolioPriceSnapshotEntity;
 import com.fincoach.core.healthv2.mapper.FcPortfolioPriceSnapshotMapper;
 import com.fincoach.core.healthv2.service.admin.CrawlerRunRequest;
@@ -301,6 +302,41 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
         dto.setStatus(hasRunningFuture ? STATUS_STOPPING : STATUS_STOPPED);
         dto.setMessage("stop requested");
         return dto;
+    }
+
+    @Override
+    public AdminRealtimeHealthDTO getRealtimeHealth(Long actorUserId) {
+        FcJobStatusEntity job = ensureJobStatus();
+        LocalDateTime now = LocalDateTime.now();
+        AdminRealtimeHealthDTO dto = new AdminRealtimeHealthDTO();
+        if (job == null) {
+            dto.setStatus(STATUS_STOPPED);
+            dto.setStale(false);
+            return dto;
+        }
+        dto.setStatus(normalizeStatus(job.getStatus()));
+        dto.setLastHeartbeatAt(formatTime(job.getLastHeartbeatAt()));
+        dto.setSecondsSinceHeartbeat(secondsSinceHeartbeat(job, now));
+        dto.setLastStartAt(formatTime(job.getLastStartAt()));
+        dto.setLastEndAt(formatTime(job.getLastEndAt()));
+        dto.setStale(isStale(job, now));
+        return dto;
+    }
+
+    @Override
+    @Transactional
+    public AdminJobActionResultDTO recoverRealtime(Long actorUserId) {
+        ensureJobStatus();
+        FcJobStatusEntity job = lockJobStatus();
+        String status = normalizeStatus(job != null ? job.getStatus() : null);
+        if (STATUS_STOPPING.equals(status)) {
+            AdminJobActionResultDTO dto = new AdminJobActionResultDTO();
+            dto.setJobName(JOB_NAME);
+            dto.setStatus(STATUS_STOPPING);
+            dto.setMessage("stop in progress");
+            return dto;
+        }
+        return startRealtime(actorUserId);
     }
 
     private boolean isCrawlerRunning() {
