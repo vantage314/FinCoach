@@ -12,6 +12,7 @@ public class LogLimiterTest {
         assertNull(LogLimiter.truncate(null, 10));
         assertEquals("", LogLimiter.truncate("abc", 0));
         assertEquals("abc", LogLimiter.truncate("abc", 10));
-        assertEquals("abcd", LogLimiter.truncate("abcdef", 4));
+        assertEquals("cdef", LogLimiter.truncate("abcdef", 4));
+        assertEquals("ef", LogLimiter.appendAndTruncate("abcd", "ef", 2));
     }
 }

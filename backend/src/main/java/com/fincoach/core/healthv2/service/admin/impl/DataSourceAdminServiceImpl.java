@@ -220,14 +220,14 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
             return dto;
         }
         if (STATUS_RUNNING.equals(status) && stale) {
-            String line = formatLogLine(now, "WARN", "STALE detected, auto-restarting");
-            String merged = mergeLog(job != null ? job.getLastLog() : null, line);
+        String line = formatLogLine(now, "WARN", "STALE detected, auto-restarting");
+        String merged = LogLimiter.appendAndTruncate(job != null ? job.getLastLog() : null, line, logMaxChars);
             UpdateWrapper<FcJobStatusEntity> staleUpdate = new UpdateWrapper<>();
             staleUpdate.eq("job_name", JOB_NAME)
                     .set("status", STATUS_STOPPED)
                     .set("last_end_at", now)
-                    .set("last_log", trimLog(merged))
-                    .set("updated_at", now);
+                .set("last_log", merged)
+                .set("updated_at", now);
             jobStatusMapper.update(null, staleUpdate);
         }
         CrawlerConfig crawlerConfig = loadCrawlerConfig(actorUserId);
@@ -393,9 +393,10 @@ public class DataSourceAdminServiceImpl implements DataSourceAdminService {
     }
 
     private void updateJobLog(String logValue, LocalDateTime now) {
+        String merged = LogLimiter.appendAndTruncate(null, logValue, logMaxChars);
         UpdateWrapper<FcJobStatusEntity> uw = new UpdateWrapper<>();
         uw.eq("job_name", JOB_NAME)
-                .set("last_log", trimLog(logValue))
+                .set("last_log", merged)
                 .set("last_heartbeat_at", now)
                 .set("updated_at", now);
         jobStatusMapper.update(null, uw);
