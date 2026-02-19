@@ -27,3 +27,9 @@ Thumbs.db
 
 .cursor.zip
 frontend/dist/
+
+# QA artifacts
+frontend/test-results/
+doc/qa/e2e-runs/
+doc/qa/chrome-scans/*
+!doc/qa/chrome-scans/README.md
