@@ -28,6 +28,15 @@
       </div>
     </div>
 
+    <div class="charts-row">
+      <el-card class="chart-card" shadow="never">
+        <template #header>
+          <span>净结余趋势</span>
+        </template>
+        <v-chart class="chart-instance" :option="cashflowTrendOption" autoresize />
+      </el-card>
+    </div>
+
     <el-table
       :data="cashflowList"
       style="width: 100%"
@@ -88,6 +97,13 @@ import { ElMessage } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { listCashflowMonths, upsertCashflowMonth } from '@/api/cashflow';
+import { use } from 'echarts/core';
+import { CanvasRenderer } from 'echarts/renderers';
+import { LineChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent } from 'echarts/components';
+import VChart from 'vue-echarts';
+
+use([CanvasRenderer, LineChart, GridComponent, TooltipComponent]);
 
 interface CashflowForm {
   id?: number | null;
@@ -120,6 +136,34 @@ const netPreview = computed(() => {
   const expense = Number(form.value.expense ?? 0);
   const net = income - expense;
   return `¥${formatMoney(net)}`;
+});
+
+const cashflowTrendOption = computed(() => {
+  const sorted = [...cashflowList.value].sort((a, b) => String(a.month).localeCompare(String(b.month)));
+  const months = sorted.map((item) => item.month);
+  const netValues = sorted.map((item) => Number(item.net ?? Number(item.income || 0) - Number(item.expense || 0)));
+  return {
+    grid: { left: '8%', right: '6%', top: '12%', bottom: '12%' },
+    tooltip: { trigger: 'axis' },
+    xAxis: {
+      type: 'category',
+      data: months,
+      axisLabel: { color: '#cbd5f5' },
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: { color: '#cbd5f5' },
+    },
+    series: [
+      {
+        type: 'line',
+        data: netValues,
+        smooth: true,
+        areaStyle: { opacity: 0.2 },
+        lineStyle: { width: 2 },
+      },
+    ],
+  };
 });
 
 const loadList = async () => {
@@ -229,6 +273,21 @@ h2 {
   --el-table-bg-color: #1d212b;
   --el-table-tr-bg-color: #1d212b;
   --el-table-header-bg-color: #1d212b;
+}
+:deep(.chart-card) {
+  background: #1d212b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+}
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.chart-instance {
+  width: 100%;
+  height: 260px;
 }
 :deep(.el-table__inner-wrapper::before) {
   display: none;

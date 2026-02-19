@@ -196,6 +196,10 @@
               <el-table-column prop="priority" label="Priority" width="100" />
             </el-table>
             <el-empty v-if="!safeArray(debtCashflowAdvice?.list).length" description="暂无建议" />
+            <div v-if="showDebtCashflowCta" class="cta-row">
+              <el-button type="primary" plain @click="goDebt">完善债务信息</el-button>
+              <el-button type="primary" plain @click="goCashflow">补充现金流</el-button>
+            </div>
           </el-card>
         </el-col>
 
@@ -268,6 +272,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useHealthStore } from '@/store/modules/health';
 import { storeToRefs } from 'pinia';
 import { use } from "echarts/core";
@@ -280,6 +285,7 @@ use([CanvasRenderer, RadarChart, LineChart, TitleComponent, TooltipComponent, Le
 
 const healthStore = useHealthStore();
 const { report } = storeToRefs(healthStore);
+const router = useRouter();
 
 const activeNames = ref(['1']);
 const scoreBreakdownActive = ref<string[]>([]);
@@ -315,6 +321,12 @@ const debtCashflowAdvice = computed(() => (adviceV2.value as any)?.debtCashflowA
 const debtOptimizer = computed(() => (adviceV2.value as any)?.debtOptimizerV1);
 const insuranceGap = computed(() => report.value?.metrics?.insuranceGapV1);
 const insuranceAdvice = computed(() => (adviceV2.value as any)?.insuranceAdviceV1);
+const adviceWarnings = computed(() => safeArray((adviceV2.value as any)?.meta?.warnings));
+const showDebtCashflowCta = computed(() => {
+  return adviceWarnings.value.includes('CASHFLOW_INSUFFICIENT_DATA')
+    || adviceWarnings.value.includes('EMERGENCY_FUND_UNKNOWN')
+    || adviceWarnings.value.includes('DTI_INSUFFICIENT_INCOME');
+});
 const alertsV1 = computed(() => report.value?.metrics?.alertsV1);
 const openAlerts = computed(() => {
   return safeArray(alertsV1.value?.openAlerts ?? alertsV1.value?.alerts);
@@ -327,6 +339,14 @@ const safeArray = <T>(value: T[] | undefined | null): T[] => {
 const formatNum = (value: any) => {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return '-';
   return Number(value).toFixed(2);
+};
+
+const goDebt = () => {
+  router.push('/app/debt');
+};
+
+const goCashflow = () => {
+  router.push('/app/cashflow');
 };
 
 // 雷达图配置
@@ -614,6 +634,13 @@ const trendOption = computed(() => ({
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
+}
+
+.cta-row {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .matrix-table th,

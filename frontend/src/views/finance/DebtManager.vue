@@ -11,6 +11,15 @@
       </el-button>
     </div>
 
+    <div class="charts-row">
+      <el-card class="chart-card" shadow="never">
+        <template #header>
+          <span>债务结构分布</span>
+        </template>
+        <v-chart class="chart-instance" :option="debtPieOption" autoresize />
+      </el-card>
+    </div>
+
     <el-table
       :data="debtList"
       style="width: 100%"
@@ -99,11 +108,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { deleteDebt, listDebts, upsertDebt } from '@/api/debt';
+import { use } from 'echarts/core';
+import { CanvasRenderer } from 'echarts/renderers';
+import { PieChart } from 'echarts/charts';
+import { LegendComponent, TooltipComponent } from 'echarts/components';
+import VChart from 'vue-echarts';
+
+use([CanvasRenderer, PieChart, LegendComponent, TooltipComponent]);
 
 interface DebtForm {
   id: number | null;
@@ -140,6 +156,36 @@ const rules: FormRules = {
   principal: [{ required: true, message: '请输入初始本金', trigger: 'blur' }],
   termMonths: [{ type: 'number', min: 1, message: '期限需大于 0', trigger: 'blur' }],
 };
+
+const debtChartData = computed(() => {
+  const sums: Record<string, number> = {};
+  debtList.value
+    .filter((item) => item && item.isActive === 1)
+    .forEach((item) => {
+      const key = formatType(item.debtType);
+      const value = Number(item.remainingBalance || 0);
+      sums[key] = (sums[key] || 0) + value;
+    });
+  return Object.entries(sums).map(([name, value]) => ({ name, value }));
+});
+
+const debtPieOption = computed(() => ({
+  tooltip: { trigger: 'item' },
+  legend: { top: '4%', textStyle: { color: '#cbd5f5' } },
+  series: [
+    {
+      type: 'pie',
+      radius: ['35%', '70%'],
+      avoidLabelOverlap: true,
+      itemStyle: {
+        borderColor: '#1d212b',
+        borderWidth: 2,
+      },
+      label: { color: '#e2e8f0' },
+      data: debtChartData.value,
+    },
+  ],
+}));
 
 const loadList = async () => {
   loading.value = true;
@@ -280,6 +326,21 @@ h2 {
   --el-table-bg-color: #1d212b;
   --el-table-tr-bg-color: #1d212b;
   --el-table-header-bg-color: #1d212b;
+}
+:deep(.chart-card) {
+  background: #1d212b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+}
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.chart-instance {
+  width: 100%;
+  height: 260px;
 }
 :deep(.el-table__inner-wrapper::before) {
   display: none;
