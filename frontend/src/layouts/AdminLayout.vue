@@ -57,8 +57,8 @@
       </el-menu>
 
       <div class="sidebar-footer">
-        <el-button type="primary" plain size="small" @click="router.push('/app/diagnosis')">
-          返回用户端
+        <el-button type="primary" plain size="small" @click="router.push('/admin/profile')">
+          个人中心
         </el-button>
       </div>
     </el-aside>
@@ -75,7 +75,7 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="router.push('/app/user/profile')">
+                <el-dropdown-item @click="router.push('/admin/profile')">
                   个人中心
                 </el-dropdown-item>
                 <el-dropdown-item divided @click="handleLogout">

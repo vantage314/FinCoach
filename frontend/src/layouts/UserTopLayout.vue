@@ -102,16 +102,6 @@
             </div>
           </template>
         </el-dropdown>
-        <el-button
-          v-if="isAdmin"
-          type="primary"
-          plain
-          size="small"
-          class="admin-entry"
-          @click="router.push('/admin/alerts')"
-        >
-          进入后台
-        </el-button>
         <el-dropdown trigger="click">
           <span class="user-dropdown-link">
             <el-avatar :size="30" class="user-avatar">{{ displayInitial }}</el-avatar>
@@ -169,7 +159,6 @@ const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
 
-const isAdmin = computed(() => userStore.isAdmin);
 const activeMenu = computed(() => route.path);
 
 const displayName = computed(() => userStore.username || '用户');
@@ -423,9 +412,6 @@ onMounted(() => loadNotifications());
   font-size: 12px;
 }
 
-.admin-entry {
-  margin-right: 4px;
-}
 
 .user-dropdown-link {
   display: flex;

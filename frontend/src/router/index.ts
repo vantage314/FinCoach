@@ -188,6 +188,12 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'AdminAdviceRulesets',
                 component: () => import('../views/admin/AdminAdviceRulesets.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: '建议规则集 - FinCoach' }
+            },
+            {
+                path: 'profile',
+                name: 'AdminProfile',
+                component: () => import('../views/admin/AdminProfile.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '个人中心 - FinCoach' }
             }
         ]
     },
@@ -264,6 +270,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
     const userStore = useUserStore(pinia);
+    userStore.initFromStorage();
 
     if (to.meta.title) {
         document.title = to.meta.title as string;
@@ -288,6 +295,12 @@ router.beforeEach((to, from, next) => {
         return;
     }
 
+    const rawRoles = Array.isArray(userStore.roles) ? userStore.roles : [];
+    const normalizedRoles = rawRoles.map((role) => String(role).toUpperCase());
+    const hasAdminRole = normalizedRoles.includes('ADMIN') || normalizedRoles.includes('ROLE_ADMIN');
+    const hasUserRole = normalizedRoles.includes('USER') || normalizedRoles.includes('ROLE_USER');
+    const hasExplicitRoles = normalizedRoles.length > 0;
+
     const roles = Array.isArray(to.meta.roles) ? to.meta.roles : [];
     const needsAdmin = to.path.startsWith('/admin') || roles.some((role) => {
         const normalized = String(role).toUpperCase();
@@ -298,6 +311,15 @@ router.beforeEach((to, from, next) => {
         ElMessage.error('无权限访问该页面');
         next('/403');
         return;
+    }
+
+    if (to.path.startsWith('/app')) {
+        const allowUserRoute = hasUserRole || (!hasAdminRole && !hasExplicitRoles);
+        if (!allowUserRoute) {
+            ElMessage.error('当前账号无法访问用户端');
+            next('/admin/dashboard');
+            return;
+        }
     }
 
     next();

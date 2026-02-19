@@ -9,6 +9,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 @Component
 public class JwtUtils {
@@ -47,5 +48,51 @@ public class JwtUtils {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public List<String> getRolesFromToken(String token) {
+        if (token == null || token.isBlank()) {
+            return List.of();
+        }
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            Object roles = claims.get("roles");
+            return normalizeRoles(roles);
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    private List<String> normalizeRoles(Object input) {
+        if (input == null) {
+            return List.of();
+        }
+        List<String> result = new ArrayList<>();
+        if (input instanceof List<?> list) {
+            for (Object item : list) {
+                if (item != null) {
+                    String value = String.valueOf(item).trim();
+                    if (!value.isEmpty()) {
+                        result.add(value);
+                    }
+                }
+            }
+            return result;
+        }
+        String raw = String.valueOf(input).trim();
+        if (raw.isEmpty()) {
+            return List.of();
+        }
+        for (String part : raw.split(",")) {
+            String value = part.trim();
+            if (!value.isEmpty()) {
+                result.add(value);
+            }
+        }
+        return result;
     }
 }

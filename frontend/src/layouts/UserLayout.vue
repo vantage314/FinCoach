@@ -56,11 +56,6 @@
         </el-menu-item>
       </el-menu>
 
-      <div class="sidebar-footer" v-if="isAdmin">
-        <el-button type="primary" plain size="small" @click="router.push('/admin/alerts')">
-          进入后台
-        </el-button>
-      </div>
     </el-aside>
 
     <el-container class="content-shell">
@@ -123,7 +118,6 @@ const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
 
-const isAdmin = computed(() => userStore.isAdmin);
 const activeMenu = computed(() => route.path);
 
 const displayName = computed(() => userStore.username || '用户');
@@ -202,10 +196,6 @@ const handleLogout = async () => {
   }
 }
 
-.sidebar-footer {
-  padding: 16px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
 
 .content-shell {
   min-height: 100vh;

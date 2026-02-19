@@ -1,6 +1,7 @@
 package com.fincoach.core.config;
 
 import com.fincoach.core.interceptor.JwtInterceptor;
+import com.fincoach.core.interceptor.AppUserRoleInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -17,6 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
+    @Autowired
+    private AppUserRoleInterceptor appUserRoleInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
@@ -28,6 +32,9 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/common/**",
                         "/api/health/ping"
                 );
+
+        registry.addInterceptor(appUserRoleInterceptor)
+                .addPathPatterns("/api/app/**");
     }
 
     @Override
