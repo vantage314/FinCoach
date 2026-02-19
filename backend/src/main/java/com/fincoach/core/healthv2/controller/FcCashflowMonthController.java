@@ -3,7 +3,9 @@ package com.fincoach.core.healthv2.controller;
 import com.fincoach.core.common.Result;
 import com.fincoach.core.common.UserContext;
 import com.fincoach.core.healthv2.dto.CashflowMonthUpsertDTO;
+import com.fincoach.core.healthv2.dto.CsvImportResultDTO;
 import com.fincoach.core.healthv2.entity.FcCashflowMonthEntity;
+import com.fincoach.core.healthv2.service.CashflowMonthCsvImportService;
 import com.fincoach.core.healthv2.service.FcCashflowMonthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +26,9 @@ public class FcCashflowMonthController {
 
     @Autowired
     private FcCashflowMonthService cashflowMonthService;
+
+    @Autowired
+    private CashflowMonthCsvImportService cashflowMonthCsvImportService;
 
     @GetMapping("/months")
     @Operation(summary = "查询现金流月度范围")
@@ -40,5 +46,17 @@ public class FcCashflowMonthController {
         Long userId = UserContext.getCurrentUserId();
         if (userId == null) return Result.error(401, "请先登录");
         return Result.success(cashflowMonthService.upsert(userId, dto));
+    }
+
+    @PostMapping("/importCsv")
+    @Operation(summary = "导入现金流月度 CSV")
+    public Result<CsvImportResultDTO> importCsv(@RequestParam("file") MultipartFile file) {
+        Long userId = UserContext.getCurrentUserId();
+        if (userId == null) return Result.error(401, "请先登录");
+        if (file == null || file.isEmpty()) {
+            return Result.error(400, "file 不能为空");
+        }
+        CsvImportResultDTO result = cashflowMonthCsvImportService.importCsv(file, userId);
+        return Result.success(result);
     }
 }

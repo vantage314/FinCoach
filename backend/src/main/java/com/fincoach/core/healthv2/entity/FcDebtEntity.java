@@ -21,6 +21,7 @@ public class FcDebtEntity {
     private Integer termMonths;
     private BigDecimal monthlyPayment;
     private BigDecimal remainingBalance;
+    private String externalKey;
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer isActive;

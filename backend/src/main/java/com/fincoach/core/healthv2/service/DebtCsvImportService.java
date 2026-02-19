@@ -101,6 +101,7 @@ public class DebtCsvImportService {
         upsert.setPrincipal(principal);
         upsert.setStartDate(dto.getStartDate());
         upsert.setEndDate(dto.getEndDate());
+        upsert.setExternalKey(dto.getExternalKey());
         return upsert;
     }
 

@@ -48,4 +48,7 @@ public class DebtUpsertDTO {
 
     @Schema(description = "结束日期(YYYY-MM-DD)", example = "2042-01-01")
     private String endDate;
+
+    @Schema(description = "外部唯一键(导入幂等用)", example = "bank-loan-001")
+    private String externalKey;
 }

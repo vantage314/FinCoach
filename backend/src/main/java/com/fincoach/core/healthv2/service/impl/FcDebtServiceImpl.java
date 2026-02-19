@@ -39,6 +39,11 @@ public class FcDebtServiceImpl implements FcDebtService {
             if (existing == null || !existing.getUserId().equals(userId)) {
                 throw new IllegalArgumentException("债务不存在或无权操作");
             }
+        } else if (StringUtils.hasText(dto.getExternalKey())) {
+            LambdaQueryWrapper<FcDebtEntity> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(FcDebtEntity::getUserId, userId)
+                   .eq(FcDebtEntity::getExternalKey, dto.getExternalKey().trim());
+            existing = debtMapper.selectOne(wrapper);
         }
 
         FcDebtEntity entity = existing == null ? new FcDebtEntity() : existing;
@@ -62,6 +67,10 @@ public class FcDebtServiceImpl implements FcDebtService {
         entity.setPrincipal(dto.getPrincipal());
         entity.setTermMonths(dto.getTermMonths());
         entity.setRemainingBalance(dto.getRemainingBalance());
+        if (dto.getExternalKey() != null) {
+            String externalKey = dto.getExternalKey().trim();
+            entity.setExternalKey(externalKey.isEmpty() ? null : externalKey);
+        }
         entity.setStartDate(parseDate(dto.getStartDate()));
         entity.setEndDate(parseDate(dto.getEndDate()));
         entity.setIsActive(ACTIVE);
