@@ -9,17 +9,17 @@ export const createAdviceRuleSet = (payload: any) => {
 };
 
 export const updateAdviceRuleSet = (id: number, payload: any) => {
-  return request.put(/admin/api/advice/rulesets/, payload, { baseURL: '' });
+  return request.put(`/admin/api/advice/rulesets/${id}`, payload, { baseURL: '' });
 };
 
 export const enableAdviceRuleSet = (id: number) => {
-  return request.put(/admin/api/advice/rulesets//enable, {}, { baseURL: '' });
+  return request.put(`/admin/api/advice/rulesets/${id}/enable`, {}, { baseURL: '' });
 };
 
 export const fetchAdviceRuleParams = (code: string) => {
-  return request.get(/admin/api/advice/rulesets//params, { baseURL: '' });
+  return request.get(`/admin/api/advice/rulesets/${code}/params`, { baseURL: '' });
 };
 
 export const updateAdviceRuleParams = (code: string, payload: any[]) => {
-  return request.put(/admin/api/advice/rulesets//params, payload, { baseURL: '' });
+  return request.put(`/admin/api/advice/rulesets/${code}/params`, payload, { baseURL: '' });
 };

@@ -168,7 +168,7 @@ const saveParams = async () => {
   if (!selectedRuleSet.value) return;
   const invalid = params.value.find((p) => !isValidParam(p));
   if (invalid) {
-    ElMessage.error(参数  格式不正确);
+    ElMessage.error('参数格式不正确');
     return;
   }
   savingParams.value = true;
