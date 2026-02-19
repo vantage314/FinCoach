@@ -1,1 +1,0 @@
-import{s as e}from"./request-QcZsVuIR.js";const n=t=>e.get("/invest/news/list",{params:t}),i=t=>e.get(`/invest/profile/${t}`),o=()=>e.get("/invest/watchlist"),r=t=>e.post("/invest/watchlist/toggle",{code:t}),a=t=>e.get(`/invest/finance/${t}`),c=t=>e.get(`/invest/notice/${t}`);export{i as a,a as b,c,n as d,o as g,r as t};
