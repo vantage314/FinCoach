@@ -13,8 +13,10 @@ public class FcNotificationEntity {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long userId;
+    private String type;
     private String title;
-    private String body;
+    private String content;
+    private String payloadJson;
     private Integer isRead;
     private LocalDateTime createdAt;
     private Long alertId;

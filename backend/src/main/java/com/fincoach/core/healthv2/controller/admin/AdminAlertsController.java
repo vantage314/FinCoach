@@ -7,12 +7,15 @@ import com.fincoach.core.common.Result;
 import com.fincoach.core.common.UserContext;
 import com.fincoach.core.healthv2.dto.admin.AdminAlertAckRequest;
 import com.fincoach.core.healthv2.dto.admin.AdminAlertListDTO;
+import com.fincoach.core.healthv2.entity.FcAlertEntity;
 import com.fincoach.core.healthv2.entity.FcAlertRecordEntity;
 import com.fincoach.core.healthv2.mapper.FcAlertRecordMapper;
+import com.fincoach.core.healthv2.service.AlertService;
 import com.fincoach.core.healthv2.service.AuditService;
 import com.fincoach.core.security.AdminOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +38,8 @@ public class AdminAlertsController {
     private final FcAlertRecordMapper recordMapper;
     private final ObjectMapper objectMapper;
     private final AuditService auditService;
+    @Autowired(required = false)
+    private AlertService alertService;
 
     public AdminAlertsController(FcAlertRecordMapper recordMapper, ObjectMapper objectMapper, AuditService auditService) {
         this.recordMapper = recordMapper;
@@ -90,6 +95,52 @@ public class AdminAlertsController {
         return Result.success(dto);
     }
 
+    @GetMapping("/list")
+    public Result<AdminAlertListDTO> listCenter(@RequestParam(required = false) String status,
+                                                @RequestParam(required = false) String type,
+                                                @RequestParam(required = false) String severity,
+                                                @RequestParam(required = false) Long userId,
+                                                @RequestParam(required = false) Integer limit) {
+        if (alertService == null) {
+            return Result.error(500, "alert service unavailable");
+        }
+        String statusFilter = status == null ? "OPEN" : status.trim().toUpperCase();
+        if ("ALL".equals(statusFilter)) {
+            statusFilter = null;
+        }
+        List<FcAlertEntity> alerts = alertService.listAdminAlerts(statusFilter, type, severity, userId);
+        List<AdminAlertListDTO.AlertItem> items = new ArrayList<>();
+        if (alerts != null) {
+            for (FcAlertEntity alert : alerts) {
+                if (alert == null) continue;
+                AdminAlertListDTO.AlertItem item = new AdminAlertListDTO.AlertItem();
+                item.setAlertId(alert.getId());
+                item.setCode(alert.getAlertType());
+                item.setSeverity(alert.getSeverity());
+                item.setTitle(alert.getTitle());
+                item.setStatus(alert.getStatus());
+                item.setCreatedAt(alert.getLastSeenAt() == null ? null : alert.getLastSeenAt().toString());
+                items.add(item);
+            }
+        }
+        items.sort((a, b) -> {
+            int sa = severityRank(a.getSeverity());
+            int sb = severityRank(b.getSeverity());
+            if (sa != sb) return Integer.compare(sb, sa);
+            String ta = a.getCreatedAt() == null ? "" : a.getCreatedAt();
+            String tb = b.getCreatedAt() == null ? "" : b.getCreatedAt();
+            return tb.compareTo(ta);
+        });
+        int safeLimit = limit == null || limit <= 0 ? items.size() : Math.min(limit, items.size());
+        if (items.size() > safeLimit) {
+            items = new ArrayList<>(items.subList(0, safeLimit));
+        }
+        AdminAlertListDTO dto = new AdminAlertListDTO();
+        dto.setTotal(items.size());
+        dto.setItems(items);
+        return Result.success(dto);
+    }
+
     @PostMapping("/ack")
     public Result<String> ack(@RequestBody AdminAlertAckRequest request) {
         if (request == null) {
@@ -107,6 +158,9 @@ public class AdminAlertsController {
                 recordMapper.updateById(entity);
                 updated++;
                 ackedIds.add(ref.getAlertId());
+                if (alertService != null) {
+                    alertService.ackAlert(ref.getAlertId());
+                }
             }
         } else if (request.getReportId() != null && request.getCodes() != null && !request.getCodes().isEmpty()) {
             updated = ackByReportAndCodes(request.getReportId(), request.getCodes(), ackedIds);
@@ -123,6 +177,24 @@ public class AdminAlertsController {
         auditService.log(adminId, "ACK_ALERTS", "ALERT_RECORD", null, null, auditPayload);
         log.info("[Admin-Alert] event=ADMIN_ALERT_ACK userId={} count={}", adminId, updated);
         return Result.success("ACKED:" + updated);
+    }
+
+    @PostMapping("/resolve")
+    public Result<String> resolve(@RequestBody AdminAlertAckRequest request) {
+        if (request == null || request.getAlerts() == null || request.getAlerts().isEmpty()) {
+            return Result.error(400, "missing alerts");
+        }
+        if (alertService == null) {
+            return Result.error(500, "alert service unavailable");
+        }
+        int updated = 0;
+        for (AdminAlertAckRequest.AlertRef ref : request.getAlerts()) {
+            if (ref == null || ref.getAlertId() == null) continue;
+            if (alertService.resolveAlert(ref.getAlertId())) {
+                updated++;
+            }
+        }
+        return Result.success("RESOLVED:" + updated);
     }
 
     private int ackByReportAndCodes(Long reportId, List<String> codes, List<Long> ackedIds) {
@@ -171,6 +243,7 @@ public class AdminAlertsController {
         if (severity == null) return 0;
         String normalized = severity.toUpperCase();
         if ("CRITICAL".equals(normalized)) return 3;
+        if ("DANGER".equals(normalized)) return 3;
         if ("WARN".equals(normalized)) return 2;
         if ("INFO".equals(normalized)) return 1;
         return 0;

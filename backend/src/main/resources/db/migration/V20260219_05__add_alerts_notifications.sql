@@ -21,8 +21,10 @@ CREATE UNIQUE INDEX uk_fc_alert_dedupe_status ON fc_alert(dedupe_key, status);
 CREATE TABLE IF NOT EXISTS fc_notification (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   user_id BIGINT NOT NULL,
+  type VARCHAR(64) NULL,
   title VARCHAR(200) NULL,
-  body TEXT NULL,
+  content TEXT NULL,
+  payload_json TEXT NULL,
   is_read TINYINT NOT NULL DEFAULT 0,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   alert_id BIGINT NULL

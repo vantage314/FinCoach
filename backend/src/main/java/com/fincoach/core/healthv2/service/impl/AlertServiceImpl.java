@@ -147,7 +147,7 @@ public class AlertServiceImpl implements AlertService {
         FcNotificationEntity notification = new FcNotificationEntity();
         notification.setUserId(alert.getUserId());
         notification.setTitle(alert.getTitle());
-        notification.setBody(alert.getMessage());
+        notification.setContent(alert.getMessage());
         notification.setIsRead(0);
         notification.setCreatedAt(LocalDateTime.now());
         notification.setAlertId(alert.getId());

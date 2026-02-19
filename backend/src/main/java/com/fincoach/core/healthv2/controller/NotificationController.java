@@ -10,9 +10,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedHashMap;
@@ -52,6 +54,15 @@ public class NotificationController {
         return Result.success(data);
     }
 
+    @GetMapping("/list")
+    @Operation(summary = "获取通知列表（别名）")
+    public Result<Map<String, Object>> listAlias(
+            @RequestParam(required = false) Integer isRead,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "1") int page) {
+        return list(isRead, size, page);
+    }
+
     @PutMapping("/{id}/read")
     @Operation(summary = "标记单条通知已读")
     public Result<String> markRead(@PathVariable Long id) {
@@ -70,6 +81,15 @@ public class NotificationController {
         return Result.success("已标记已读");
     }
 
+    @PostMapping("/read")
+    @Operation(summary = "标记单条通知已读（别名）")
+    public Result<String> markReadAlias(@RequestBody ReadRequest request) {
+        if (request == null || request.getId() == null) {
+            return Result.error(400, "缺少通知ID");
+        }
+        return markRead(request.getId());
+    }
+
     @PutMapping("/read-all")
     @Operation(summary = "全部标记已读")
     public Result<String> markAllRead() {
@@ -79,5 +99,23 @@ public class NotificationController {
         }
         notificationService.markAllRead(userId);
         return Result.success("已全部标记已读");
+    }
+
+    @PostMapping("/readAll")
+    @Operation(summary = "全部标记已读（别名）")
+    public Result<String> markAllReadAlias() {
+        return markAllRead();
+    }
+
+    public static class ReadRequest {
+        private Long id;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
     }
 }

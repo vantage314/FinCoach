@@ -18,10 +18,13 @@ export interface AdminAlertList {
 export interface AdminAlertQuery {
     limit?: number;
     status?: string;
+    type?: string;
+    severity?: string;
+    userId?: number;
 }
 
 export const fetchAdminAlerts = (params: AdminAlertQuery) => {
-    return request.get<AdminAlertList>('/admin/api/alerts', {
+    return request.get<AdminAlertList>('/admin/api/alerts/list', {
         params,
         baseURL: '',
     });
@@ -29,4 +32,8 @@ export const fetchAdminAlerts = (params: AdminAlertQuery) => {
 
 export const ackAdminAlerts = (alerts: Array<{ alertId: number }>) => {
     return request.post('/admin/api/alerts/ack', { alerts }, { baseURL: '' });
+};
+
+export const resolveAdminAlerts = (alerts: Array<{ alertId: number }>) => {
+    return request.post('/admin/api/alerts/resolve', { alerts }, { baseURL: '' });
 };

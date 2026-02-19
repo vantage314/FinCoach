@@ -9,6 +9,7 @@
         <el-select v-model="status" class="filter-item" placeholder="状态">
           <el-option label="OPEN" value="OPEN" />
           <el-option label="ACKED" value="ACKED" />
+          <el-option label="RESOLVED" value="RESOLVED" />
           <el-option label="ALL" value="ALL" />
         </el-select>
         <el-input-number
@@ -57,7 +58,7 @@
         </el-table-column>
         <el-table-column prop="createdAt" label="CreatedAt" min-width="180" />
         <el-table-column prop="reportId" label="ReportId" width="120" />
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button
               size="small"
@@ -66,6 +67,15 @@
               @click="ackAlert(row)"
             >
               ACK
+            </el-button>
+            <el-button
+              size="small"
+              type="danger"
+              plain
+              :disabled="row.status === 'RESOLVED' || resolvingId === row.alertId"
+              @click="resolveAlert(row)"
+            >
+              RESOLVE
             </el-button>
           </template>
         </el-table-column>
@@ -80,7 +90,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { ackAdminAlerts, fetchAdminAlerts, type AdminAlertItem } from '@/api/adminAlerts';
+import { ackAdminAlerts, fetchAdminAlerts, resolveAdminAlerts, type AdminAlertItem } from '@/api/adminAlerts';
 
 const status = ref('OPEN');
 const limit = ref(200);
@@ -89,6 +99,7 @@ const total = ref(0);
 const loading = ref(false);
 const error = ref('');
 const ackingId = ref<number | null>(null);
+const resolvingId = ref<number | null>(null);
 
 const loadAlerts = async () => {
   loading.value = true;
@@ -124,6 +135,23 @@ const ackAlert = async (row: AdminAlertItem) => {
   }
 };
 
+const resolveAlert = async (row: AdminAlertItem) => {
+  if (!row?.alertId) {
+    ElMessage.warning('无效的 alertId');
+    return;
+  }
+  resolvingId.value = row.alertId;
+  try {
+    await resolveAdminAlerts([{ alertId: row.alertId }]);
+    ElMessage.success('RESOLVE 成功');
+    await loadAlerts();
+  } catch (e: any) {
+    error.value = e?.message || 'RESOLVE 失败';
+  } finally {
+    resolvingId.value = null;
+  }
+};
+
 const statusTag = (value?: string) => {
   const normalized = (value || 'OPEN').toUpperCase();
   return normalized === 'ACKED' ? 'success' : 'warning';
@@ -131,6 +159,7 @@ const statusTag = (value?: string) => {
 
 const severityTag = (value?: string) => {
   const normalized = (value || '').toUpperCase();
+  if (normalized === 'DANGER') return 'danger';
   if (normalized === 'CRITICAL') return 'danger';
   if (normalized === 'WARN') return 'warning';
   if (normalized === 'INFO') return 'info';
