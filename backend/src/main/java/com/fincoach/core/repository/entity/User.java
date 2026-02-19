@@ -16,6 +16,9 @@ public class User {
     private String password;
     private String email;
     private String phone;
+    private Integer enabled;
+    @TableField("last_login_at")
+    private LocalDateTime lastLoginAt;
     @TableField(exist = false)
     private String role;
     private LocalDateTime createTime;
