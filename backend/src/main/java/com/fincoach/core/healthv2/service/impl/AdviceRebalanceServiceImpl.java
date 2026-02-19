@@ -60,6 +60,7 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
             return dto;
         }
 
+        List<String> warnings = new ArrayList<>();
         AdviceRuleSnapshot ruleSnapshot = adviceRuleRegistry == null ? null : adviceRuleRegistry.get();
         double driftThreshold = readDecimal(ruleSnapshot, AdviceRuleDefaults.REBALANCE_DRIFT_PCT, 0.05);
         int maxPositions = readInt(ruleSnapshot, AdviceRuleDefaults.MAX_POSITIONS, 8);
@@ -79,6 +80,9 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
         List<FcAssetEntity> assets = assetMapper.selectList(
                 new LambdaQueryWrapper<FcAssetEntity>().eq(FcAssetEntity::getUserId, userId));
         BigDecimal totalAssets = sumAssets(assets);
+        if (totalAssets == null || totalAssets.compareTo(BigDecimal.ZERO) <= 0) {
+            warnings.add("TOTAL_ASSETS_MISSING");
+        }
         Map<String, Double> allocation = buildAllocation(assets, totalAssets);
         double cashRatio = allocation.getOrDefault("CASH", 0.0);
         double topRatio = maxRatio(allocation);
@@ -111,13 +115,18 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
 
         Map<String, Double> targets = resolveTargets();
         List<AdviceRebalanceSuggestionDTO> suggestions = buildSuggestions(allocation, targets, driftThreshold, totalAssets);
-        dto.setRebalanceSuggestions(suggestions);
+        dto.setRebalanceSuggestions(suggestions == null ? new ArrayList<>() : suggestions);
 
         Map<String, Object> meta = new LinkedHashMap<>();
         meta.put("threshold", driftThreshold);
         meta.put("currentAllocation", allocation);
         meta.put("targetAllocation", targets);
         meta.put("maxPositions", maxPositions);
+        meta.put("cashflowStatus", "NOT_AVAILABLE");
+        meta.put("debtStatus", "NOT_AVAILABLE");
+        warnings.add("CASHFLOW_NOT_AVAILABLE");
+        warnings.add("DEBT_NOT_AVAILABLE");
+        meta.put("warnings", warnings);
         if (ruleSnapshot != null) {
             meta.put("ruleSetCode", ruleSnapshot.getCode());
             meta.put("ruleSetVersion", ruleSnapshot.getVersion());

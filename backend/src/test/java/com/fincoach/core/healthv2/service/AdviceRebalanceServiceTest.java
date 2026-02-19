@@ -116,6 +116,34 @@ public class AdviceRebalanceServiceTest {
         assertTrue(dto1.getBehaviorScore() < dto2.getBehaviorScore());
     }
 
+    @Test
+    public void testPayloadNonNullFieldsAndWarnings() {
+        FcAssetMapper assetMapper = Mockito.mock(FcAssetMapper.class);
+        FcHealthReportMapper reportMapper = Mockito.mock(FcHealthReportMapper.class);
+        BehaviorEventService behaviorEventService = Mockito.mock(BehaviorEventService.class);
+        AdviceRuleRegistry ruleRegistry = Mockito.mock(AdviceRuleRegistry.class);
+        RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
+
+        Mockito.when(assetMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(reportMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(behaviorEventService.countByType(anyLong(), anyInt())).thenReturn(Map.of());
+        Mockito.when(ruleRegistry.get()).thenReturn(null);
+        Mockito.when(templateRegistry.getActive()).thenReturn(null);
+
+        AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
+                assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper());
+
+        AdviceRebalanceResponseDTO dto = service.buildRebalanceAdvice(1L);
+        assertNotNull(dto.getRiskScore());
+        assertNotNull(dto.getHealthScore());
+        assertNotNull(dto.getBehaviorScore());
+        assertNotNull(dto.getRebalanceSuggestions());
+        assertNotNull(dto.getMeta());
+        Object warnings = dto.getMeta().get("warnings");
+        assertTrue(warnings instanceof List);
+        assertTrue(((List<?>) warnings).size() > 0);
+    }
+
     private AdviceRuleSnapshot snapshotWith(Map<String, String> values) {
         Map<String, com.fincoach.core.healthv2.advice.rules.AdviceRuleParamValue> params = new LinkedHashMap<>();
         for (Map.Entry<String, String> e : values.entrySet()) {
