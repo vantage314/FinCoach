@@ -21,6 +21,7 @@ import com.fincoach.core.healthv2.analyzer.RebalanceAdvisor;
 import com.fincoach.core.healthv2.analyzer.ScoreEngine;
 import com.fincoach.core.healthv2.analyzer.DebtCashflowV1Builder;
 import com.fincoach.core.healthv2.analyzer.DebtCashflowV1Result;
+import com.fincoach.core.healthv2.analyzer.DebtCashflowWarningCodes;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizerV1Builder;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizerV1Result;
 import com.fincoach.core.healthv2.analyzer.InsuranceGapV1Builder;
@@ -38,6 +39,7 @@ import com.fincoach.core.healthv2.entity.*;
 import com.fincoach.core.healthv2.mapper.*;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateRegistry;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateSnapshot;
+import com.fincoach.core.healthv2.rules.ScoreRuleDefaults;
 import com.fincoach.core.healthv2.rules.ScoreRuleSetRegistry;
 import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
 import com.fincoach.core.healthv2.service.AuditService;
@@ -71,6 +73,10 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     private FcLiabilityMapper liabilityMapper;
     @Autowired
     private FcCashflowMapper cashflowMapper;
+    @Autowired
+    private FcDebtMapper debtMapper;
+    @Autowired
+    private FcCashflowMonthMapper cashflowMonthMapper;
     @Autowired
     private FcGoalMapper goalMapper;
     @Autowired
@@ -142,6 +148,17 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                         .orderByDesc(FcCashflowEntity::getMonth)
                         .last("LIMIT 1"));
 
+        List<FcDebtEntity> debts = debtMapper.selectList(
+                new LambdaQueryWrapper<FcDebtEntity>()
+                        .eq(FcDebtEntity::getUserId, userId)
+                        .eq(FcDebtEntity::getIsActive, 1));
+
+        List<FcCashflowMonthEntity> cashflowMonths = cashflowMonthMapper.selectList(
+                new LambdaQueryWrapper<FcCashflowMonthEntity>()
+                        .eq(FcCashflowMonthEntity::getUserId, userId)
+                        .orderByDesc(FcCashflowMonthEntity::getMonth)
+                        .last("LIMIT 3"));
+
         List<FcGoalEntity> goals = goalMapper.selectList(
                 new LambdaQueryWrapper<FcGoalEntity>().eq(FcGoalEntity::getUserId, userId));
 
@@ -155,6 +172,7 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
                 .filter(a -> "CASH".equals(a.getType()))
                 .map(FcAssetEntity::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        boolean hasCashAsset = assets.stream().anyMatch(a -> "CASH".equals(a.getType()));
 
         BigDecimal totalAssets = assets.stream()
                 .map(FcAssetEntity::getAmount)
@@ -166,12 +184,20 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
 
         BigDecimal netWorth = totalAssets.subtract(totalDebt);
 
+        List<String> debtCashflowWarnings = new ArrayList<>();
+        List<Map<String, Object>> debtCashflowWarningDetails = new ArrayList<>();
+
         // --- 2b. 现金流模块 ---
         Map<String, Object> cashflowMetrics = new LinkedHashMap<>();
         BigDecimal dti = null;
         BigDecimal essentialExpense = BigDecimal.ZERO;
         BigDecimal monthlySurplus = null;
         BigDecimal emergencyMonths = null;
+        BigDecimal avgMonthlyIncome = BigDecimal.ZERO;
+        BigDecimal avgMonthlyExpense = BigDecimal.ZERO;
+        BigDecimal avgMonthlyNet = BigDecimal.ZERO;
+        int cashflowMonthsCount = 0;
+        int cashflowStabilityScore = 50;
 
         if (cashflow != null) {
             if (cashflow.getFixedExpense() != null) essentialExpense = essentialExpense.add(cashflow.getFixedExpense());
@@ -195,6 +221,20 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         cashflowMetrics.put("monthlySurplus", monthlySurplus);
         cashflowMetrics.put("emergencyMonths", emergencyMonths);
 
+        CashflowMonthSummary cashflowSummary = computeCashflowMonthSummary(
+                cashflowMonths, debtCashflowWarnings, debtCashflowWarningDetails);
+        avgMonthlyIncome = cashflowSummary.avgIncome();
+        avgMonthlyExpense = cashflowSummary.avgExpense();
+        avgMonthlyNet = cashflowSummary.avgNet();
+        cashflowStabilityScore = cashflowSummary.stabilityScore();
+        cashflowMonthsCount = cashflowSummary.monthsCount();
+
+        cashflowMetrics.put("avgIncome", avgMonthlyIncome);
+        cashflowMetrics.put("avgExpense", avgMonthlyExpense);
+        cashflowMetrics.put("avgNet", avgMonthlyNet);
+        cashflowMetrics.put("stabilityScore", cashflowStabilityScore);
+        cashflowMetrics.put("lastMonthsCount", cashflowMonthsCount);
+
         // --- 2c. 资产组合模块 ---
         Map<String, Object> portfolioMetrics = new LinkedHashMap<>();
         portfolioMetrics.put("cashAssets", cashAssets);
@@ -207,8 +247,6 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         List<String> rebalanceV1Warnings = new ArrayList<>();
         List<Map<String, Object>> rebalanceV1WarningDetails = new ArrayList<>();
         RebalanceAdviceV1Result rebalanceV1Result = null;
-        List<String> debtCashflowWarnings = new ArrayList<>();
-        List<Map<String, Object>> debtCashflowWarningDetails = new ArrayList<>();
         List<String> debtOptimizerWarnings = new ArrayList<>();
         List<Map<String, Object>> debtOptimizerWarningDetails = new ArrayList<>();
         DebtOptimizerV1Result debtOptimizerV1 = null;
@@ -398,12 +436,60 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         }
         debtMetrics.put("avgInterestRate", avgInterestRate);
 
+        BigDecimal totalMonthlyDebtPayment = BigDecimal.ZERO;
+        BigDecimal totalRemainingBalance = BigDecimal.ZERO;
+        int activeDebtsCount = debts == null ? 0 : debts.size();
+        if (debts != null) {
+            for (FcDebtEntity debt : debts) {
+                if (debt == null) continue;
+                BigDecimal payment = debt.getMonthlyPayment() == null ? BigDecimal.ZERO : debt.getMonthlyPayment();
+                BigDecimal balance = debt.getRemainingBalance() == null ? BigDecimal.ZERO : debt.getRemainingBalance();
+                totalMonthlyDebtPayment = totalMonthlyDebtPayment.add(payment);
+                totalRemainingBalance = totalRemainingBalance.add(balance);
+                String type = debt.getDebtType() == null ? "" : debt.getDebtType().trim().toUpperCase();
+                if (("CREDITCARD".equals(type) || "CREDIT_CARD".equals(type))
+                        && (debt.getMonthlyPayment() == null
+                        || debt.getMonthlyPayment().compareTo(BigDecimal.ZERO) <= 0)) {
+                    addWarning(debtCashflowWarnings, debtCashflowWarningDetails,
+                            DebtCashflowWarningCodes.DEBT_MISSING_PAYMENT,
+                            "credit card payment missing");
+                }
+            }
+        }
+
+        BigDecimal dtiForScore = null;
+        BigDecimal dtiPayload = BigDecimal.ZERO;
+        if (avgMonthlyIncome.compareTo(BigDecimal.ZERO) > 0) {
+            dtiForScore = totalMonthlyDebtPayment.divide(avgMonthlyIncome, 4, RoundingMode.HALF_UP);
+            dtiPayload = dtiForScore;
+        } else {
+            addWarning(debtCashflowWarnings, debtCashflowWarningDetails,
+                    DebtCashflowWarningCodes.DTI_INSUFFICIENT_INCOME,
+                    "avgMonthlyIncome <= 0");
+        }
+
+        EmergencyFundSummary emergencySummary = computeEmergencyFundSummary(
+                cashAssets, hasCashAsset, avgMonthlyExpense, debtCashflowWarnings, debtCashflowWarningDetails);
+        BigDecimal liquidCash = emergencySummary.liquidCash();
+        BigDecimal emergencyFundMonthsV2 = emergencySummary.months();
+        boolean emergencyFundValid = emergencySummary.valid();
+
+        debtMetrics.put("totalMonthlyPayment", totalMonthlyDebtPayment);
+        debtMetrics.put("totalRemainingBalance", totalRemainingBalance);
+        debtMetrics.put("dti", dtiPayload);
+        debtMetrics.put("activeDebtsCount", activeDebtsCount);
+
+        Map<String, Object> emergencyFundMetrics = new LinkedHashMap<>();
+        emergencyFundMetrics.put("liquidCash", liquidCash);
+        emergencyFundMetrics.put("months", emergencyFundMonthsV2);
+
         ScoreRuleSnapshot scoreRuleSnapshot = scoreRuleSetRegistry == null ? null : scoreRuleSetRegistry.get();
         DebtCashflowV1Result debtCashflowResult = new DebtCashflowV1Builder().build(
                 assets, liabilities, cashflow, totalAssets, totalDebt, cashAssets, scoreRuleSnapshot);
         if (debtCashflowResult != null) {
-            debtCashflowWarnings = debtCashflowResult.getWarnings();
-            debtCashflowWarningDetails = debtCashflowResult.getWarningDetails();
+            mergeWarnings(debtCashflowWarnings, debtCashflowResult.getWarnings());
+            debtCashflowWarningDetails = mergeWarningDetails(debtCashflowWarningDetails,
+                    debtCashflowResult.getWarningDetails());
             Double debtCashflowDti = debtCashflowResult.getDti();
             Double debtCashflowSurplusRate = debtCashflowResult.getSurplusRate();
             Double debtCashflowEmergencyMonths = debtCashflowResult.getEmergencyFundMonths();
@@ -456,6 +542,7 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         metrics.put("cashflow", cashflowMetrics);
         metrics.put("portfolio", portfolioMetrics);
         metrics.put("debt", debtMetrics);
+        metrics.put("emergencyFund", emergencyFundMetrics);
         metrics.put("goals", goalsMetrics);
         metrics.put("insurance", insuranceMetrics);
         if (debtCashflowResult != null) {
@@ -514,17 +601,27 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         int riskScore = (Integer) scoreResult.get("riskScore");
         int behaviorScore = (Integer) scoreResult.get("behaviorScore");
 
+        ScoreAdjustmentResult adjustedScores = applyDebtCashflowAdjustments(
+                riskScore, healthScore, dtiForScore, emergencyFundMonthsV2, emergencyFundValid,
+                avgMonthlyNet, debtCashflowWarnings, debtCashflowWarningDetails);
+        riskScore = adjustedScores.riskScore();
+        healthScore = adjustedScores.healthScore();
+        scoreResult.put("riskScore", riskScore);
+        scoreResult.put("healthScore", healthScore);
+
         // scoreBreakdown 写入 metrics
         metrics.put("scoreBreakdown", scoreResult.get("breakdown"));
         @SuppressWarnings("unchecked")
         Map<String, Object> scoresPayload = (Map<String, Object>) scoreResult.get("scores");
         if (scoresPayload != null) {
+            updateScorePayload(scoresPayload, riskScore, healthScore, scoreRuleSnapshot);
             metrics.put("scores", scoresPayload);
         }
         if (scoreResult.get("ruleSet") != null) {
             metrics.put("scoreRuleSet", scoreResult.get("ruleSet"));
         }
         List<String> scoreWarnings = extractWarningCodes(scoreResult.get("scoreWarnings"));
+        mergeWarnings(scoreWarnings, debtCashflowWarnings);
         PortfolioDebugContextHolder.record(snapshot -> {
             PortfolioMarketDebugSnapshot.ScoreSummary summary = new PortfolioMarketDebugSnapshot.ScoreSummary();
             summary.setRisk(buildScoreSummaryItem(scoresPayload == null ? null : scoresPayload.get("riskScore")));
@@ -1341,6 +1438,191 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         }
         return result;
     }
+
+    CashflowMonthSummary computeCashflowMonthSummary(List<FcCashflowMonthEntity> cashflowMonths,
+                                                     List<String> warnings,
+                                                     List<Map<String, Object>> warningDetails) {
+        if (cashflowMonths == null || cashflowMonths.isEmpty()) {
+            addWarning(warnings, warningDetails, DebtCashflowWarningCodes.CASHFLOW_INSUFFICIENT_DATA,
+                    "cashflowMonths=0");
+            return new CashflowMonthSummary(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 50, 0);
+        }
+
+        int count = cashflowMonths.size();
+        BigDecimal sumIncome = BigDecimal.ZERO;
+        BigDecimal sumExpense = BigDecimal.ZERO;
+        BigDecimal sumNet = BigDecimal.ZERO;
+        for (FcCashflowMonthEntity item : cashflowMonths) {
+            BigDecimal income = item.getIncome() == null ? BigDecimal.ZERO : item.getIncome();
+            BigDecimal expense = item.getExpense() == null ? BigDecimal.ZERO : item.getExpense();
+            BigDecimal net = item.getNet() == null ? income.subtract(expense) : item.getNet();
+            sumIncome = sumIncome.add(income);
+            sumExpense = sumExpense.add(expense);
+            sumNet = sumNet.add(net);
+        }
+        BigDecimal countBd = BigDecimal.valueOf(count);
+        BigDecimal avgIncome = sumIncome.divide(countBd, 2, RoundingMode.HALF_UP);
+        BigDecimal avgExpense = sumExpense.divide(countBd, 2, RoundingMode.HALF_UP);
+        BigDecimal avgNet = sumNet.divide(countBd, 2, RoundingMode.HALF_UP);
+
+        int stabilityScore = 50;
+        if (count >= 2 && avgIncome.compareTo(BigDecimal.ZERO) > 0) {
+            double avgNetDouble = avgNet.doubleValue();
+            double variance = 0;
+            for (FcCashflowMonthEntity item : cashflowMonths) {
+                BigDecimal income = item.getIncome() == null ? BigDecimal.ZERO : item.getIncome();
+                BigDecimal expense = item.getExpense() == null ? BigDecimal.ZERO : item.getExpense();
+                BigDecimal net = item.getNet() == null ? income.subtract(expense) : item.getNet();
+                double diff = net.doubleValue() - avgNetDouble;
+                variance += diff * diff;
+            }
+            double stddev = Math.sqrt(variance / count);
+            double ratio = stddev / avgIncome.doubleValue();
+            ratio = Math.min(1, Math.max(0, ratio));
+            stabilityScore = (int) Math.round(100 - ratio * 100);
+        } else {
+            addWarning(warnings, warningDetails, DebtCashflowWarningCodes.CASHFLOW_INSUFFICIENT_DATA,
+                    "cashflowMonths=" + count);
+            stabilityScore = 50;
+        }
+
+        return new CashflowMonthSummary(avgIncome, avgExpense, avgNet, stabilityScore, count);
+    }
+
+    EmergencyFundSummary computeEmergencyFundSummary(BigDecimal cashAssets,
+                                                     boolean hasCashAsset,
+                                                     BigDecimal avgMonthlyExpense,
+                                                     List<String> warnings,
+                                                     List<Map<String, Object>> warningDetails) {
+        BigDecimal liquidCash = hasCashAsset ? cashAssets : BigDecimal.ZERO;
+        if (!hasCashAsset) {
+            addWarning(warnings, warningDetails, DebtCashflowWarningCodes.EMERGENCY_FUND_UNKNOWN,
+                    "cash asset missing");
+        }
+        if (avgMonthlyExpense == null || avgMonthlyExpense.compareTo(BigDecimal.ZERO) <= 0) {
+            addWarning(warnings, warningDetails, DebtCashflowWarningCodes.EMERGENCY_FUND_INSUFFICIENT_EXPENSE,
+                    "avgMonthlyExpense <= 0");
+            return new EmergencyFundSummary(liquidCash, BigDecimal.ZERO, false);
+        }
+        BigDecimal months = liquidCash.divide(avgMonthlyExpense, 2, RoundingMode.HALF_UP);
+        return new EmergencyFundSummary(liquidCash, months, hasCashAsset);
+    }
+
+    ScoreAdjustmentResult applyDebtCashflowAdjustments(int riskScore,
+                                                       int healthScore,
+                                                       BigDecimal dti,
+                                                       BigDecimal emergencyFundMonths,
+                                                       boolean emergencyFundValid,
+                                                       BigDecimal avgMonthlyNet,
+                                                       List<String> warnings,
+                                                       List<Map<String, Object>> warningDetails) {
+        int adjustedRisk = riskScore;
+        int adjustedHealth = healthScore;
+
+        if (dti != null) {
+            if (dti.compareTo(new BigDecimal("0.50")) >= 0) {
+                adjustedRisk += 15;
+                adjustedHealth -= 15;
+                addWarning(warnings, warningDetails, DebtCashflowWarningCodes.DTI_DANGER, "dti >= 0.50");
+            } else if (dti.compareTo(new BigDecimal("0.35")) >= 0) {
+                adjustedRisk += 8;
+                adjustedHealth -= 8;
+                addWarning(warnings, warningDetails, DebtCashflowWarningCodes.DTI_WARN, "dti >= 0.35");
+            }
+        }
+
+        if (emergencyFundValid && emergencyFundMonths != null) {
+            if (emergencyFundMonths.compareTo(new BigDecimal("1")) < 0) {
+                adjustedRisk += 10;
+                adjustedHealth -= 10;
+                addWarning(warnings, warningDetails, DebtCashflowWarningCodes.EMERGENCY_FUND_CRITICAL,
+                        "emergencyFundMonths < 1");
+            } else if (emergencyFundMonths.compareTo(new BigDecimal("3")) < 0) {
+                adjustedRisk += 5;
+                adjustedHealth -= 5;
+                addWarning(warnings, warningDetails, DebtCashflowWarningCodes.EMERGENCY_FUND_LOW,
+                        "emergencyFundMonths < 3");
+            }
+        }
+
+        if (avgMonthlyNet != null && avgMonthlyNet.compareTo(BigDecimal.ZERO) < 0) {
+            adjustedRisk += 8;
+            adjustedHealth -= 8;
+            addWarning(warnings, warningDetails, DebtCashflowWarningCodes.CASHFLOW_NEGATIVE, "avgMonthlyNet < 0");
+        }
+
+        return new ScoreAdjustmentResult(clampScore(adjustedRisk), clampScore(adjustedHealth));
+    }
+
+    private void updateScorePayload(Map<String, Object> scoresPayload,
+                                    int riskScore,
+                                    int healthScore,
+                                    ScoreRuleSnapshot snapshot) {
+        int riskHighMin = snapshot == null ? 70 : snapshot.getInt(ScoreRuleDefaults.RISK_LEVEL_HIGH_MIN, 70);
+        int riskMedMin = snapshot == null ? 40 : snapshot.getInt(ScoreRuleDefaults.RISK_LEVEL_MED_MIN, 40);
+        int healthHighMin = snapshot == null ? 70 : snapshot.getInt(ScoreRuleDefaults.HEALTH_LEVEL_HIGH_MIN, 70);
+        int healthMedMin = snapshot == null ? 40 : snapshot.getInt(ScoreRuleDefaults.HEALTH_LEVEL_MED_MIN, 40);
+
+        updateScoreMap(scoresPayload.get("riskScore"), riskScore, levelForScore(riskScore, riskMedMin, riskHighMin));
+        updateScoreMap(scoresPayload.get("assetHealthScore"), healthScore,
+                levelForScore(healthScore, healthMedMin, healthHighMin));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updateScoreMap(Object raw, int value, String level) {
+        if (raw instanceof Map<?, ?> map) {
+            Map<String, Object> target = (Map<String, Object>) map;
+            target.put("value", value);
+            target.put("level", level);
+        }
+    }
+
+    private String levelForScore(int score, int medMin, int highMin) {
+        int high = Math.max(0, Math.min(100, highMin));
+        int med = Math.max(0, Math.min(100, medMin));
+        if (med >= high) {
+            med = Math.max(0, high - 1);
+        }
+        if (score >= high) return "HIGH";
+        if (score >= med) return "MED";
+        return "LOW";
+    }
+
+    private int clampScore(int value) {
+        return Math.max(0, Math.min(100, value));
+    }
+
+    private void addWarning(List<String> warnings,
+                            List<Map<String, Object>> warningDetails,
+                            String code,
+                            String detail) {
+        if (warnings == null || code == null || code.isBlank()) return;
+        if (!warnings.contains(code)) {
+            warnings.add(code);
+        }
+        if (warningDetails == null) return;
+        for (Map<String, Object> item : warningDetails) {
+            if (item == null) continue;
+            Object existing = item.get("code");
+            if (code.equals(existing == null ? null : existing.toString())) {
+                return;
+            }
+        }
+        Map<String, Object> entry = new LinkedHashMap<>();
+        entry.put("code", code);
+        entry.put("detail", truncate(detail == null ? "" : detail, 200));
+        warningDetails.add(entry);
+    }
+
+    record CashflowMonthSummary(BigDecimal avgIncome,
+                                BigDecimal avgExpense,
+                                BigDecimal avgNet,
+                                int stabilityScore,
+                                int monthsCount) {}
+
+    record EmergencyFundSummary(BigDecimal liquidCash, BigDecimal months, boolean valid) {}
+
+    record ScoreAdjustmentResult(int riskScore, int healthScore) {}
 
     private String truncate(String input, int max) {
         if (input == null) return "";
