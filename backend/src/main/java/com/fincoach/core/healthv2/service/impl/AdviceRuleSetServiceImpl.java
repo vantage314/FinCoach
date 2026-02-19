@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,19 +94,57 @@ public class AdviceRuleSetServiceImpl implements AdviceRuleSetService {
     @Transactional
     public void enable(Long id) {
         if (id == null) return;
+        LocalDateTime now = LocalDateTime.now();
+        List<FcAdviceRuleSetEntity> enabledList = listEnabled();
+        healMultipleEnabled(enabledList, now);
+
         FcAdviceRuleSetEntity target = ruleSetMapper.selectById(id);
         if (target == null) return;
-        LocalDateTime now = LocalDateTime.now();
-        ruleSetMapper.update(null, new LambdaUpdateWrapper<FcAdviceRuleSetEntity>()
+        LambdaUpdateWrapper<FcAdviceRuleSetEntity> disableOthers = new LambdaUpdateWrapper<FcAdviceRuleSetEntity>()
                 .eq(FcAdviceRuleSetEntity::getEnabled, 1)
                 .set(FcAdviceRuleSetEntity::getEnabled, 0)
-                .set(FcAdviceRuleSetEntity::getUpdatedAt, now));
+                .set(FcAdviceRuleSetEntity::getUpdatedAt, now);
+        if (target.getId() != null) {
+            disableOthers.ne(FcAdviceRuleSetEntity::getId, target.getId());
+        }
+        ruleSetMapper.update(null, disableOthers);
 
         target.setEnabled(1);
         target.setUpdatedAt(now);
         ruleSetMapper.updateById(target);
         registry.reload();
         log.info("[AdviceRuleSet] enabled: code={}, version={}", target.getCode(), target.getVersion());
+    }
+
+    private List<FcAdviceRuleSetEntity> listEnabled() {
+        return ruleSetMapper.selectList(new LambdaQueryWrapper<FcAdviceRuleSetEntity>()
+                .eq(FcAdviceRuleSetEntity::getEnabled, 1));
+    }
+
+    private void healMultipleEnabled(List<FcAdviceRuleSetEntity> enabledList, LocalDateTime now) {
+        if (enabledList == null || enabledList.size() <= 1) return;
+        FcAdviceRuleSetEntity latest = pickLatestEnabled(enabledList);
+        Long keepId = latest == null ? null : latest.getId();
+        log.warn("[AdviceRuleSet] multiple enabled found, auto-heal keepId={}", keepId);
+
+        LambdaUpdateWrapper<FcAdviceRuleSetEntity> wrapper = new LambdaUpdateWrapper<FcAdviceRuleSetEntity>()
+                .eq(FcAdviceRuleSetEntity::getEnabled, 1)
+                .set(FcAdviceRuleSetEntity::getEnabled, 0)
+                .set(FcAdviceRuleSetEntity::getUpdatedAt, now);
+        if (keepId != null) {
+            wrapper.ne(FcAdviceRuleSetEntity::getId, keepId);
+        }
+        ruleSetMapper.update(null, wrapper);
+    }
+
+    private FcAdviceRuleSetEntity pickLatestEnabled(List<FcAdviceRuleSetEntity> enabledList) {
+        if (enabledList == null || enabledList.isEmpty()) return null;
+        return enabledList.stream().max(Comparator
+                .comparing(FcAdviceRuleSetEntity::getVersion, Comparator.nullsLast(Integer::compareTo))
+                .thenComparing(FcAdviceRuleSetEntity::getUpdatedAt, Comparator.nullsLast(LocalDateTime::compareTo))
+                .thenComparing(FcAdviceRuleSetEntity::getCreatedAt, Comparator.nullsLast(LocalDateTime::compareTo))
+                .thenComparing(FcAdviceRuleSetEntity::getId, Comparator.nullsLast(Long::compareTo))
+        ).orElse(null);
     }
 
     @Override
