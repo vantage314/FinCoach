@@ -24,6 +24,24 @@ Manage configurable advice rulesets (rebalance drift, risk bands, behavior scori
 3. Enable the ruleset (PUT /enable).
 4. Verify /api/advice/rebalance output.
 
+## Safe Rollout Steps
+1. Create draft ruleset with a new version code (do not enable yet).
+2. Update params and validate JSON/numeric formats.
+3. Verify `/api/advice/rebalance` in staging or a test user to confirm payload shape.
+4. Enable the new ruleset during a low-traffic window.
+5. Rollback by re-enabling the previous ruleset if metrics regress.
+
+## Verification Curl
+```bash
+curl -X GET http://localhost:8080/admin/api/advice/rulesets
+curl -X GET http://localhost:8080/admin/api/advice/rulesets/DEFAULT/params
+curl -X PUT http://localhost:8080/admin/api/advice/rulesets/1/enable
+curl -X PUT http://localhost:8080/admin/api/advice/rulesets/DEFAULT/params \
+  -H "Content-Type: application/json" \
+  -d '[{\"paramKey\":\"REBALANCE_DRIFT_PCT\",\"paramValue\":\"0.06\",\"valueType\":\"DECIMAL\"}]'
+curl -X GET http://localhost:8080/api/advice/rebalance
+```
+
 ## Notes
 - Enabling a ruleset disables the previous active one.
 - Updates to params trigger registry reload.
