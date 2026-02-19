@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fincoach.core.healthv2.service.admin.impl.DataSourceAdminServiceImpl;
 import com.fincoach.core.healthv2.scheduler.CrawlerSelfHealScheduler;
+import com.fincoach.core.healthv2.service.AlertService;
 import com.fincoach.core.healthv2.mapper.FcPortfolioPriceSnapshotMapper;
 import com.fincoach.core.repository.entity.FcJobStatusEntity;
 import com.fincoach.core.repository.entity.FcSystemConfigEntity;
@@ -84,7 +85,8 @@ public class CrawlerObservabilityTest {
 
         configureEventMapper(service);
 
-        CrawlerSelfHealScheduler scheduler = new CrawlerSelfHealScheduler(service);
+        AlertService alertService = Mockito.mock(AlertService.class);
+        CrawlerSelfHealScheduler scheduler = new CrawlerSelfHealScheduler(service, alertService);
         scheduler.checkAndHeal();
 
         ArgumentCaptor<UpdateWrapper> captor = ArgumentCaptor.forClass(UpdateWrapper.class);
