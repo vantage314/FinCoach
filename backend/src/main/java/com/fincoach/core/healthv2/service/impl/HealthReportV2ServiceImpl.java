@@ -24,8 +24,10 @@ import com.fincoach.core.healthv2.analyzer.DebtCashflowV1Result;
 import com.fincoach.core.healthv2.analyzer.DebtCashflowWarningCodes;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizerV1Builder;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizerV1Result;
+import com.fincoach.core.healthv2.analyzer.InsuranceGapCalculator;
 import com.fincoach.core.healthv2.analyzer.InsuranceGapV1Builder;
 import com.fincoach.core.healthv2.analyzer.InsuranceGapV1Result;
+import com.fincoach.core.healthv2.analyzer.InsuranceWarningCodes;
 import com.fincoach.core.healthv2.analyzer.DebtOptimizer;
 import com.fincoach.core.healthv2.analyzer.CashflowPlanner;
 import com.fincoach.core.healthv2.analyzer.GoalPlanner;
@@ -43,6 +45,7 @@ import com.fincoach.core.healthv2.rules.ScoreRuleDefaults;
 import com.fincoach.core.healthv2.rules.ScoreRuleSetRegistry;
 import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
 import com.fincoach.core.healthv2.service.AuditService;
+import com.fincoach.core.healthv2.service.FcInsuranceConfigService;
 import com.fincoach.core.healthv2.service.HealthReportV2Service;
 import com.fincoach.core.healthv2.util.CanonicalJsonHelper;
 import com.fincoach.core.healthv2.util.ConfigJsonHelper;
@@ -112,6 +115,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     private GoalPlanner goalPlanner;
     @Autowired
     private InsuranceGapAnalyzer insuranceGapAnalyzer;
+    @Autowired
+    private FcInsuranceConfigService insuranceConfigService;
     @Autowired
     private FcStrategyFlagMapper strategyFlagMapper;
     @Autowired
@@ -536,6 +541,23 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         // --- 2f. 保险模块 ---
         Map<String, Object> insuranceMetrics = new LinkedHashMap<>();
         insuranceMetrics.put("insuranceProfileComplete", insurance != null);
+        InsuranceGapCalculator.InsuranceGapCalcResult insuranceCalc = null;
+        List<String> insuranceCalcWarnings = new ArrayList<>();
+        try {
+            insuranceCalc = new InsuranceGapCalculator().calculate(
+                    insurance, insuranceConfigService == null ? null : insuranceConfigService.getDefaultConfig());
+            if (insuranceCalc != null) {
+                insuranceMetrics.putAll(insuranceCalc.metrics());
+                insuranceCalcWarnings = insuranceCalc.warnings() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(insuranceCalc.warnings());
+                insuranceMetrics.put("warnings", insuranceCalcWarnings);
+            }
+        } catch (Exception e) {
+            log.warn("[HealthV2-Report] InsuranceGapCalculator 异常", e);
+            insuranceCalcWarnings.add(InsuranceWarningCodes.INSURANCE_INCOME_MISSING);
+            insuranceMetrics.put("warnings", insuranceCalcWarnings);
+        }
 
         // --- 组装 metrics ---
         Map<String, Object> metrics = new LinkedHashMap<>();
