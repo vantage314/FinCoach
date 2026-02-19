@@ -12,6 +12,14 @@
         class="side-menu"
         :collapse="false"
       >
+        <el-menu-item index="/admin/dashboard">
+          <el-icon><DataBoard /></el-icon>
+          <span>仪表盘</span>
+        </el-menu-item>
+        <el-menu-item index="/admin/users">
+          <el-icon><User /></el-icon>
+          <span>用户管理</span>
+        </el-menu-item>
         <el-menu-item index="/admin/alerts">
           <el-icon><Bell /></el-icon>
           <span>预警管理</span>
@@ -93,7 +101,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowDown, Bell, Monitor, Setting } from '@element-plus/icons-vue';
+import { ArrowDown, Bell, DataBoard, Monitor, Setting, User } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '@/store/modules/user';
 

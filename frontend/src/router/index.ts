@@ -136,10 +136,22 @@ const routes: Array<RouteRecordRaw> = [
                 redirect: '/admin/alerts',
             },
             {
+                path: 'dashboard',
+                name: 'AdminDashboard',
+                component: () => import('../views/admin/AdminDashboard.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '仪表盘 - FinCoach' }
+            },
+            {
                 path: 'alerts',
                 name: 'AdminAlerts',
                 component: () => import('../views/admin/AdminAlerts.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: '预警管理 - FinCoach' }
+            },
+            {
+                path: 'users',
+                name: 'AdminUsers',
+                component: () => import('../views/admin/AdminUsers.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '用户管理 - FinCoach' }
             },
             {
                 path: 'debug',
