@@ -113,6 +113,12 @@ const routes: Array<RouteRecordRaw> = [
                 meta: { title: '现金流管理 - FinCoach', requiresAuth: true }
             },
             {
+                path: 'notifications',
+                name: 'Notifications',
+                component: () => import('@/views/notifications/Index.vue'),
+                meta: { title: '通知中心 - FinCoach', requiresAuth: true }
+            },
+            {
                 path: 'user/profile',
                 name: 'UserProfile',
                 component: () => import('../views/user/Profile.vue'),

@@ -66,6 +66,42 @@
       </el-menu>
 
       <div class="user-area">
+        <el-dropdown trigger="click" @visible-change="handleNotifyVisible">
+          <span class="notify-trigger">
+            <el-badge :value="unreadCount" :max="99" class="notify-badge">
+              <el-icon class="notify-icon"><Bell /></el-icon>
+            </el-badge>
+          </span>
+          <template #dropdown>
+            <div class="notify-dropdown">
+              <div class="notify-header">
+                <span>通知中心</span>
+                <el-button text size="small" @click.stop="markAllRead">全部已读</el-button>
+              </div>
+              <div v-if="notifyLoading" class="notify-empty">加载中...</div>
+              <div v-else>
+                <div v-if="notifications.length === 0" class="notify-empty">暂无通知</div>
+                <div v-else class="notify-list">
+                  <div
+                    v-for="item in notifications"
+                    :key="item.id"
+                    class="notify-item"
+                    @click="openNotification(item)"
+                  >
+                    <div class="notify-title">
+                      <span :class="item.isRead === 1 ? 'read' : 'unread'">{{ item.title }}</span>
+                      <span class="notify-time">{{ formatTime(item.createdAt) }}</span>
+                    </div>
+                    <div class="notify-content">{{ item.content }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="notify-footer">
+                <el-button text size="small" @click="goNotifications">查看全部</el-button>
+              </div>
+            </div>
+          </template>
+        </el-dropdown>
         <el-button
           v-if="isAdmin"
           type="primary"
@@ -110,10 +146,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
   ArrowDown,
+  Bell,
   ChatDotRound,
   DataLine,
   EditPen,
@@ -126,6 +163,7 @@ import {
 } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '@/store/modules/user';
+import { fetchNotifications, markAllNotificationsRead, markNotificationRead } from '@/api/notification';
 
 const route = useRoute();
 const router = useRouter();
@@ -151,6 +189,83 @@ const handleLogout = async () => {
     ElMessage.error('退出失败，请重试');
   }
 };
+
+const notifications = ref<any[]>([]);
+const unreadCount = ref(0);
+const notifyLoading = ref(false);
+
+const loadNotifications = async () => {
+  notifyLoading.value = true;
+  try {
+    const res: any = await fetchNotifications({ page: 1, size: 10 });
+    const data = res?.data ?? res;
+    notifications.value = Array.isArray(data?.list) ? data.list : [];
+    unreadCount.value = Number(data?.unreadCount ?? 0);
+  } catch (error) {
+    notifications.value = [];
+    unreadCount.value = 0;
+    console.error('[UserTopLayout] load notifications failed', error);
+  } finally {
+    notifyLoading.value = false;
+  }
+};
+
+const handleNotifyVisible = (visible: boolean) => {
+  if (visible) {
+    loadNotifications();
+  }
+};
+
+const markAllRead = async () => {
+  try {
+    await markAllNotificationsRead();
+    ElMessage.success('已全部标记已读');
+    loadNotifications();
+  } catch (error) {
+    ElMessage.error('操作失败');
+  }
+};
+
+const resolveRoute = (payloadJson?: string) => {
+  if (!payloadJson) return null;
+  try {
+    const payload = JSON.parse(payloadJson);
+    if (payload && typeof payload.route === 'string') {
+      return payload.route;
+    }
+  } catch (error) {
+    return null;
+  }
+  return null;
+};
+
+const openNotification = async (item: any) => {
+  try {
+    if (item.isRead !== 1) {
+      await markNotificationRead(item.id);
+    }
+  } catch (error) {
+    console.error('[UserTopLayout] mark read failed', error);
+  }
+  const routePath = resolveRoute(item.payloadJson);
+  if (routePath) {
+    router.push(routePath);
+  } else {
+    router.push('/app/notifications');
+  }
+  loadNotifications();
+};
+
+const goNotifications = () => {
+  router.push('/app/notifications');
+};
+
+const formatTime = (value: any) => {
+  if (!value) return '';
+  return String(value).replace('T', ' ').slice(0, 16);
+};
+
+onMounted(() => loadNotifications());
 </script>
 
 <style lang="scss" scoped>
@@ -222,6 +337,90 @@ const handleLogout = async () => {
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+}
+
+.notify-trigger {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.notify-icon {
+  color: $text-light;
+  font-size: 18px;
+}
+
+.notify-dropdown {
+  width: 320px;
+  padding: 12px;
+  background: #1d212b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: $text-light;
+}
+
+.notify-header,
+.notify-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.notify-footer {
+  margin-top: 8px;
+}
+
+.notify-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.notify-item {
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.notify-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.notify-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.notify-title .unread {
+  font-weight: 600;
+  color: #93c5fd;
+}
+
+.notify-title .read {
+  color: $text-dim;
+}
+
+.notify-time {
+  font-size: 11px;
+  color: $text-dim;
+}
+
+.notify-content {
+  font-size: 12px;
+  color: #cbd5f5;
+}
+
+.notify-empty {
+  padding: 16px 0;
+  text-align: center;
+  color: $text-dim;
+  font-size: 12px;
 }
 
 .admin-entry {
