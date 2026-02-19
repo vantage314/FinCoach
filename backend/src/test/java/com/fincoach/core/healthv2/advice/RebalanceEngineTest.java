@@ -36,7 +36,7 @@ public class RebalanceEngineTest {
                 List.of());
         when(templateRegistry.getActive()).thenReturn(templateSnapshot);
 
-        AdviceEngineV2 engine = new AdviceEngineV2(scoreRegistry, templateRegistry);
+        AdviceEngineV2 engine = new AdviceEngineV2(scoreRegistry, null, templateRegistry);
 
         Map<String, Object> allocation = new LinkedHashMap<>();
         allocation.put("STOCK", new BigDecimal("0.70"));

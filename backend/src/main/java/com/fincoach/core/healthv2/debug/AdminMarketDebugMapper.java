@@ -1,6 +1,8 @@
 package com.fincoach.core.healthv2.debug;
 
 import com.fincoach.core.healthv2.advice.AdviceThresholds;
+import com.fincoach.core.healthv2.advice.rules.AdviceRuleRegistry;
+import com.fincoach.core.healthv2.advice.rules.AdviceRuleSnapshot;
 import com.fincoach.core.healthv2.dto.admin.AdminMarketDebugLatestDTO;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateRegistry;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateSnapshot;
@@ -19,6 +21,8 @@ public class AdminMarketDebugMapper {
 
     @Autowired(required = false)
     private ScoreRuleSetRegistry scoreRuleSetRegistry;
+    @Autowired(required = false)
+    private AdviceRuleRegistry adviceRuleRegistry;
     @Autowired(required = false)
     private RebalanceTemplateRegistry rebalanceTemplateRegistry;
 
@@ -75,7 +79,8 @@ public class AdminMarketDebugMapper {
     private void attachAdviceMeta(AdminMarketDebugLatestDTO dto) {
         if (dto == null) return;
         ScoreRuleSnapshot scoreSnapshot = scoreRuleSetRegistry == null ? null : scoreRuleSetRegistry.get();
-        AdviceThresholds thresholds = AdviceThresholds.fromSnapshot(scoreSnapshot);
+        AdviceRuleSnapshot adviceSnapshot = adviceRuleRegistry == null ? null : adviceRuleRegistry.get();
+        AdviceThresholds thresholds = AdviceThresholds.fromSnapshots(scoreSnapshot, adviceSnapshot);
         dto.setAdviceThresholds(thresholds.toMap());
         dto.setAdviceWarnings(new ArrayList<>(safeList(thresholds.getWarnings())));
 

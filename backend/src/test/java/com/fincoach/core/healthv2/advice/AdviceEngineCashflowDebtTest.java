@@ -43,7 +43,7 @@ public class AdviceEngineCashflowDebtTest {
                 Map.of("CASH", 0.15, "BOND", 0.30, "STOCK", 0.35), List.of());
         when(templateRegistry.getActive()).thenReturn(templateSnapshot);
 
-        AdviceEngineV2 engine = new AdviceEngineV2(scoreRegistry, templateRegistry);
+        AdviceEngineV2 engine = new AdviceEngineV2(scoreRegistry, null, templateRegistry);
 
         FcCashflowEntity cashflow = new FcCashflowEntity();
         cashflow.setIncome(new BigDecimal("10000"));
@@ -64,7 +64,7 @@ public class AdviceEngineCashflowDebtTest {
 
     @Test
     public void testWarningsWhenAllInputsMissing() {
-        AdviceEngineV2 engine = new AdviceEngineV2(null, null);
+        AdviceEngineV2 engine = new AdviceEngineV2(null, null, null);
 
         AdviceEngineResult result = assertDoesNotThrow(() -> engine.build(null, null, null, null, null));
 
@@ -80,7 +80,7 @@ public class AdviceEngineCashflowDebtTest {
 
     @Test
     public void testWarningsWhenCashflowPresentAllocationMissing() {
-        AdviceEngineV2 engine = new AdviceEngineV2(null, null);
+        AdviceEngineV2 engine = new AdviceEngineV2(null, null, null);
 
         FcCashflowEntity cashflow = new FcCashflowEntity();
         cashflow.setIncome(new BigDecimal("8000"));
@@ -102,7 +102,7 @@ public class AdviceEngineCashflowDebtTest {
 
     @Test
     public void testWarningsWhenTotalAssetsMissingButAssetsPresent() {
-        AdviceEngineV2 engine = new AdviceEngineV2(null, null);
+        AdviceEngineV2 engine = new AdviceEngineV2(null, null, null);
 
         FcCashflowEntity cashflow = new FcCashflowEntity();
         cashflow.setIncome(new BigDecimal("9000"));
