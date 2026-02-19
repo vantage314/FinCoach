@@ -3,6 +3,8 @@ package com.fincoach.core.healthv2.advice;
 import com.fincoach.core.healthv2.entity.FcAssetEntity;
 import com.fincoach.core.healthv2.entity.FcCashflowEntity;
 import com.fincoach.core.healthv2.entity.FcLiabilityEntity;
+import com.fincoach.core.healthv2.advice.rules.AdviceRuleRegistry;
+import com.fincoach.core.healthv2.advice.rules.AdviceRuleSnapshot;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateRegistry;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateSnapshot;
 import com.fincoach.core.healthv2.rules.ScoreRuleSetRegistry;
@@ -21,11 +23,14 @@ import java.util.Map;
 public class AdviceEngineV2 {
 
     private final ScoreRuleSetRegistry scoreRuleSetRegistry;
+    private final AdviceRuleRegistry adviceRuleRegistry;
     private final RebalanceTemplateRegistry rebalanceTemplateRegistry;
 
     public AdviceEngineV2(ScoreRuleSetRegistry scoreRuleSetRegistry,
+                          AdviceRuleRegistry adviceRuleRegistry,
                           RebalanceTemplateRegistry rebalanceTemplateRegistry) {
         this.scoreRuleSetRegistry = scoreRuleSetRegistry;
+        this.adviceRuleRegistry = adviceRuleRegistry;
         this.rebalanceTemplateRegistry = rebalanceTemplateRegistry;
     }
 
@@ -41,7 +46,8 @@ public class AdviceEngineV2 {
                 assets, liabilities, cashflow, allocation, totalAssets, warnings);
 
         ScoreRuleSnapshot scoreSnapshot = scoreRuleSetRegistry == null ? null : scoreRuleSetRegistry.get();
-        AdviceThresholds thresholds = AdviceThresholds.fromSnapshot(scoreSnapshot);
+        AdviceRuleSnapshot adviceSnapshot = adviceRuleRegistry == null ? null : adviceRuleRegistry.get();
+        AdviceThresholds thresholds = AdviceThresholds.fromSnapshots(scoreSnapshot, adviceSnapshot);
         warnings.addAll(thresholds.getWarnings());
 
         RebalanceTemplateSnapshot templateSnapshot = rebalanceTemplateRegistry == null
@@ -92,6 +98,11 @@ public class AdviceEngineV2 {
             meta.put("ruleSetCode", scoreSnapshot.getCode());
             meta.put("ruleSetVersion", scoreSnapshot.getVersion());
             meta.put("ruleSetSource", scoreSnapshot.getSource());
+        }
+        if (adviceSnapshot != null) {
+            meta.put("adviceRuleSetCode", adviceSnapshot.getCode());
+            meta.put("adviceRuleSetVersion", adviceSnapshot.getVersion());
+            meta.put("adviceRuleSetSource", adviceSnapshot.getSource());
         }
         if (templateSnapshot != null) {
             meta.put("templateCode", templateSnapshot.getCode());

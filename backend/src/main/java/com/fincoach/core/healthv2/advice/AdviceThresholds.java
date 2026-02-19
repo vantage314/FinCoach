@@ -1,5 +1,8 @@
 package com.fincoach.core.healthv2.advice;
 
+import com.fincoach.core.healthv2.advice.rules.AdviceRuleDefaults;
+import com.fincoach.core.healthv2.advice.rules.AdviceRuleRegistry;
+import com.fincoach.core.healthv2.advice.rules.AdviceRuleSnapshot;
 import com.fincoach.core.healthv2.rules.ScoreRuleDefaults;
 import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
 
@@ -28,20 +31,31 @@ public class AdviceThresholds {
         this.warnings = warnings == null ? new ArrayList<>() : warnings;
     }
 
-    public static AdviceThresholds fromSnapshot(ScoreRuleSnapshot snapshot) {
+    public static AdviceThresholds fromSnapshots(ScoreRuleSnapshot scoreSnapshot,
+                                                 AdviceRuleSnapshot adviceSnapshot) {
         List<String> warnings = new ArrayList<>();
         double rebalanceThreshold = 0.05;
         int emergencyMonthsMin = 6;
         double debtPaymentRatioMax = 0.35;
         double surplusRateMin = 0.10;
 
-        if (snapshot != null) {
-            rebalanceThreshold = readDecimal(snapshot, ScoreRuleDefaults.REB_THRESHOLD, rebalanceThreshold, warnings);
-            emergencyMonthsMin = readInt(snapshot, ScoreRuleDefaults.EMERGENCY_MONTHS_MIN, emergencyMonthsMin, warnings);
-            debtPaymentRatioMax = readDecimal(snapshot, ScoreRuleDefaults.DEBT_PAYMENT_RATIO_MAX, debtPaymentRatioMax, warnings);
-            surplusRateMin = readDecimal(snapshot, ScoreRuleDefaults.SURPLUS_RATE_MIN, surplusRateMin, warnings);
-            if (snapshot.getWarnings() != null) {
-                for (String w : snapshot.getWarnings()) {
+        if (adviceSnapshot != null) {
+            rebalanceThreshold = readDecimal(adviceSnapshot, AdviceRuleDefaults.REBALANCE_DRIFT_PCT, rebalanceThreshold, warnings);
+            if (adviceSnapshot.getWarnings() != null) {
+                for (String w : adviceSnapshot.getWarnings()) {
+                    if (!warnings.contains(w)) warnings.add(w);
+                }
+            }
+        } else {
+            warnings.add(AdviceRuleRegistry.WARN_FALLBACK_DEFAULT);
+        }
+
+        if (scoreSnapshot != null) {
+            emergencyMonthsMin = readInt(scoreSnapshot, ScoreRuleDefaults.EMERGENCY_MONTHS_MIN, emergencyMonthsMin, warnings);
+            debtPaymentRatioMax = readDecimal(scoreSnapshot, ScoreRuleDefaults.DEBT_PAYMENT_RATIO_MAX, debtPaymentRatioMax, warnings);
+            surplusRateMin = readDecimal(scoreSnapshot, ScoreRuleDefaults.SURPLUS_RATE_MIN, surplusRateMin, warnings);
+            if (scoreSnapshot.getWarnings() != null) {
+                for (String w : scoreSnapshot.getWarnings()) {
                     if (!warnings.contains(w)) warnings.add(w);
                 }
             }
@@ -50,6 +64,15 @@ public class AdviceThresholds {
         }
 
         return new AdviceThresholds(rebalanceThreshold, emergencyMonthsMin, debtPaymentRatioMax, surplusRateMin, warnings);
+    }
+
+    private static double readDecimal(AdviceRuleSnapshot snapshot, String key, double fallback, List<String> warnings) {
+        if (snapshot.getParams() == null || !snapshot.getParams().containsKey(key)) {
+            warnings.add(AdviceRuleRegistry.WARN_PARAM_MISSING_PREFIX + key);
+            return fallback;
+        }
+        BigDecimal value = snapshot.getDecimal(key, BigDecimal.valueOf(fallback));
+        return value == null ? fallback : value.doubleValue();
     }
 
     private static double readDecimal(ScoreRuleSnapshot snapshot, String key, double fallback, List<String> warnings) {
@@ -78,7 +101,7 @@ public class AdviceThresholds {
 
     public Map<String, Object> toMap() {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("REB_THRESHOLD", rebalanceThreshold);
+        map.put(AdviceRuleDefaults.REBALANCE_DRIFT_PCT, rebalanceThreshold);
         map.put("EMERGENCY_MONTHS_MIN", emergencyMonthsMin);
         map.put("DEBT_PAYMENT_RATIO_MAX", debtPaymentRatioMax);
         map.put("SURPLUS_RATE_MIN", surplusRateMin);
