@@ -37,6 +37,10 @@
             <el-icon><Setting /></el-icon>
             <span>数据质量</span>
           </el-menu-item>
+          <el-menu-item index="/admin/advice/rulesets">
+            <el-icon><Setting /></el-icon>
+            <span>建议规则</span>
+          </el-menu-item>
           <el-menu-item index="/admin/data-source">
             <el-icon><Setting /></el-icon>
             <span>数据源与抓取</span>

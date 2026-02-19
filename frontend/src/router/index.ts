@@ -152,6 +152,12 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'AdminSecuritiesQuality',
                 component: () => import('../views/admin/AdminSecuritiesQuality.vue'),
                 meta: { requiresAuth: true, roles: ['ADMIN'], title: '数据质量 - FinCoach' }
+            },
+            {
+                path: 'advice/rulesets',
+                name: 'AdminAdviceRulesets',
+                component: () => import('../views/admin/AdminAdviceRulesets.vue'),
+                meta: { requiresAuth: true, roles: ['ADMIN'], title: '建议规则集 - FinCoach' }
             }
         ]
     },
