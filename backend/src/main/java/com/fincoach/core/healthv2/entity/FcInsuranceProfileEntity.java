@@ -22,5 +22,11 @@ public class FcInsuranceProfileEntity {
     private BigDecimal existingCoverAccident;
     private BigDecimal existingCoverCi;
     private BigDecimal existingCoverLife;
-    private LocalDateTime updatedAt;
+    private String maritalStatus;
+    private Integer childrenCount;
+    private Integer dependentsCount;
+    private String cityTier;
+    private String existingCoverageJson;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

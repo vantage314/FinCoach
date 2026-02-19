@@ -9,7 +9,13 @@ CREATE TABLE IF NOT EXISTS fc_insurance_profile (
   existing_cover_accident DECIMAL(18,2) NOT NULL DEFAULT 0,
   existing_cover_ci DECIMAL(18,2) NOT NULL DEFAULT 0,
   existing_cover_life DECIMAL(18,2) NOT NULL DEFAULT 0,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  marital_status VARCHAR(16) NULL,
+  children_count INT NOT NULL DEFAULT 0,
+  dependents_count INT NOT NULL DEFAULT 0,
+  city_tier VARCHAR(16) NULL,
+  existing_coverage_json TEXT NULL,
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_fc_insurance_profile_user ON fc_insurance_profile(user_id);
