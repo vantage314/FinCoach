@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-
 @Slf4j
 @Component
 public class CrawlerSelfHealScheduler {
@@ -20,29 +18,13 @@ public class CrawlerSelfHealScheduler {
     @Value("${crawler.selfHealEnabled:true}")
     private boolean selfHealEnabled = true;
 
-    @Value("${crawler.staleThresholdSeconds:30}")
-    private long staleThresholdSeconds = 30;
-
-    private long delayMillis = 15000L;
-
     public CrawlerSelfHealScheduler(DataSourceAdminService dataSourceAdminService,
                                     AlertService alertService) {
         this.dataSourceAdminService = dataSourceAdminService;
         this.alertService = alertService;
     }
 
-    @PostConstruct
-    public void init() {
-        long half = staleThresholdSeconds / 2;
-        long bounded = Math.max(5, Math.min(30, half));
-        delayMillis = bounded * 1000L;
-    }
-
-    public long getDelayMillis() {
-        return delayMillis > 0 ? delayMillis : 15000L;
-    }
-
-    @Scheduled(fixedDelayString = "#{@crawlerSelfHealScheduler.delayMillis}")
+    @Scheduled(fixedDelayString = "${crawler.selfHealIntervalMs:15000}")
     public void checkAndHeal() {
         if (!selfHealEnabled) {
             return;
