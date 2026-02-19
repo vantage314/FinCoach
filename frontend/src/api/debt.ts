@@ -23,3 +23,11 @@ export const upsertDebt = (payload: DebtItem) => {
 export const deleteDebt = (id: number) => {
   return request.post('/app/debt/delete', { id });
 };
+
+export const importDebtCsv = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return request.post('/app/debt/importCsv', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};

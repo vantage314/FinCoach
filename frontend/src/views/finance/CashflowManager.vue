@@ -21,6 +21,14 @@
           class="filter-item"
         />
         <el-button type="primary" @click="loadList">查询</el-button>
+        <el-upload
+          :show-file-list="false"
+          :before-upload="handleImport"
+          accept=".csv"
+        >
+          <el-button type="primary" plain :loading="importing">导入 CSV</el-button>
+        </el-upload>
+        <el-button plain @click="downloadTemplate">下载模板</el-button>
         <el-button type="primary" plain @click="handleAdd">
           <el-icon><Plus /></el-icon>
           记录月份
@@ -88,6 +96,36 @@
         </span>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="importDialogVisible" title="导入结果" width="720px" class="dark-dialog">
+      <div class="import-summary">
+        <div>总行数：{{ importResult.totalRows }}</div>
+        <div>成功：{{ importResult.successRows }}</div>
+        <div>失败：{{ importResult.errorRows }}</div>
+      </div>
+      <el-table
+        v-if="importErrors.length > 0"
+        :data="importErrors"
+        style="width: 100%"
+        class="dark-table"
+        :header-cell-style="{ background: '#1d212b', color: '#909399', borderBottom: '1px solid #363636' }"
+        :row-style="{ background: 'transparent', color: '#fff' }"
+      >
+        <el-table-column prop="row" label="行号" width="80" />
+        <el-table-column prop="field" label="字段" width="140" />
+        <el-table-column label="错误信息">
+          <template #default="{ row }">
+            {{ row.message || row.reason || row.error || '--' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="raw" label="原始行" />
+      </el-table>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="importDialogVisible = false">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -96,7 +134,7 @@ import { ref, computed, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import type { FormInstance, FormRules } from 'element-plus';
-import { listCashflowMonths, upsertCashflowMonth } from '@/api/cashflow';
+import { listCashflowMonths, upsertCashflowMonth, importCashflowCsv } from '@/api/cashflow';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { LineChart } from 'echarts/charts';
@@ -115,6 +153,10 @@ interface CashflowForm {
 const loading = ref(false);
 const cashflowList = ref<any[]>([]);
 const dialogVisible = ref(false);
+const importing = ref(false);
+const importDialogVisible = ref(false);
+const importResult = ref({ totalRows: 0, successRows: 0, errorRows: 0 });
+const importErrors = ref<any[]>([]);
 const formRef = ref<FormInstance>();
 const filters = ref<{ from: string | null; to: string | null }>({ from: null, to: null });
 
@@ -191,6 +233,41 @@ const handleAdd = () => {
     expense: 0,
   };
   dialogVisible.value = true;
+};
+
+const handleImport = async (file: File) => {
+  importing.value = true;
+  try {
+    const res: any = await importCashflowCsv(file);
+    const data = res?.data ?? res;
+    const successRows = Number(data?.successRows ?? data?.successCount ?? 0);
+    const errorRows = Number(data?.errorRows ?? data?.failCount ?? 0);
+    const totalRows = Number(data?.totalRows ?? successRows + errorRows);
+    const errors = data?.errors ?? data?.failures ?? [];
+    importResult.value = { totalRows, successRows, errorRows };
+    importErrors.value = Array.isArray(errors) ? errors : [];
+    importDialogVisible.value = true;
+    ElMessage.success('导入完成');
+    loadList();
+  } catch (error) {
+    ElMessage.error('导入失败');
+  } finally {
+    importing.value = false;
+  }
+  return false;
+};
+
+const downloadTemplate = () => {
+  const header = 'month,income,expense';
+  const sample = '2026-01,12000,8000';
+  const csv = `${header}\n${sample}\n`;
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'cashflow_import_template.csv';
+  link.click();
+  URL.revokeObjectURL(url);
 };
 
 const handleEdit = (row: any) => {
@@ -322,5 +399,11 @@ h2 {
 }
 .negative {
   color: #f56c6c;
+}
+.import-summary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  color: #cbd5f5;
 }
 </style>

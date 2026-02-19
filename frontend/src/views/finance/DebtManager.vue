@@ -5,10 +5,20 @@
         <h2>债务管理</h2>
         <div class="subtitle">记录当前债务与月供，支持 APR 小数或百分比输入</div>
       </div>
-      <el-button type="primary" @click="handleAdd">
-        <el-icon><Plus /></el-icon>
-        新增债务
-      </el-button>
+      <div class="actions">
+        <el-upload
+          :show-file-list="false"
+          :before-upload="handleImport"
+          accept=".csv"
+        >
+          <el-button type="primary" plain :loading="importing">导入 CSV</el-button>
+        </el-upload>
+        <el-button plain @click="downloadTemplate">下载模板</el-button>
+        <el-button type="primary" @click="handleAdd">
+          <el-icon><Plus /></el-icon>
+          新增债务
+        </el-button>
+      </div>
     </div>
 
     <div class="charts-row">
@@ -104,6 +114,36 @@
         </span>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="importDialogVisible" title="导入结果" width="720px" class="dark-dialog">
+      <div class="import-summary">
+        <div>总行数：{{ importResult.totalRows }}</div>
+        <div>成功：{{ importResult.successRows }}</div>
+        <div>失败：{{ importResult.errorRows }}</div>
+      </div>
+      <el-table
+        v-if="importErrors.length > 0"
+        :data="importErrors"
+        style="width: 100%"
+        class="dark-table"
+        :header-cell-style="{ background: '#1d212b', color: '#909399', borderBottom: '1px solid #363636' }"
+        :row-style="{ background: 'transparent', color: '#fff' }"
+      >
+        <el-table-column prop="row" label="行号" width="80" />
+        <el-table-column prop="field" label="字段" width="140" />
+        <el-table-column label="错误信息">
+          <template #default="{ row }">
+            {{ row.message || row.reason || row.error || '--' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="raw" label="原始行" />
+      </el-table>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="importDialogVisible = false">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -112,7 +152,7 @@ import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import type { FormInstance, FormRules } from 'element-plus';
-import { deleteDebt, listDebts, upsertDebt } from '@/api/debt';
+import { deleteDebt, listDebts, upsertDebt, importDebtCsv } from '@/api/debt';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { PieChart } from 'echarts/charts';
@@ -136,6 +176,10 @@ interface DebtForm {
 const loading = ref(false);
 const debtList = ref<any[]>([]);
 const dialogVisible = ref(false);
+const importing = ref(false);
+const importDialogVisible = ref(false);
+const importResult = ref({ totalRows: 0, successRows: 0, errorRows: 0 });
+const importErrors = ref<any[]>([]);
 const formRef = ref<FormInstance>();
 const form = ref<DebtForm>({
   id: null,
@@ -214,6 +258,41 @@ const handleAdd = () => {
     endDate: null,
   };
   dialogVisible.value = true;
+};
+
+const handleImport = async (file: File) => {
+  importing.value = true;
+  try {
+    const res: any = await importDebtCsv(file);
+    const data = res?.data ?? res;
+    const successRows = Number(data?.successRows ?? data?.successCount ?? 0);
+    const errorRows = Number(data?.errorRows ?? data?.failCount ?? 0);
+    const totalRows = Number(data?.totalRows ?? successRows + errorRows);
+    const errors = data?.errors ?? data?.failures ?? [];
+    importResult.value = { totalRows, successRows, errorRows };
+    importErrors.value = Array.isArray(errors) ? errors : [];
+    importDialogVisible.value = true;
+    ElMessage.success('导入完成');
+    loadList();
+  } catch (error) {
+    ElMessage.error('导入失败');
+  } finally {
+    importing.value = false;
+  }
+  return false;
+};
+
+const downloadTemplate = () => {
+  const header = 'debtType,apr,remainingBalance,monthlyPayment,termMonths,principal,startDate,endDate,externalKey';
+  const sample = 'MORTGAGE,0.045,480000,3200,240,500000,2022-01-01,2042-01-01,loan-001';
+  const csv = `${header}\n${sample}\n`;
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'debt_import_template.csv';
+  link.click();
+  URL.revokeObjectURL(url);
 };
 
 const handleEdit = (row: any) => {
@@ -311,6 +390,14 @@ onMounted(() => loadList());
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 h2 {
   margin: 0;
@@ -375,5 +462,11 @@ h2 {
   font-size: 12px;
   color: #909399;
   margin-top: 4px;
+}
+.import-summary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  color: #cbd5f5;
 }
 </style>
