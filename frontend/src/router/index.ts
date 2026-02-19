@@ -101,6 +101,18 @@ const routes: Array<RouteRecordRaw> = [
                 meta: { title: '资产管理 - FinCoach', requiresAuth: true }
             },
             {
+                path: 'debt',
+                name: 'DebtManager',
+                component: () => import('@/views/finance/DebtManager.vue'),
+                meta: { title: '债务管理 - FinCoach', requiresAuth: true }
+            },
+            {
+                path: 'cashflow',
+                name: 'CashflowManager',
+                component: () => import('@/views/finance/CashflowManager.vue'),
+                meta: { title: '现金流管理 - FinCoach', requiresAuth: true }
+            },
+            {
                 path: 'user/profile',
                 name: 'UserProfile',
                 component: () => import('../views/user/Profile.vue'),

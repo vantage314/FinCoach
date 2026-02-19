@@ -34,6 +34,14 @@
             <el-icon><EditPen /></el-icon>
             <span>账本管理</span>
           </el-menu-item>
+          <el-menu-item index="/app/debt">
+            <el-icon><Wallet /></el-icon>
+            <span>债务管理</span>
+          </el-menu-item>
+          <el-menu-item index="/app/cashflow">
+            <el-icon><DataLine /></el-icon>
+            <span>现金流管理</span>
+          </el-menu-item>
           <el-menu-item index="/app/dashboard">
             <el-icon><PieChart /></el-icon>
             <span>资产总览</span>
