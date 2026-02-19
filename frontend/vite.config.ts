@@ -23,4 +23,27 @@ export default defineConfig({
             },
         },
     },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (!id.includes('node_modules')) {
+                        return;
+                    }
+                    if (/element-plus/.test(id)) {
+                        return 'element-plus';
+                    }
+                    if (/echarts|vue-echarts/.test(id)) {
+                        return 'echarts';
+                    }
+                    if (/axios/.test(id)) {
+                        return 'axios';
+                    }
+                    if (/[\\/]vue[\\/]/.test(id) || /@vue/.test(id) || /vue-router/.test(id) || /pinia/.test(id)) {
+                        return 'vue-core';
+                    }
+                },
+            },
+        },
+    },
 })

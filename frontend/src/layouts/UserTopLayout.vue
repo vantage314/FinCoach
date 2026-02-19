@@ -127,9 +127,16 @@
 
     <el-main class="main-content">
       <router-view v-slot="{ Component }">
-        <transition name="fade-transform" mode="out-in">
-          <component :is="Component" :key="$route.fullPath" />
-        </transition>
+        <Suspense>
+          <template #default>
+            <transition name="fade-transform" mode="out-in">
+              <component :is="Component" :key="$route.fullPath" />
+            </transition>
+          </template>
+          <template #fallback>
+            <div class="route-loading">页面加载中...</div>
+          </template>
+        </Suspense>
       </router-view>
     </el-main>
   </el-container>
@@ -444,6 +451,13 @@ onMounted(() => loadNotifications());
   padding: 20px 24px;
   background-color: $background-dark;
   min-height: calc(100vh - 64px);
+}
+
+.route-loading {
+  color: $text-dim;
+  padding: 32px 0;
+  text-align: center;
+  font-size: 14px;
 }
 
 .fade-transform-enter-active,
