@@ -19,15 +19,15 @@
     <el-card class="summary-card" shadow="never" v-loading="loading">
       <template #header>核心摘要</template>
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="UserId">{{ snapshot?.userId ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item label="RequestId">{{ snapshot?.requestId ?? '-' }}</el-descriptions-item>
-        <el-descriptions-item label="Scores">{{ scoreSummaryText }}</el-descriptions-item>
-        <el-descriptions-item label="DebtCashflow">{{ debtCashflowText }}</el-descriptions-item>
-        <el-descriptions-item label="DebtOptimizer">{{ debtOptimizerText }}</el-descriptions-item>
-        <el-descriptions-item label="InsuranceGap">{{ insuranceGapText }}</el-descriptions-item>
-        <el-descriptions-item label="Alerts">{{ alertsSummaryText }}</el-descriptions-item>
-        <el-descriptions-item label="Correlation">{{ correlationSummaryText }}</el-descriptions-item>
-        <el-descriptions-item label="CorrelationWarnings" :span="2">{{ correlationWarnings }}</el-descriptions-item>
+        <el-descriptions-item :label="label('UserId')">{{ formatEmpty(snapshot?.userId) }}</el-descriptions-item>
+        <el-descriptions-item :label="label('RequestId')">{{ formatEmpty(snapshot?.requestId) }}</el-descriptions-item>
+        <el-descriptions-item :label="label('Scores')">{{ scoreSummaryText }}</el-descriptions-item>
+        <el-descriptions-item :label="label('DebtCashflow')">{{ debtCashflowText }}</el-descriptions-item>
+        <el-descriptions-item :label="label('DebtOptimizer')">{{ debtOptimizerText }}</el-descriptions-item>
+        <el-descriptions-item :label="label('InsuranceGap')">{{ insuranceGapText }}</el-descriptions-item>
+        <el-descriptions-item :label="label('Alerts')">{{ alertsSummaryText }}</el-descriptions-item>
+        <el-descriptions-item :label="label('Correlation')">{{ correlationSummaryText }}</el-descriptions-item>
+        <el-descriptions-item :label="label('CorrelationWarnings')" :span="2">{{ correlationWarnings }}</el-descriptions-item>
       </el-descriptions>
     </el-card>
 
@@ -36,13 +36,13 @@
         <el-card class="summary-card" shadow="never">
           <template #header>分数摘要</template>
           <el-descriptions :column="1" border>
-            <el-descriptions-item label="Risk">
+            <el-descriptions-item :label="label('Risk')">
               {{ snapshot?.scoreSummary?.risk?.value ?? '-' }} / {{ snapshot?.scoreSummary?.risk?.level ?? '-' }}
             </el-descriptions-item>
-            <el-descriptions-item label="AssetHealth">
+            <el-descriptions-item :label="label('AssetHealth')">
               {{ snapshot?.scoreSummary?.assetHealth?.value ?? '-' }} / {{ snapshot?.scoreSummary?.assetHealth?.level ?? '-' }}
             </el-descriptions-item>
-            <el-descriptions-item label="Behavior">
+            <el-descriptions-item :label="label('Behavior')">
               {{ snapshot?.scoreSummary?.behavior?.value ?? '-' }} / {{ snapshot?.scoreSummary?.behavior?.level ?? '-' }}
             </el-descriptions-item>
           </el-descriptions>
@@ -52,10 +52,10 @@
         <el-card class="summary-card" shadow="never">
           <template #header>预警摘要</template>
           <el-descriptions :column="1" border>
-            <el-descriptions-item label="OpenCount">{{ snapshot?.alertsSummary?.openCount ?? '-' }}</el-descriptions-item>
-            <el-descriptions-item label="CriticalCount">{{ snapshot?.alertsSummary?.criticalCount ?? '-' }}</el-descriptions-item>
-            <el-descriptions-item label="TopCodes">{{ (snapshot?.alertsSummary?.topCodes || []).join(', ') || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="LastCreatedAt">{{ snapshot?.alertsSummary?.lastCreatedAt ?? '-' }}</el-descriptions-item>
+            <el-descriptions-item :label="label('OpenCount')">{{ formatEmpty(snapshot?.alertsSummary?.openCount) }}</el-descriptions-item>
+            <el-descriptions-item :label="label('CriticalCount')">{{ formatEmpty(snapshot?.alertsSummary?.criticalCount) }}</el-descriptions-item>
+            <el-descriptions-item :label="label('TopCodes')">{{ formatEmpty((snapshot?.alertsSummary?.topCodes || []).join(', ')) }}</el-descriptions-item>
+            <el-descriptions-item :label="label('LastCreatedAt')">{{ formatEmpty(snapshot?.alertsSummary?.lastCreatedAt) }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </el-col>
@@ -93,11 +93,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { fetchMarketDebugLatest } from '@/api/adminDebug';
+import { formatEmpty, formatEmptyText, getAdminLabel } from '@/utils/labelMap';
 
 const snapshot = ref<any>(null);
 const loading = ref(false);
 const error = ref('');
 const matrixOpen = ref<string[]>([]);
+const label = (key: string) => getAdminLabel(key);
 
 const loadSnapshot = async () => {
   loading.value = true;
@@ -165,7 +167,7 @@ const correlationSummaryText = computed(() => {
 
 const correlationWarnings = computed(() => {
   const warnings = snapshot.value?.correlationMatrixSummary?.warnings || [];
-  return warnings.length ? warnings.join(', ') : '暂无';
+  return warnings.length ? warnings.join(', ') : formatEmptyText('');
 });
 
 onMounted(() => {

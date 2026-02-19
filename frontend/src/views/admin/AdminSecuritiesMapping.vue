@@ -6,8 +6,8 @@
         <p class="sub">管理资产关键字与交易所代码映射关系</p>
       </div>
       <div class="header-actions">
-        <el-button type="primary" @click="openCreate">新增映射</el-button>
-        <el-button @click="loadMappings" :loading="loading">刷新</el-button>
+        <el-button type="primary" @click="openCreate">{{ label('Add') }}映射</el-button>
+        <el-button @click="loadMappings" :loading="loading">{{ label('Refresh') }}</el-button>
       </div>
     </div>
 
@@ -24,17 +24,17 @@
         <el-input
           v-model="query.keyword"
           class="filter-item"
-          placeholder="AssetKey / 关键字"
+          :placeholder="assetKeyPlaceholder"
           clearable
           @keyup.enter="handleSearch"
         />
-        <el-select v-model="enabledFilter" class="filter-item" placeholder="启用状态">
+        <el-select v-model="enabledFilter" class="filter-item" :placeholder="label('Enabled')">
           <el-option label="全部" value="ALL" />
-          <el-option label="启用" value="ENABLED" />
-          <el-option label="禁用" value="DISABLED" />
+          <el-option :label="label('EnabledOn')" value="ENABLED" />
+          <el-option :label="label('Disabled')" value="DISABLED" />
         </el-select>
-        <el-button type="primary" @click="handleSearch">查询</el-button>
-        <el-button @click="handleReset">重置</el-button>
+        <el-button type="primary" @click="handleSearch">{{ label('Query') }}</el-button>
+        <el-button @click="handleReset">{{ label('Reset') }}</el-button>
       </div>
     </el-card>
 
@@ -45,24 +45,35 @@
         v-loading="loading"
         empty-text="暂无映射"
       >
-        <el-table-column prop="keyword" label="AssetKey" min-width="180" />
-        <el-table-column prop="ticker" label="Ticker" min-width="160" />
-        <el-table-column prop="market" label="Market" min-width="120" />
-        <el-table-column label="Enabled" width="120">
+        <el-table-column prop="keyword" :label="label('AssetKey')" min-width="180" />
+        <el-table-column prop="ticker" :label="label('Ticker')" min-width="160" />
+        <el-table-column :label="label('Market')" min-width="120">
           <template #default="{ row }">
-            <el-switch
-              v-model="row.enabled"
-              :active-value="1"
-              :inactive-value="0"
-              @change="(val: number) => handleToggle(row, val)"
-            />
+            {{ formatMarket(row.market) }}
           </template>
         </el-table-column>
-        <el-table-column prop="updatedAt" label="UpdatedAt" min-width="180" />
-        <el-table-column label="操作" width="140" fixed="right">
+        <el-table-column :label="label('Enabled')" min-width="160">
+          <template #default="{ row }">
+            <el-space size="8" alignment="center">
+              <el-switch
+                v-model="row.enabled"
+                :active-value="1"
+                :inactive-value="0"
+                @change="(val: number) => handleToggle(row, val)"
+              />
+              <span class="status-text">{{ formatEnabled(row.enabled) }}</span>
+            </el-space>
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('UpdatedAt')" min-width="180">
+          <template #default="{ row }">
+            {{ formatEmpty(row.updatedAt) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('Operation')" width="140" fixed="right">
           <template #default="{ row }">
             <el-button size="small" type="primary" plain @click="openEdit(row)">
-              编辑
+              {{ label('Edit') }}
             </el-button>
           </template>
         </el-table-column>
@@ -84,19 +95,19 @@
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="520px">
       <el-form :model="form" label-width="110px">
-        <el-form-item label="AssetKey" required>
+        <el-form-item :label="label('AssetKey')" required>
           <el-input v-model="form.keyword" placeholder="例如 STOCK" />
         </el-form-item>
-        <el-form-item label="Ticker" required>
+        <el-form-item :label="label('Ticker')" required>
           <el-input v-model="form.ticker" placeholder="例如 SPY.US" />
         </el-form-item>
-        <el-form-item label="Market">
+        <el-form-item :label="label('Market')">
           <el-input v-model="form.market" placeholder="US / HK / CN" />
         </el-form-item>
-        <el-form-item label="Priority">
+        <el-form-item :label="label('Priority')">
           <el-input-number v-model="form.priority" :min="0" :max="999" />
         </el-form-item>
-        <el-form-item label="Enabled">
+        <el-form-item :label="label('Enabled')">
           <el-switch v-model="form.enabled" :active-value="1" :inactive-value="0" />
         </el-form-item>
       </el-form>
@@ -119,6 +130,7 @@ import {
   updateSecuritiesMapping,
   toggleSecuritiesMapping,
 } from '@/api/adminSecurities';
+import { formatEmpty, formatEnabled, formatMarket, getAdminLabel } from '@/utils/labelMap';
 
 const items = ref<any[]>([]);
 const total = ref(0);
@@ -146,9 +158,11 @@ const form = reactive({
   enabled: 1,
 });
 
+const label = (key: string) => getAdminLabel(key);
 const dialogTitle = computed(() =>
-  dialogMode.value === 'create' ? '新增映射' : '编辑映射'
+  dialogMode.value === 'create' ? `${label('Add')}映射` : `${label('Edit')}映射`
 );
+const assetKeyPlaceholder = computed(() => `${label('AssetKey')} / 关键词`);
 
 const loadMappings = async () => {
   loading.value = true;
@@ -220,7 +234,7 @@ const openEdit = (row: any) => {
 
 const handleSave = async () => {
   if (!form.keyword || !form.ticker) {
-    ElMessage.warning('AssetKey 与 Ticker 必填');
+    ElMessage.warning(`${label('AssetKey')} 与 ${label('Ticker')} 必填`);
     return;
   }
   saving.value = true;
@@ -252,7 +266,7 @@ const handleToggle = async (row: any, value: number) => {
   const previous = value === 1 ? 0 : 1;
   try {
     await toggleSecuritiesMapping(row.id, value === 1);
-    ElMessage.success(value === 1 ? '已启用' : '已禁用');
+    ElMessage.success(value === 1 ? `已${label('EnabledOn')}` : `已${label('Disabled')}`);
   } catch (e: any) {
     row.enabled = previous;
     error.value = e?.message || '切换失败';
@@ -328,5 +342,10 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   padding-top: 12px;
+}
+
+.status-text {
+  font-size: 12px;
+  color: #cbd5f5;
 }
 </style>
