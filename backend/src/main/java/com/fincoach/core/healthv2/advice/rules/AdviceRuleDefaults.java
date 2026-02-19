@@ -16,6 +16,11 @@ public final class AdviceRuleDefaults {
     public static final String RISK_SCORE_HIGH = "RISK_SCORE_HIGH";
     public static final String BEHAVIOR_SCORE_WEIGHTS_JSON = "BEHAVIOR_SCORE_WEIGHTS_JSON";
     public static final String MAX_POSITIONS = "MAX_POSITIONS";
+    public static final String EMERGENCY_FUND_MONTHS_TARGET = "EMERGENCY_FUND_MONTHS_TARGET";
+    public static final String DTI_WARN = "DTI_WARN";
+    public static final String DTI_DANGER = "DTI_DANGER";
+    public static final String DEBT_STRATEGY = "DEBT_STRATEGY";
+    public static final String MIN_NET_FOR_EXTRA_DEBT_PAYMENT = "MIN_NET_FOR_EXTRA_DEBT_PAYMENT";
 
     private static final Map<String, AdviceRuleParamDefinition> DEFAULT_PARAMS;
 
@@ -35,6 +40,17 @@ public final class AdviceRuleDefaults {
                 "Behavior score weights"));
         map.put(MAX_POSITIONS, new AdviceRuleParamDefinition(
                 MAX_POSITIONS, AdviceRuleValueType.INT, "8", "Max positions"));
+        map.put(EMERGENCY_FUND_MONTHS_TARGET, new AdviceRuleParamDefinition(
+                EMERGENCY_FUND_MONTHS_TARGET, AdviceRuleValueType.INT, "3", "Emergency fund target months"));
+        map.put(DTI_WARN, new AdviceRuleParamDefinition(
+                DTI_WARN, AdviceRuleValueType.DECIMAL, "0.35", "Debt-to-income warning threshold"));
+        map.put(DTI_DANGER, new AdviceRuleParamDefinition(
+                DTI_DANGER, AdviceRuleValueType.DECIMAL, "0.50", "Debt-to-income danger threshold"));
+        map.put(DEBT_STRATEGY, new AdviceRuleParamDefinition(
+                DEBT_STRATEGY, AdviceRuleValueType.STRING, "AVALANCHE", "Debt payoff strategy"));
+        map.put(MIN_NET_FOR_EXTRA_DEBT_PAYMENT, new AdviceRuleParamDefinition(
+                MIN_NET_FOR_EXTRA_DEBT_PAYMENT, AdviceRuleValueType.DECIMAL, "0",
+                "Min net cashflow for extra debt payment"));
         DEFAULT_PARAMS = Collections.unmodifiableMap(map);
     }
 
