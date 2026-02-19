@@ -49,7 +49,7 @@
         <el-table-column prop="ticker" :label="label('Ticker')" min-width="160" />
         <el-table-column :label="label('Market')" min-width="120">
           <template #default="{ row }">
-            {{ formatMarket(row.market) }}
+            {{ formatMarketText(row.market) }}
           </template>
         </el-table-column>
         <el-table-column :label="label('Enabled')" min-width="160">
@@ -61,13 +61,13 @@
                 :inactive-value="0"
                 @change="(val: number) => handleToggle(row, val)"
               />
-              <span class="status-text">{{ formatEnabled(row.enabled) }}</span>
+              <span class="status-text">{{ formatEnabledText(row.enabled) }}</span>
             </el-space>
           </template>
         </el-table-column>
         <el-table-column :label="label('UpdatedAt')" min-width="180">
           <template #default="{ row }">
-            {{ formatEmpty(row.updatedAt) }}
+            {{ formatEmptyText(row.updatedAt) }}
           </template>
         </el-table-column>
         <el-table-column :label="label('Operation')" width="140" fixed="right">
@@ -130,7 +130,12 @@ import {
   updateSecuritiesMapping,
   toggleSecuritiesMapping,
 } from '@/api/adminSecurities';
-import { formatEmpty, formatEnabled, formatMarket, getAdminLabel } from '@/utils/labelMap';
+import {
+  formatEmptyText,
+  formatEnabledText,
+  formatMarketText,
+  getAdminLabel
+} from '@/utils/labelMap';
 
 const items = ref<any[]>([]);
 const total = ref(0);

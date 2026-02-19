@@ -30,6 +30,55 @@ export const adminLabelMap: Record<string, string> = {
   Refresh: '刷新',
   Priority: '优先级',
   Empty: '暂无',
+  Mode: '模式',
+  Description: '说明',
+  Job: '任务',
+  Status: '状态',
+  CrawlerMode: '抓取方式',
+  Interval: '间隔',
+  LastStartAt: '最近启动',
+  LastHeartbeatAt: '最近心跳',
+  Stale: '是否过期',
+  SecondsSinceHeartbeat: '心跳间隔(秒)',
+  LastEndAt: '最近结束',
+  Time: '时间',
+  Type: '类型',
+  Message: '消息',
+  ImportDemo: '导入演示数据',
+  SwitchTo: '切换到',
+  Start: '启动',
+  Stop: '停止',
+  Recover: '恢复',
+  ModeDemo: '演示',
+  ModeRealtime: '实时',
+  ModeDaemon: '守护',
+  ModeOnce: '单次',
+  StatusRunning: '运行中',
+  StatusStopped: '已停止',
+  StatusStopping: '停止中',
+  StatusFailed: '失败',
+  StatusOk: '正常',
+  StatusStale: '过期',
+  Summary: '摘要',
+  AssetsCount: '资产数',
+  SampleSize: '样本数',
+  LatestDate: '最新日期',
+  Date: '日期',
+  PriceClose: '收盘价',
+  Currency: '币种',
+  Source: '来源',
+  MissingMappings: '缺失映射',
+  Coverage: '覆盖不足/滞后',
+  CoverageDays: '覆盖天数',
+  LagDays: '滞后天数',
+  Issues: '问题',
+  Anomalies: '异常波动',
+  Reason: '原因',
+  ChangePct: '涨跌幅',
+  Recommendations: '总体建议',
+  StaleCount: '过期',
+  RecoverCount: '恢复',
+  RestartCount: '重启',
 };
 
 export const getAdminLabel = (key: string, fallback?: string) => {
@@ -62,4 +111,57 @@ export const formatEnabled = (value: unknown) => {
 
 export const formatEmptyText = (value: unknown) => {
   return formatEmpty(value, getAdminLabel('Empty'));
+};
+
+export const formatMarketText = (value: unknown) => {
+  if (value === null || value === undefined || value === '') {
+    return formatEmptyText(value);
+  }
+  return formatMarket(value);
+};
+
+export const formatEnabledText = (value: unknown) => {
+  const formatted = formatEnabled(value);
+  return formatted === '-' ? formatEmptyText(value) : formatted;
+};
+
+export const formatDataSourceMode = (value: unknown) => {
+  if (value === null || value === undefined || value === '') {
+    return formatEmptyText(value);
+  }
+  const normalized = String(value).trim().toUpperCase();
+  if (normalized === 'REALTIME') return getAdminLabel('ModeRealtime');
+  if (normalized === 'DEMO_DB' || normalized === 'DEMO') return getAdminLabel('ModeDemo');
+  return String(value);
+};
+
+export const formatJobStatus = (value: unknown) => {
+  if (value === null || value === undefined || value === '') {
+    return formatEmptyText(value);
+  }
+  const normalized = String(value).trim().toUpperCase();
+  if (normalized === 'RUNNING') return getAdminLabel('StatusRunning');
+  if (normalized === 'STOPPING') return getAdminLabel('StatusStopping');
+  if (normalized === 'STOPPED') return getAdminLabel('StatusStopped');
+  if (normalized === 'FAILED') return getAdminLabel('StatusFailed');
+  return String(value);
+};
+
+export const formatCrawlerMode = (value: unknown) => {
+  if (value === null || value === undefined || value === '') {
+    return formatEmptyText(value);
+  }
+  const normalized = String(value).trim().toUpperCase();
+  if (normalized === 'DAEMON') return getAdminLabel('ModeDaemon');
+  if (normalized === 'ONCE' || normalized === 'RUN_ONCE') return getAdminLabel('ModeOnce');
+  return String(value);
+};
+
+export const formatStaleStatus = (value: unknown) => {
+  if (value === null || value === undefined || value === '') {
+    return formatEmptyText(value);
+  }
+  if (value === true || value === 'STALE') return getAdminLabel('StatusStale');
+  if (value === false || value === 'OK') return getAdminLabel('StatusOk');
+  return String(value);
 };

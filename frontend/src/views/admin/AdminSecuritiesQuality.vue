@@ -6,7 +6,7 @@
         <p class="sub">查看映射缺失、覆盖不足与异常波动</p>
       </div>
       <el-button type="primary" @click="loadQuality" :loading="loading">
-        刷新
+        {{ label('Refresh') }}
       </el-button>
     </div>
 
@@ -19,15 +19,23 @@
     />
 
     <el-card class="table-card" shadow="never">
-      <template #header>缺失映射</template>
+      <template #header>{{ label('MissingMappings') }}</template>
       <el-table
         :data="quality.missingMappings"
         style="width: 100%"
         v-loading="loading"
-        empty-text="暂无缺失映射"
+        :empty-text="`${label('Empty')}${label('MissingMappings')}`"
       >
-        <el-table-column prop="assetKey" label="AssetKey" min-width="180" />
-        <el-table-column prop="reason" label="原因" min-width="220" />
+        <el-table-column :label="label('AssetKey')" min-width="180">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.assetKey) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('Reason')" min-width="220">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.reason) }}
+          </template>
+        </el-table-column>
       </el-table>
       <div class="card-tip">
         建议下一步：{{ missingSuggestion }}
@@ -35,25 +43,25 @@
     </el-card>
 
     <el-card class="summary-card" shadow="never">
-      <template #header>覆盖不足 / 滞后</template>
+      <template #header>{{ label('Coverage') }}</template>
       <el-descriptions :column="4" border>
-        <el-descriptions-item label="资产数">
+        <el-descriptions-item :label="label('AssetsCount')">
           {{ quality.snapshotCoverage?.assetsCount ?? 0 }}
         </el-descriptions-item>
-        <el-descriptions-item label="覆盖天数">
+        <el-descriptions-item :label="label('CoverageDays')">
           {{ quality.snapshotCoverage?.daysCovered ?? 0 }}
         </el-descriptions-item>
-        <el-descriptions-item label="最新日期">
-          {{ quality.snapshotCoverage?.latestDate || '-' }}
+        <el-descriptions-item :label="label('LatestDate')">
+          {{ formatEmptyText(quality.snapshotCoverage?.latestDate) }}
         </el-descriptions-item>
-        <el-descriptions-item label="滞后天数">
+        <el-descriptions-item :label="label('LagDays')">
           {{ quality.snapshotCoverage?.lagDays ?? 0 }}
         </el-descriptions-item>
       </el-descriptions>
       <div class="issues">
-        <div class="issues-title">Issues</div>
+        <div class="issues-title">{{ label('Issues') }}</div>
         <ul>
-          <li v-for="item in quality.snapshotCoverage?.issues || []" :key="item">
+          <li v-for="item in coverageIssues" :key="item">
             {{ item }}
           </li>
         </ul>
@@ -64,21 +72,33 @@
     </el-card>
 
     <el-card class="table-card" shadow="never">
-      <template #header>异常波动</template>
+      <template #header>{{ label('Anomalies') }}</template>
       <el-table
         :data="quality.anomalies"
         style="width: 100%"
         v-loading="loading"
-        empty-text="暂无异常波动"
+        :empty-text="`${label('Empty')}${label('Anomalies')}`"
       >
-        <el-table-column prop="assetKey" label="AssetKey" min-width="160" />
-        <el-table-column prop="date" label="日期" width="140" />
-        <el-table-column label="Change%" width="140">
+        <el-table-column :label="label('AssetKey')" min-width="160">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.assetKey) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('Date')" width="140">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.date) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('ChangePct')" width="140">
           <template #default="{ row }">
             {{ formatPct(row.changePct) }}
           </template>
         </el-table-column>
-        <el-table-column prop="reason" label="原因" min-width="220" />
+        <el-table-column :label="label('Reason')" min-width="220">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.reason) }}
+          </template>
+        </el-table-column>
       </el-table>
       <div class="card-tip">
         建议下一步：{{ anomalySuggestion }}
@@ -86,9 +106,9 @@
     </el-card>
 
     <el-card class="summary-card" shadow="never">
-      <template #header>总体建议</template>
+      <template #header>{{ label('Recommendations') }}</template>
       <ul class="tips">
-        <li v-for="rec in quality.recommendations || []" :key="rec">
+        <li v-for="rec in recommendations" :key="rec">
           {{ rec }}
         </li>
       </ul>
@@ -99,6 +119,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { fetchSecuritiesQuality } from '@/api/adminSecurities';
+import { formatEmptyText, getAdminLabel } from '@/utils/labelMap';
 
 const loading = ref(false);
 const error = ref('');
@@ -108,6 +129,7 @@ const quality = ref<any>({
   anomalies: [],
   recommendations: [],
 });
+const label = (key: string) => getAdminLabel(key);
 
 const loadQuality = async () => {
   loading.value = true;
@@ -148,9 +170,21 @@ const anomalySuggestion = computed(() => {
 });
 
 const formatPct = (value: number) => {
-  if (typeof value !== 'number') return '-';
+  if (typeof value !== 'number') return formatEmptyText(value);
   return `${(value * 100).toFixed(2)}%`;
 };
+
+const coverageIssues = computed(() => {
+  const list = quality.value?.snapshotCoverage?.issues || [];
+  if (!list.length) return [formatEmptyText('')];
+  return list.map((item: string) => formatEmptyText(item));
+});
+
+const recommendations = computed(() => {
+  const list = quality.value?.recommendations || [];
+  if (!list.length) return [formatEmptyText('')];
+  return list.map((item: string) => formatEmptyText(item));
+});
 
 onMounted(() => {
   loadQuality();

@@ -12,10 +12,10 @@
           :loading="importing"
           @click="importDemo"
         >
-          导入演示数据
+          {{ label('ImportDemo') }}
         </el-button>
         <el-button type="primary" @click="loadSnapshots" :loading="loading">
-          刷新
+          {{ label('Refresh') }}
         </el-button>
       </div>
     </div>
@@ -33,7 +33,7 @@
         <el-input
           v-model="query.assetKey"
           class="filter-item"
-          placeholder="AssetKey / 来源"
+          :placeholder="assetKeyPlaceholder"
           clearable
           @keyup.enter="handleSearch"
         />
@@ -45,22 +45,22 @@
           end-placeholder="结束日期"
           value-format="YYYY-MM-DD"
         />
-        <el-button type="primary" @click="handleSearch">查询</el-button>
-        <el-button @click="handleReset">重置</el-button>
+        <el-button type="primary" @click="handleSearch">{{ label('Query') }}</el-button>
+        <el-button @click="handleReset">{{ label('Reset') }}</el-button>
       </div>
     </el-card>
 
     <el-card class="summary-card" shadow="never" v-loading="loading">
-      <template #header>摘要</template>
+      <template #header>{{ label('Summary') }}</template>
       <el-descriptions :column="3" border>
-        <el-descriptions-item label="资产数">
+        <el-descriptions-item :label="label('AssetsCount')">
           {{ summary.assetsCount ?? 0 }}
         </el-descriptions-item>
-        <el-descriptions-item label="样本数">
+        <el-descriptions-item :label="label('SampleSize')">
           {{ summary.sampleSize ?? 0 }}
         </el-descriptions-item>
-        <el-descriptions-item label="最新日期">
-          {{ summary.latestDate || '-' }}
+        <el-descriptions-item :label="label('LatestDate')">
+          {{ formatEmptyText(summary.latestDate) }}
         </el-descriptions-item>
       </el-descriptions>
     </el-card>
@@ -70,13 +70,33 @@
         :data="items"
         style="width: 100%"
         v-loading="loading"
-        empty-text="暂无快照"
+        :empty-text="`${label('Empty')}快照`"
       >
-        <el-table-column prop="date" label="日期" width="140" />
-        <el-table-column prop="assetKey" label="AssetKey" min-width="160" />
-        <el-table-column prop="price" label="Price/Close" min-width="140" />
-        <el-table-column prop="currency" label="Currency" width="120" />
-        <el-table-column prop="source" label="Source" min-width="160" />
+        <el-table-column :label="label('Date')" width="140">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.date) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('AssetKey')" min-width="160">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.assetKey) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('PriceClose')" min-width="140">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.price) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('Currency')" width="120">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.currency) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="label('Source')" min-width="160">
+          <template #default="{ row }">
+            {{ formatEmptyText(row.source) }}
+          </template>
+        </el-table-column>
       </el-table>
 
       <div class="table-footer">
@@ -96,10 +116,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { fetchSecuritiesSnapshots } from '@/api/adminSecurities';
 import { importDemoData } from '@/api/adminDataSource';
+import { formatEmptyText, getAdminLabel } from '@/utils/labelMap';
 
 const items = ref<any[]>([]);
 const total = ref(0);
@@ -115,6 +136,8 @@ const query = reactive({
 });
 
 const dateRange = ref<string[] | null>(null);
+const label = (key: string) => getAdminLabel(key);
+const assetKeyPlaceholder = computed(() => `${label('AssetKey')} / ${label('Source')}`);
 
 const loadSnapshots = async () => {
   loading.value = true;
