@@ -1,32 +1,267 @@
 <template>
   <div class="finance-page">
-    <el-card class="glass-card">
-      <template #header>
-        <div class="card-header">
-          <span>现金流管理</span>
-        </div>
+    <div class="toolbar">
+      <div>
+        <h2>现金流管理</h2>
+        <div class="subtitle">按月记录收入与支出，自动计算净结余</div>
+      </div>
+      <div class="actions">
+        <el-date-picker
+          v-model="filters.from"
+          type="month"
+          value-format="YYYY-MM"
+          placeholder="开始月份"
+          class="filter-item"
+        />
+        <el-date-picker
+          v-model="filters.to"
+          type="month"
+          value-format="YYYY-MM"
+          placeholder="结束月份"
+          class="filter-item"
+        />
+        <el-button type="primary" @click="loadList">查询</el-button>
+        <el-button type="primary" plain @click="handleAdd">
+          <el-icon><Plus /></el-icon>
+          记录月份
+        </el-button>
+      </div>
+    </div>
+
+    <el-table
+      :data="cashflowList"
+      style="width: 100%"
+      v-loading="loading"
+      class="dark-table"
+      :header-cell-style="{ background: '#1d212b', color: '#909399', borderBottom: '1px solid #363636' }"
+      :row-style="{ background: 'transparent', color: '#fff' }"
+    >
+      <el-table-column prop="month" label="月份" width="120" />
+      <el-table-column prop="income" label="收入" align="right">
+        <template #default="{ row }">¥{{ formatMoney(row.income) }}</template>
+      </el-table-column>
+      <el-table-column prop="expense" label="支出" align="right">
+        <template #default="{ row }">¥{{ formatMoney(row.expense) }}</template>
+      </el-table-column>
+      <el-table-column prop="net" label="净结余" align="right">
+        <template #default="{ row }">
+          <span :class="Number(row.net) >= 0 ? 'positive' : 'negative'">
+            ¥{{ formatMoney(row.net) }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="120" align="center">
+        <template #default="{ row }">
+          <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <el-dialog v-model="dialogVisible" :title="form.id ? '编辑现金流' : '新增现金流'" width="480px" class="dark-dialog">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="月份" prop="month">
+          <el-date-picker v-model="form.month" type="month" value-format="YYYY-MM" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="收入" prop="income">
+          <el-input-number v-model="form.income" :min="0" :precision="2" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="支出" prop="expense">
+          <el-input-number v-model="form.expense" :min="0" :precision="2" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="净结余">
+          <el-input :model-value="netPreview" disabled />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitForm">确定</el-button>
+        </span>
       </template>
-      <el-empty description="页面建设中" />
-    </el-card>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
+import { Plus } from '@element-plus/icons-vue';
+import type { FormInstance, FormRules } from 'element-plus';
+import { listCashflowMonths, upsertCashflowMonth } from '@/api/cashflow';
+
+interface CashflowForm {
+  id?: number | null;
+  month: string | null;
+  income: number | null;
+  expense: number | null;
+}
+
+const loading = ref(false);
+const cashflowList = ref<any[]>([]);
+const dialogVisible = ref(false);
+const formRef = ref<FormInstance>();
+const filters = ref<{ from: string | null; to: string | null }>({ from: null, to: null });
+
+const form = ref<CashflowForm>({
+  id: null,
+  month: null,
+  income: 0,
+  expense: 0,
+});
+
+const rules: FormRules = {
+  month: [{ required: true, message: '请选择月份', trigger: 'change' }],
+  income: [{ required: true, message: '请输入收入', trigger: 'blur' }],
+  expense: [{ required: true, message: '请输入支出', trigger: 'blur' }],
+};
+
+const netPreview = computed(() => {
+  const income = Number(form.value.income ?? 0);
+  const expense = Number(form.value.expense ?? 0);
+  const net = income - expense;
+  return `¥${formatMoney(net)}`;
+});
+
+const loadList = async () => {
+  loading.value = true;
+  try {
+    const res: any = await listCashflowMonths({
+      from: filters.value.from || undefined,
+      to: filters.value.to || undefined,
+    });
+    const data = res?.data ?? res;
+    cashflowList.value = Array.isArray(data) ? data : [];
+  } catch (error) {
+    cashflowList.value = [];
+    console.error('[CashflowManager] load list failed', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handleAdd = () => {
+  form.value = {
+    id: null,
+    month: null,
+    income: 0,
+    expense: 0,
+  };
+  dialogVisible.value = true;
+};
+
+const handleEdit = (row: any) => {
+  form.value = {
+    id: row.id ?? null,
+    month: row.month ?? null,
+    income: toNumber(row.income),
+    expense: toNumber(row.expense),
+  };
+  dialogVisible.value = true;
+};
+
+const submitForm = async () => {
+  if (!formRef.value) return;
+  await formRef.value.validate(async (valid) => {
+    if (!valid) return;
+    try {
+      const payload = {
+        month: form.value.month,
+        income: Number(form.value.income ?? 0),
+        expense: Number(form.value.expense ?? 0),
+      };
+      await upsertCashflowMonth(payload);
+      ElMessage.success('保存成功');
+      dialogVisible.value = false;
+      loadList();
+    } catch (error) {
+      ElMessage.error('保存失败');
+    }
+  });
+};
+
+const formatMoney = (val: any) =>
+  val != null ? Number(val).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00';
+
+const toNumber = (val: any) => {
+  if (val == null) return null;
+  const num = Number(val);
+  return Number.isNaN(num) ? null : num;
+};
+
+onMounted(() => loadList());
 </script>
 
 <style scoped>
 .finance-page {
-  padding: 16px;
+  padding: 20px;
+  background: #14161a;
+  min-height: 100vh;
+  color: #fff;
 }
-.glass-card {
-  background: #1d212b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
-.card-header {
+.actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.subtitle {
+  font-size: 12px;
+  color: #a0a3af;
+  margin-top: 4px;
+}
+.filter-item {
+  width: 140px;
+}
+.dark-table {
+  --el-table-border-color: #363636;
+  --el-table-bg-color: #1d212b;
+  --el-table-tr-bg-color: #1d212b;
+  --el-table-header-bg-color: #1d212b;
+}
+:deep(.el-table__inner-wrapper::before) {
+  display: none;
+}
+:deep(.el-table td.el-table__cell),
+:deep(.el-table th.el-table__cell.is-leaf) {
+  border-bottom: 1px solid #363636;
+}
+:deep(.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell) {
+  background-color: #2b303c !important;
+}
+:deep(.el-dialog) {
+  background: #1d212b;
+}
+:deep(.el-dialog__title) {
   color: #fff;
-  font-weight: 600;
+}
+:deep(.el-form-item__label) {
+  color: #dcdfe6;
+}
+:deep(.el-input__wrapper),
+:deep(.el-input-number__decrease),
+:deep(.el-input-number__increase) {
+  background-color: #2b303c;
+  box-shadow: 0 0 0 1px #4c4d4f inset;
+}
+:deep(.el-input__inner) {
+  color: #fff;
+}
+.positive {
+  color: #67c23a;
+}
+.negative {
+  color: #f56c6c;
 }
 </style>
