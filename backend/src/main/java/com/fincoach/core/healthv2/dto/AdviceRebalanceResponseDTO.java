@@ -31,6 +31,9 @@ public class AdviceRebalanceResponseDTO {
     @Schema(description = "现金流建议")
     private List<AdviceActionSuggestionDTO> cashflowSuggestions;
 
+    @Schema(description = "保险建议")
+    private List<AdviceActionSuggestionDTO> insuranceSuggestions;
+
     @Schema(description = "元信息")
     private Map<String, Object> meta;
 }

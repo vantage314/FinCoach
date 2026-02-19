@@ -6,22 +6,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fincoach.core.healthv2.advice.rules.AdviceRuleDefaults;
 import com.fincoach.core.healthv2.advice.rules.AdviceRuleSnapshot;
 import com.fincoach.core.healthv2.advice.rules.AdviceRuleRegistry;
+import com.fincoach.core.healthv2.analyzer.InsuranceGapCalculator;
 import com.fincoach.core.healthv2.dto.AdviceActionSuggestionDTO;
 import com.fincoach.core.healthv2.dto.AdviceRebalanceResponseDTO;
 import com.fincoach.core.healthv2.dto.AdviceRebalanceSuggestionDTO;
 import com.fincoach.core.healthv2.entity.FcAssetEntity;
 import com.fincoach.core.healthv2.entity.FcCashflowMonthEntity;
+import com.fincoach.core.healthv2.entity.FcInsuranceConfigEntity;
+import com.fincoach.core.healthv2.entity.FcInsuranceProfileEntity;
 import com.fincoach.core.healthv2.entity.FcDebtEntity;
 import com.fincoach.core.healthv2.entity.FcHealthReportEntity;
 import com.fincoach.core.healthv2.mapper.FcAssetMapper;
 import com.fincoach.core.healthv2.mapper.FcCashflowMonthMapper;
 import com.fincoach.core.healthv2.mapper.FcDebtMapper;
 import com.fincoach.core.healthv2.mapper.FcHealthReportMapper;
+import com.fincoach.core.healthv2.mapper.FcInsuranceProfileMapper;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateDefaults;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateRegistry;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateSnapshot;
 import com.fincoach.core.healthv2.service.AdviceRebalanceService;
 import com.fincoach.core.healthv2.service.BehaviorEventService;
+import com.fincoach.core.healthv2.service.FcInsuranceConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +50,8 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
     private final ObjectMapper objectMapper;
     private final FcDebtMapper debtMapper;
     private final FcCashflowMonthMapper cashflowMonthMapper;
+    private final FcInsuranceProfileMapper insuranceProfileMapper;
+    private final FcInsuranceConfigService insuranceConfigService;
 
     public AdviceRebalanceServiceImpl(FcAssetMapper assetMapper,
                                       FcHealthReportMapper healthReportMapper,
@@ -53,7 +60,9 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
                                       RebalanceTemplateRegistry rebalanceTemplateRegistry,
                                       ObjectMapper objectMapper,
                                       FcDebtMapper debtMapper,
-                                      FcCashflowMonthMapper cashflowMonthMapper) {
+                                      FcCashflowMonthMapper cashflowMonthMapper,
+                                      FcInsuranceProfileMapper insuranceProfileMapper,
+                                      FcInsuranceConfigService insuranceConfigService) {
         this.assetMapper = assetMapper;
         this.healthReportMapper = healthReportMapper;
         this.behaviorEventService = behaviorEventService;
@@ -62,6 +71,8 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
         this.objectMapper = objectMapper;
         this.debtMapper = debtMapper;
         this.cashflowMonthMapper = cashflowMonthMapper;
+        this.insuranceProfileMapper = insuranceProfileMapper;
+        this.insuranceConfigService = insuranceConfigService;
     }
 
     @Override
@@ -71,6 +82,7 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
             dto.setRebalanceSuggestions(new ArrayList<>());
             dto.setDebtSuggestions(new ArrayList<>());
             dto.setCashflowSuggestions(new ArrayList<>());
+            dto.setInsuranceSuggestions(new ArrayList<>());
             dto.setMeta(new LinkedHashMap<>());
             return dto;
         }
@@ -206,8 +218,11 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
                 emergencyFundMonths,
                 emergencyTargetMonths,
                 warnings);
+        List<AdviceActionSuggestionDTO> insuranceSuggestions = buildInsuranceSuggestions(
+                userId, warnings);
         dto.setDebtSuggestions(debtSuggestions);
         dto.setCashflowSuggestions(cashflowSuggestions);
+        dto.setInsuranceSuggestions(insuranceSuggestions);
 
         Map<String, Object> meta = new LinkedHashMap<>();
         meta.put("threshold", driftThreshold);
@@ -559,6 +574,74 @@ public class AdviceRebalanceServiceImpl implements AdviceRebalanceService {
         dto.setDetail(detail);
         dto.setPriority(priority);
         return dto;
+    }
+
+    private List<AdviceActionSuggestionDTO> buildInsuranceSuggestions(Long userId, List<String> warnings) {
+        List<AdviceActionSuggestionDTO> suggestions = new ArrayList<>();
+        FcInsuranceProfileEntity profile = loadInsuranceProfile(userId);
+        FcInsuranceConfigEntity config = insuranceConfigService == null ? null : insuranceConfigService.getDefaultConfig();
+        InsuranceGapCalculator.InsuranceGapCalcResult calc =
+                new InsuranceGapCalculator().calculate(profile, config);
+
+        BigDecimal premiumRatio = getDecimal(calc.metrics().get("premiumRatio"));
+        BigDecimal ratioWarn = config == null ? new BigDecimal("0.10") : safe(config.getPremiumRatioWarn(), new BigDecimal("0.10"));
+        BigDecimal ratioDanger = config == null ? new BigDecimal("0.20") : safe(config.getPremiumRatioDanger(), new BigDecimal("0.20"));
+
+        BigDecimal medicalGap = getDecimal(calc.metrics().get("medicalGap"));
+        BigDecimal accidentGap = getDecimal(calc.metrics().get("accidentGap"));
+        BigDecimal ciGap = getDecimal(calc.metrics().get("ciGap"));
+        BigDecimal lifeGap = getDecimal(calc.metrics().get("lifeGap"));
+        boolean hasGap = medicalGap.signum() > 0 || accidentGap.signum() > 0 || ciGap.signum() > 0 || lifeGap.signum() > 0;
+
+        int dependents = 0;
+        if (profile != null) {
+            if (profile.getDependents() != null) {
+                dependents = profile.getDependents();
+            } else if (profile.getDependentsCount() != null) {
+                dependents = profile.getDependentsCount();
+            }
+        } else {
+            addWarning(warnings, "INSURANCE_PROFILE_MISSING");
+            suggestions.add(suggestion("INSURANCE_PROFILE", "完善保险档案",
+                    "补充年收入、被赡养人数和保额信息，便于评估保障缺口。", "HIGH"));
+        }
+
+        if (dependents > 0) {
+            suggestions.add(suggestion("INSURANCE_LIFE", "寿险优先保障",
+                    "有被赡养人时，寿险应优先覆盖家庭责任。", "HIGH"));
+        }
+        suggestions.add(suggestion("INSURANCE_MEDICAL", "医疗险基础保障",
+                "优先补足医疗保障，覆盖高额医疗费用风险。", "HIGH"));
+        suggestions.add(suggestion("INSURANCE_ACCIDENT", "意外险补充",
+                "意外险成本低，建议作为第二优先保障。", "MEDIUM"));
+        suggestions.add(suggestion("INSURANCE_CI", "重疾险保障",
+                "根据预算配置重疾险，覆盖长期治疗与收入损失。", "MEDIUM"));
+
+        if (premiumRatio.compareTo(ratioDanger) >= 0) {
+            suggestions.add(suggestion("INSURANCE_BUDGET", "优化保费负担",
+                    "当前保费占比已超过危险阈值，建议优化保障结构或降低保费压力。", "HIGH"));
+        } else if (hasGap && premiumRatio.compareTo(ratioWarn) < 0) {
+            suggestions.add(suggestion("INSURANCE_BUDGET", "预算内补齐缺口",
+                    "保障缺口仍存在，可在保费占比警戒阈值内逐步补齐。", "MEDIUM"));
+        }
+        return suggestions;
+    }
+
+    private FcInsuranceProfileEntity loadInsuranceProfile(Long userId) {
+        if (insuranceProfileMapper == null || userId == null) return null;
+        return insuranceProfileMapper.selectOne(
+                new LambdaQueryWrapper<FcInsuranceProfileEntity>()
+                        .eq(FcInsuranceProfileEntity::getUserId, userId));
+    }
+
+    private BigDecimal getDecimal(Object value) {
+        if (value instanceof BigDecimal bd) return bd;
+        if (value instanceof Number n) return BigDecimal.valueOf(n.doubleValue());
+        return BigDecimal.ZERO;
+    }
+
+    private BigDecimal safe(BigDecimal value, BigDecimal fallback) {
+        return value == null ? fallback : value;
     }
 
     private double toDouble(BigDecimal value, double fallback) {

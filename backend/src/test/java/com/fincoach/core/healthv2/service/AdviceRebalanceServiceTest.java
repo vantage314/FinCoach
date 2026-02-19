@@ -10,13 +10,17 @@ import com.fincoach.core.healthv2.dto.AdviceRebalanceResponseDTO;
 import com.fincoach.core.healthv2.entity.FcAssetEntity;
 import com.fincoach.core.healthv2.entity.FcCashflowMonthEntity;
 import com.fincoach.core.healthv2.entity.FcDebtEntity;
+import com.fincoach.core.healthv2.entity.FcInsuranceConfigEntity;
+import com.fincoach.core.healthv2.entity.FcInsuranceProfileEntity;
 import com.fincoach.core.healthv2.mapper.FcAssetMapper;
 import com.fincoach.core.healthv2.mapper.FcCashflowMonthMapper;
 import com.fincoach.core.healthv2.mapper.FcDebtMapper;
 import com.fincoach.core.healthv2.mapper.FcHealthReportMapper;
+import com.fincoach.core.healthv2.mapper.FcInsuranceProfileMapper;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateRegistry;
 import com.fincoach.core.healthv2.rebalance.RebalanceTemplateSnapshot;
 import com.fincoach.core.healthv2.service.impl.AdviceRebalanceServiceImpl;
+import com.fincoach.core.healthv2.service.FcInsuranceConfigService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -25,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,6 +47,8 @@ public class AdviceRebalanceServiceTest {
         RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
         FcDebtMapper debtMapper = Mockito.mock(FcDebtMapper.class);
         FcCashflowMonthMapper cashflowMonthMapper = Mockito.mock(FcCashflowMonthMapper.class);
+        FcInsuranceProfileMapper insuranceProfileMapper = Mockito.mock(FcInsuranceProfileMapper.class);
+        FcInsuranceConfigService insuranceConfigService = Mockito.mock(FcInsuranceConfigService.class);
 
         List<FcAssetEntity> assets = List.of(asset("STOCK", 80), asset("BOND", 20));
         Mockito.when(assetMapper.selectList(any())).thenReturn(assets);
@@ -49,6 +56,8 @@ public class AdviceRebalanceServiceTest {
         Mockito.when(behaviorEventService.countByType(anyLong(), anyInt())).thenReturn(Map.of());
         Mockito.when(debtMapper.selectList(any())).thenReturn(List.of());
         Mockito.when(cashflowMonthMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(insuranceProfileMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(insuranceConfigService.getDefaultConfig()).thenReturn(defaultInsuranceConfig());
 
         AdviceRuleSnapshot snapshot = snapshotWith(
                 Map.of(
@@ -71,7 +80,7 @@ public class AdviceRebalanceServiceTest {
 
         AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
                 assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper(),
-                debtMapper, cashflowMonthMapper);
+                debtMapper, cashflowMonthMapper, insuranceProfileMapper, insuranceConfigService);
 
         AdviceRebalanceResponseDTO dto = service.buildRebalanceAdvice(1L);
         assertNotNull(dto);
@@ -89,6 +98,8 @@ public class AdviceRebalanceServiceTest {
         RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
         FcDebtMapper debtMapper = Mockito.mock(FcDebtMapper.class);
         FcCashflowMonthMapper cashflowMonthMapper = Mockito.mock(FcCashflowMonthMapper.class);
+        FcInsuranceProfileMapper insuranceProfileMapper = Mockito.mock(FcInsuranceProfileMapper.class);
+        FcInsuranceConfigService insuranceConfigService = Mockito.mock(FcInsuranceConfigService.class);
 
         List<FcAssetEntity> assets = List.of(asset("CASH", 60), asset("STOCK", 40));
         Mockito.when(assetMapper.selectList(any())).thenReturn(assets);
@@ -97,6 +108,8 @@ public class AdviceRebalanceServiceTest {
         Mockito.when(templateRegistry.getActive()).thenReturn(null);
         Mockito.when(debtMapper.selectList(any())).thenReturn(List.of());
         Mockito.when(cashflowMonthMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(insuranceProfileMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(insuranceConfigService.getDefaultConfig()).thenReturn(defaultInsuranceConfig());
 
         AdviceRuleSnapshot cashHeavy = snapshotWith(
                 Map.of(
@@ -122,7 +135,7 @@ public class AdviceRebalanceServiceTest {
 
         AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
                 assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper(),
-                debtMapper, cashflowMonthMapper);
+                debtMapper, cashflowMonthMapper, insuranceProfileMapper, insuranceConfigService);
 
         AdviceRebalanceResponseDTO dto1 = service.buildRebalanceAdvice(1L);
         AdviceRebalanceResponseDTO dto2 = service.buildRebalanceAdvice(1L);
@@ -139,6 +152,8 @@ public class AdviceRebalanceServiceTest {
         RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
         FcDebtMapper debtMapper = Mockito.mock(FcDebtMapper.class);
         FcCashflowMonthMapper cashflowMonthMapper = Mockito.mock(FcCashflowMonthMapper.class);
+        FcInsuranceProfileMapper insuranceProfileMapper = Mockito.mock(FcInsuranceProfileMapper.class);
+        FcInsuranceConfigService insuranceConfigService = Mockito.mock(FcInsuranceConfigService.class);
 
         Mockito.when(assetMapper.selectList(any())).thenReturn(List.of());
         Mockito.when(reportMapper.selectOne(any())).thenReturn(null);
@@ -147,10 +162,12 @@ public class AdviceRebalanceServiceTest {
         Mockito.when(templateRegistry.getActive()).thenReturn(null);
         Mockito.when(debtMapper.selectList(any())).thenReturn(List.of());
         Mockito.when(cashflowMonthMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(insuranceProfileMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(insuranceConfigService.getDefaultConfig()).thenReturn(defaultInsuranceConfig());
 
         AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
                 assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper(),
-                debtMapper, cashflowMonthMapper);
+                debtMapper, cashflowMonthMapper, insuranceProfileMapper, insuranceConfigService);
 
         AdviceRebalanceResponseDTO dto = service.buildRebalanceAdvice(1L);
         assertNotNull(dto.getRiskScore());
@@ -174,6 +191,8 @@ public class AdviceRebalanceServiceTest {
         RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
         FcDebtMapper debtMapper = Mockito.mock(FcDebtMapper.class);
         FcCashflowMonthMapper cashflowMonthMapper = Mockito.mock(FcCashflowMonthMapper.class);
+        FcInsuranceProfileMapper insuranceProfileMapper = Mockito.mock(FcInsuranceProfileMapper.class);
+        FcInsuranceConfigService insuranceConfigService = Mockito.mock(FcInsuranceConfigService.class);
 
         Mockito.when(assetMapper.selectList(any())).thenReturn(List.of(asset("CASH", 100), asset("STOCK", 900)));
         Mockito.when(reportMapper.selectOne(any())).thenReturn(null);
@@ -185,6 +204,8 @@ public class AdviceRebalanceServiceTest {
                 cashflow("2025-02", 1000, 500),
                 cashflow("2025-03", 1000, 500)
         ));
+        Mockito.when(insuranceProfileMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(insuranceConfigService.getDefaultConfig()).thenReturn(defaultInsuranceConfig());
 
         AdviceRuleSnapshot snapshot = snapshotWith(
                 Map.ofEntries(
@@ -205,7 +226,7 @@ public class AdviceRebalanceServiceTest {
 
         AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
                 assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper(),
-                debtMapper, cashflowMonthMapper);
+                debtMapper, cashflowMonthMapper, insuranceProfileMapper, insuranceConfigService);
 
         AdviceRebalanceResponseDTO dto = service.buildRebalanceAdvice(1L);
         assertTrue(dto.getDebtSuggestions().stream().anyMatch(s -> "DTI_RISK".equals(s.getType())));
@@ -221,6 +242,8 @@ public class AdviceRebalanceServiceTest {
         RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
         FcDebtMapper debtMapper = Mockito.mock(FcDebtMapper.class);
         FcCashflowMonthMapper cashflowMonthMapper = Mockito.mock(FcCashflowMonthMapper.class);
+        FcInsuranceProfileMapper insuranceProfileMapper = Mockito.mock(FcInsuranceProfileMapper.class);
+        FcInsuranceConfigService insuranceConfigService = Mockito.mock(FcInsuranceConfigService.class);
 
         Mockito.when(assetMapper.selectList(any())).thenReturn(List.of(asset("CASH", 100)));
         Mockito.when(reportMapper.selectOne(any())).thenReturn(null);
@@ -232,6 +255,8 @@ public class AdviceRebalanceServiceTest {
                 cashflow("2025-02", 1000, 1200),
                 cashflow("2025-03", 1000, 1200)
         ));
+        Mockito.when(insuranceProfileMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(insuranceConfigService.getDefaultConfig()).thenReturn(defaultInsuranceConfig());
 
         Mockito.when(ruleRegistry.get()).thenReturn(snapshotWith(Map.of(
                 AdviceRuleDefaults.REBALANCE_DRIFT_PCT, "0.05",
@@ -244,7 +269,7 @@ public class AdviceRebalanceServiceTest {
 
         AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
                 assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper(),
-                debtMapper, cashflowMonthMapper);
+                debtMapper, cashflowMonthMapper, insuranceProfileMapper, insuranceConfigService);
 
         AdviceRebalanceResponseDTO dto = service.buildRebalanceAdvice(1L);
         assertTrue(dto.getCashflowSuggestions().stream().anyMatch(s -> "CASHFLOW_STABILIZE".equals(s.getType())));
@@ -260,6 +285,8 @@ public class AdviceRebalanceServiceTest {
         RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
         FcDebtMapper debtMapper = Mockito.mock(FcDebtMapper.class);
         FcCashflowMonthMapper cashflowMonthMapper = Mockito.mock(FcCashflowMonthMapper.class);
+        FcInsuranceProfileMapper insuranceProfileMapper = Mockito.mock(FcInsuranceProfileMapper.class);
+        FcInsuranceConfigService insuranceConfigService = Mockito.mock(FcInsuranceConfigService.class);
 
         Mockito.when(assetMapper.selectList(any())).thenReturn(List.of(asset("CASH", 500)));
         Mockito.when(reportMapper.selectOne(any())).thenReturn(null);
@@ -271,6 +298,8 @@ public class AdviceRebalanceServiceTest {
                 cashflow("2025-02", 1000, 500),
                 cashflow("2025-03", 1000, 500)
         ));
+        Mockito.when(insuranceProfileMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(insuranceConfigService.getDefaultConfig()).thenReturn(defaultInsuranceConfig());
 
         AdviceRuleSnapshot snapshot = snapshotWith(
                 Map.of(
@@ -288,10 +317,83 @@ public class AdviceRebalanceServiceTest {
 
         AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
                 assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper(),
-                debtMapper, cashflowMonthMapper);
+                debtMapper, cashflowMonthMapper, insuranceProfileMapper, insuranceConfigService);
 
         AdviceRebalanceResponseDTO dto = service.buildRebalanceAdvice(1L);
         assertTrue(dto.getDebtSuggestions().stream().anyMatch(s -> "DTI_RISK".equals(s.getType())));
+    }
+
+    @Test
+    public void testInsuranceSuggestionOrderWithDependents() {
+        FcAssetMapper assetMapper = Mockito.mock(FcAssetMapper.class);
+        FcHealthReportMapper reportMapper = Mockito.mock(FcHealthReportMapper.class);
+        BehaviorEventService behaviorEventService = Mockito.mock(BehaviorEventService.class);
+        AdviceRuleRegistry ruleRegistry = Mockito.mock(AdviceRuleRegistry.class);
+        RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
+        FcDebtMapper debtMapper = Mockito.mock(FcDebtMapper.class);
+        FcCashflowMonthMapper cashflowMonthMapper = Mockito.mock(FcCashflowMonthMapper.class);
+        FcInsuranceProfileMapper insuranceProfileMapper = Mockito.mock(FcInsuranceProfileMapper.class);
+        FcInsuranceConfigService insuranceConfigService = Mockito.mock(FcInsuranceConfigService.class);
+
+        Mockito.when(assetMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(reportMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(behaviorEventService.countByType(anyLong(), anyInt())).thenReturn(Map.of());
+        Mockito.when(templateRegistry.getActive()).thenReturn(null);
+        Mockito.when(debtMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(cashflowMonthMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(ruleRegistry.get()).thenReturn(null);
+
+        FcInsuranceProfileEntity profile = new FcInsuranceProfileEntity();
+        profile.setDependents(1);
+        Mockito.when(insuranceProfileMapper.selectOne(any())).thenReturn(profile);
+        Mockito.when(insuranceConfigService.getDefaultConfig()).thenReturn(defaultInsuranceConfig());
+
+        AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
+                assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper(),
+                debtMapper, cashflowMonthMapper, insuranceProfileMapper, insuranceConfigService);
+
+        AdviceRebalanceResponseDTO dto = service.buildRebalanceAdvice(1L);
+        List<String> types = dto.getInsuranceSuggestions().stream().map(s -> s.getType()).toList();
+        assertEquals("INSURANCE_LIFE", types.get(0));
+        assertEquals("INSURANCE_MEDICAL", types.get(1));
+    }
+
+    @Test
+    public void testPremiumRatioDangerAddsBudgetSuggestion() {
+        FcAssetMapper assetMapper = Mockito.mock(FcAssetMapper.class);
+        FcHealthReportMapper reportMapper = Mockito.mock(FcHealthReportMapper.class);
+        BehaviorEventService behaviorEventService = Mockito.mock(BehaviorEventService.class);
+        AdviceRuleRegistry ruleRegistry = Mockito.mock(AdviceRuleRegistry.class);
+        RebalanceTemplateRegistry templateRegistry = Mockito.mock(RebalanceTemplateRegistry.class);
+        FcDebtMapper debtMapper = Mockito.mock(FcDebtMapper.class);
+        FcCashflowMonthMapper cashflowMonthMapper = Mockito.mock(FcCashflowMonthMapper.class);
+        FcInsuranceProfileMapper insuranceProfileMapper = Mockito.mock(FcInsuranceProfileMapper.class);
+        FcInsuranceConfigService insuranceConfigService = Mockito.mock(FcInsuranceConfigService.class);
+
+        Mockito.when(assetMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(reportMapper.selectOne(any())).thenReturn(null);
+        Mockito.when(behaviorEventService.countByType(anyLong(), anyInt())).thenReturn(Map.of());
+        Mockito.when(templateRegistry.getActive()).thenReturn(null);
+        Mockito.when(debtMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(cashflowMonthMapper.selectList(any())).thenReturn(List.of());
+        Mockito.when(ruleRegistry.get()).thenReturn(null);
+
+        FcInsuranceProfileEntity profile = new FcInsuranceProfileEntity();
+        profile.setAnnualIncome(new BigDecimal("100000"));
+        profile.setAnnualPremiumTotal(new BigDecimal("30000"));
+        Mockito.when(insuranceProfileMapper.selectOne(any())).thenReturn(profile);
+
+        FcInsuranceConfigEntity config = defaultInsuranceConfig();
+        config.setPremiumRatioWarn(new BigDecimal("0.10"));
+        config.setPremiumRatioDanger(new BigDecimal("0.20"));
+        Mockito.when(insuranceConfigService.getDefaultConfig()).thenReturn(config);
+
+        AdviceRebalanceServiceImpl service = new AdviceRebalanceServiceImpl(
+                assetMapper, reportMapper, behaviorEventService, ruleRegistry, templateRegistry, new ObjectMapper(),
+                debtMapper, cashflowMonthMapper, insuranceProfileMapper, insuranceConfigService);
+
+        AdviceRebalanceResponseDTO dto = service.buildRebalanceAdvice(1L);
+        assertTrue(dto.getInsuranceSuggestions().stream().anyMatch(s -> "INSURANCE_BUDGET".equals(s.getType())));
     }
 
     private AdviceRuleSnapshot snapshotWith(Map<String, String> values) {
@@ -344,5 +446,17 @@ public class AdviceRebalanceServiceTest {
         entity.setExpense(BigDecimal.valueOf(expense));
         entity.setNet(BigDecimal.valueOf(income - expense));
         return entity;
+    }
+
+    private FcInsuranceConfigEntity defaultInsuranceConfig() {
+        FcInsuranceConfigEntity config = new FcInsuranceConfigEntity();
+        config.setCode("DEFAULT");
+        config.setTargetMedical(BigDecimal.valueOf(500000));
+        config.setTargetAccident(BigDecimal.valueOf(500000));
+        config.setTargetCi(BigDecimal.valueOf(500000));
+        config.setTargetLifeMultiplier(BigDecimal.valueOf(5));
+        config.setPremiumRatioWarn(BigDecimal.valueOf(0.10));
+        config.setPremiumRatioDanger(BigDecimal.valueOf(0.20));
+        return config;
     }
 }
