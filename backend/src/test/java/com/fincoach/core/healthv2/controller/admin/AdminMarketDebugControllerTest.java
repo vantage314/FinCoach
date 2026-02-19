@@ -1,27 +1,34 @@
 package com.fincoach.core.healthv2.controller.admin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fincoach.core.common.GlobalExceptionHandler;
 import com.fincoach.core.common.UserContext;
 import com.fincoach.core.healthv2.debug.AdminMarketDebugMapper;
 import com.fincoach.core.healthv2.debug.PortfolioDebugContextHolder;
 import com.fincoach.core.healthv2.debug.PortfolioMarketDebugSnapshot;
+import com.fincoach.core.interceptor.JwtInterceptor;
 import com.fincoach.core.rbac.RbacPermissionCodes;
+import com.fincoach.core.rbac.service.RbacQueryService;
 import com.fincoach.core.repository.entity.User;
 import com.fincoach.core.repository.mapper.UserMapper;
 import com.fincoach.core.security.AdminChecker;
 import com.fincoach.core.security.AdminOnlyAspect;
 import com.fincoach.core.security.PermissionAspect;
 import com.fincoach.core.security.PermissionChecker;
+import com.fincoach.core.utils.JwtUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -248,5 +255,92 @@ public class AdminMarketDebugControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(403));
         UserContext.clear();
+    }
+
+    @Test
+    public void testAdminTokenAccessOk() throws Exception {
+        long adminId = 10L;
+        UserMapper userMapper = Mockito.mock(UserMapper.class);
+        User admin = new User();
+        admin.setId(adminId);
+        admin.setRole("ADMIN");
+        when(userMapper.selectById(adminId)).thenReturn(admin);
+
+        RbacQueryService rbacQueryService = Mockito.mock(RbacQueryService.class);
+        when(rbacQueryService.getUserPermissions(adminId)).thenReturn(Set.of());
+        when(rbacQueryService.getUserRoleCodes(adminId)).thenReturn(List.of("ADMIN"));
+        PermissionChecker permissionChecker = new PermissionChecker(rbacQueryService, new MockEnvironment(), false);
+
+        AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
+        AdminChecker adminChecker = new AdminChecker(userMapper, permissionChecker);
+        AdminOnlyAspect adminAspect = new AdminOnlyAspect(adminChecker);
+        PermissionAspect permissionAspect = new PermissionAspect(permissionChecker);
+        AspectJProxyFactory factory = new AspectJProxyFactory(controller);
+        factory.addAspect(adminAspect);
+        factory.addAspect(permissionAspect);
+        AdminMarketDebugController proxy = factory.getProxy();
+
+        JwtUtils jwtUtils = new JwtUtils();
+        JwtInterceptor jwtInterceptor = buildJwtInterceptor(jwtUtils);
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(proxy)
+                .addInterceptors(jwtInterceptor)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .setMessageConverters(new MappingJackson2HttpMessageConverter())
+                .build();
+
+        String token = jwtUtils.generateToken(adminId, List.of("ADMIN"));
+        mockMvc.perform(get("/api/admin/portfolio/market-debug/latest")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+        PortfolioDebugContextHolder.clear();
+    }
+
+    @Test
+    public void testNonAdminTokenForbidden() throws Exception {
+        long userId = 11L;
+        UserMapper userMapper = Mockito.mock(UserMapper.class);
+        User user = new User();
+        user.setId(userId);
+        user.setRole("USER");
+        when(userMapper.selectById(userId)).thenReturn(user);
+
+        RbacQueryService rbacQueryService = Mockito.mock(RbacQueryService.class);
+        when(rbacQueryService.getUserPermissions(userId)).thenReturn(Set.of());
+        when(rbacQueryService.getUserRoleCodes(userId)).thenReturn(List.of("USER"));
+        PermissionChecker permissionChecker = new PermissionChecker(rbacQueryService, new MockEnvironment(), false);
+
+        AdminMarketDebugController controller = new AdminMarketDebugController(new AdminMarketDebugMapper());
+        AdminChecker adminChecker = new AdminChecker(userMapper, permissionChecker);
+        AdminOnlyAspect adminAspect = new AdminOnlyAspect(adminChecker);
+        PermissionAspect permissionAspect = new PermissionAspect(permissionChecker);
+        AspectJProxyFactory factory = new AspectJProxyFactory(controller);
+        factory.addAspect(adminAspect);
+        factory.addAspect(permissionAspect);
+        AdminMarketDebugController proxy = factory.getProxy();
+
+        JwtUtils jwtUtils = new JwtUtils();
+        JwtInterceptor jwtInterceptor = buildJwtInterceptor(jwtUtils);
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(proxy)
+                .addInterceptors(jwtInterceptor)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .setMessageConverters(new MappingJackson2HttpMessageConverter())
+                .build();
+
+        String token = jwtUtils.generateToken(userId, List.of("USER"));
+        mockMvc.perform(get("/api/admin/portfolio/market-debug/latest")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+        PortfolioDebugContextHolder.clear();
+    }
+
+    private JwtInterceptor buildJwtInterceptor(JwtUtils jwtUtils) {
+        JwtInterceptor interceptor = new JwtInterceptor();
+        ReflectionTestUtils.setField(interceptor, "jwtUtils", jwtUtils);
+        ReflectionTestUtils.setField(interceptor, "objectMapper", new ObjectMapper());
+        return interceptor;
     }
 }

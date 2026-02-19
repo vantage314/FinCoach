@@ -45,7 +45,14 @@ public class PermissionChecker {
             return false;
         }
         try {
-            return rbacQueryService.getUserPermissions(userId).contains(code);
+            Set<String> permissions = rbacQueryService.getUserPermissions(userId);
+            if (permissions.contains(code)) {
+                return true;
+            }
+            if (code.startsWith("ADMIN_") && isAdminRole(userId)) {
+                return true;
+            }
+            return false;
         } catch (Exception e) {
             // Dev/config fallback only
             return rbacFallbackEnabled && userId == 1L;
@@ -86,5 +93,19 @@ public class PermissionChecker {
 
     public void invalidateAll() {
         rbacQueryService.invalidateAll();
+    }
+
+    private boolean isAdminRole(Long userId) {
+        List<String> roleCodes = getRoleCodes(userId);
+        if (roleCodes == null || roleCodes.isEmpty()) {
+            return false;
+        }
+        for (String code : roleCodes) {
+            String normalized = code == null ? "" : code.trim().toUpperCase();
+            if ("ADMIN".equals(normalized) || "ROLE_ADMIN".equals(normalized)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
