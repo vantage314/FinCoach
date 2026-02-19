@@ -19,4 +19,20 @@ public class CsvImportResultDTO {
     public void increaseSuccess() {
         successCount++;
     }
+
+    public int getTotalRows() {
+        return successCount + failCount;
+    }
+
+    public int getSuccessRows() {
+        return successCount;
+    }
+
+    public int getErrorRows() {
+        return failCount;
+    }
+
+    public List<CsvImportFailureDTO> getErrors() {
+        return failures;
+    }
 }
