@@ -42,6 +42,7 @@ import com.fincoach.core.healthv2.rebalance.RebalanceTemplateSnapshot;
 import com.fincoach.core.healthv2.rules.ScoreRuleDefaults;
 import com.fincoach.core.healthv2.rules.ScoreRuleSetRegistry;
 import com.fincoach.core.healthv2.rules.ScoreRuleSnapshot;
+import com.fincoach.core.healthv2.service.AlertService;
 import com.fincoach.core.healthv2.service.AuditService;
 import com.fincoach.core.healthv2.service.HealthReportV2Service;
 import com.fincoach.core.healthv2.util.CanonicalJsonHelper;
@@ -128,6 +129,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
     private com.fincoach.core.healthv2.service.BehaviorEventService behaviorEventService;
     @Autowired
     private com.fincoach.core.healthv2.service.NotificationService notificationService;
+    @Autowired
+    private AlertService alertService;
 
     @Override
     public HealthReportV2VO generate(Long userId) {
@@ -608,6 +611,8 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         healthScore = adjustedScores.healthScore();
         scoreResult.put("riskScore", riskScore);
         scoreResult.put("healthScore", healthScore);
+
+        emitHealthAlerts(userId, debtCashflowWarnings, dtiForScore, emergencyFundMonthsV2, avgMonthlyNet, insuranceGapV1);
 
         // scoreBreakdown 写入 metrics
         metrics.put("scoreBreakdown", scoreResult.get("breakdown"));
@@ -1612,6 +1617,91 @@ public class HealthReportV2ServiceImpl implements HealthReportV2Service {
         entry.put("code", code);
         entry.put("detail", truncate(detail == null ? "" : detail, 200));
         warningDetails.add(entry);
+    }
+
+    void emitHealthAlerts(Long userId,
+                          List<String> warnings,
+                          BigDecimal dti,
+                          BigDecimal emergencyFundMonths,
+                          BigDecimal avgMonthlyNet,
+                          InsuranceGapV1Result insuranceGapV1) {
+        if (alertService == null || userId == null) {
+            return;
+        }
+        List<String> codes = warnings == null ? Collections.emptyList() : warnings;
+        Map<String, Object> baseMeta = new LinkedHashMap<>();
+        if (dti != null) baseMeta.put("dti", dti);
+        if (emergencyFundMonths != null) baseMeta.put("emergencyFundMonths", emergencyFundMonths);
+        if (avgMonthlyNet != null) baseMeta.put("avgMonthlyNet", avgMonthlyNet);
+
+        if (codes.contains(DebtCashflowWarningCodes.DTI_DANGER)) {
+            alertService.raiseAlert(userId, "DTI_DANGER", "DANGER",
+                    "负债压力过高", "DTI 超过危险阈值", "HEALTHV2", baseMeta);
+        } else if (codes.contains(DebtCashflowWarningCodes.DTI_WARN)) {
+            alertService.raiseAlert(userId, "DTI_WARN", "WARN",
+                    "负债压力偏高", "DTI 接近或超过警戒阈值", "HEALTHV2", baseMeta);
+        }
+
+        if (codes.contains(DebtCashflowWarningCodes.CASHFLOW_NEGATIVE)) {
+            alertService.raiseAlert(userId, "CASHFLOW_NEGATIVE", "WARN",
+                    "现金流为负", "平均月度净现金流为负", "HEALTHV2", baseMeta);
+        }
+
+        if (codes.contains(DebtCashflowWarningCodes.EMERGENCY_FUND_CRITICAL)) {
+            alertService.raiseAlert(userId, "EMERGENCY_FUND_CRITICAL", "DANGER",
+                    "应急金严重不足", "应急金覆盖不足 1 个月", "HEALTHV2", baseMeta);
+        } else if (codes.contains(DebtCashflowWarningCodes.EMERGENCY_FUND_LOW)) {
+            alertService.raiseAlert(userId, "EMERGENCY_FUND_LOW", "WARN",
+                    "应急金不足", "应急金覆盖不足 3 个月", "HEALTHV2", baseMeta);
+        }
+
+        if (insuranceGapV1 != null) {
+            baseMeta.put("insuranceSummaryLevel", insuranceGapV1.getSummaryLevel());
+            baseMeta.put("insuranceTopGapValue", insuranceGapV1.getTopGapValue());
+            baseMeta.put("premiumRatio", insuranceGapV1.getPremiumRatio());
+            Double threshold = extractPremiumRatioThreshold(insuranceGapV1);
+            if (threshold != null) {
+                baseMeta.put("premiumRatioThreshold", threshold);
+            }
+
+            if ("HIGH".equalsIgnoreCase(insuranceGapV1.getSummaryLevel())) {
+                alertService.raiseAlert(userId, "INSURANCE_GAP_HIGH", "WARN",
+                        "保障缺口偏高", "保险保障缺口较大，建议优先补齐基础保障", "HEALTHV2", baseMeta);
+            }
+
+            if (insuranceGapV1.getPremiumRatio() != null && threshold != null) {
+                double ratio = insuranceGapV1.getPremiumRatio();
+                double dangerThreshold = threshold * 2;
+                if (ratio >= dangerThreshold) {
+                    alertService.raiseAlert(userId, "PREMIUM_RATIO_DANGER", "DANGER",
+                            "保费负担过重", "保费占收入比例超过危险阈值", "HEALTHV2", baseMeta);
+                } else if (ratio >= threshold) {
+                    alertService.raiseAlert(userId, "PREMIUM_RATIO_WARN", "WARN",
+                            "保费占比偏高", "保费占收入比例超过警戒阈值", "HEALTHV2", baseMeta);
+                }
+            }
+        }
+    }
+
+    private Double extractPremiumRatioThreshold(InsuranceGapV1Result insuranceGapV1) {
+        if (insuranceGapV1 == null || insuranceGapV1.getMetrics() == null) {
+            return null;
+        }
+        Object raw = insuranceGapV1.getMetrics().get("premiumRatio");
+        if (raw instanceof Map<?, ?> map) {
+            Object threshold = map.get("threshold");
+            if (threshold instanceof Number number) {
+                return number.doubleValue();
+            }
+            if (threshold != null) {
+                try {
+                    return Double.parseDouble(threshold.toString());
+                } catch (Exception ignored) {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     record CashflowMonthSummary(BigDecimal avgIncome,
