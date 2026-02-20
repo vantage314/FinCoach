@@ -1,0 +1,40 @@
+CREATE TABLE IF NOT EXISTS fc_role (
+  id BIGSERIAL PRIMARY KEY,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  enabled SMALLINT NOT NULL DEFAULT 1,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX uk_fc_role_code ON fc_role(code);
+
+CREATE TABLE IF NOT EXISTS fc_permission (
+  id BIGSERIAL PRIMARY KEY,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  module VARCHAR(64) NULL,
+  enabled SMALLINT NOT NULL DEFAULT 1,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX uk_fc_permission_code ON fc_permission(code);
+
+CREATE TABLE IF NOT EXISTS fc_user_role (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  role_id BIGINT NOT NULL,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX uk_fc_user_role ON fc_user_role(user_id, role_id);
+
+CREATE TABLE IF NOT EXISTS fc_role_permission (
+  id BIGSERIAL PRIMARY KEY,
+  role_id BIGINT NOT NULL,
+  permission_id BIGINT NOT NULL,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX uk_fc_role_permission ON fc_role_permission(role_id, permission_id);
