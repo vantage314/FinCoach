@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    include: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/fincoach?useSSL=false&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration/mysql
+
+app:
+  db: mysql
