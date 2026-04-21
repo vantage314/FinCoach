@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+
 /**
  * DeepSeek API 客户端 (基于 OpenAI 协议标准)
  * 文档: https://api-docs.deepseek.com/zh-cn/
@@ -32,8 +34,16 @@ public class OpenAiClient {
     @Value("${ai.model}")
     private String model;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    /** 专用 RestTemplate：连接超时 10s，读取超时 60s */
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public OpenAiClient() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(10_000);  // 连接超时 10 秒
+        factory.setReadTimeout(60_000);     // 读取超时 60 秒
+        this.restTemplate = new RestTemplate(factory);
+    }
 
     /**
      * 调用 DeepSeek Chat API

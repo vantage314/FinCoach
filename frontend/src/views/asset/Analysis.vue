@@ -131,7 +131,7 @@ onUnmounted(() => {
 
 <style scoped>
 /* 全局容器：深色背景 */
-.analysis-container { padding: 20px; background: #14161a; min-height: 100vh; color: #fff; }
+.analysis-container { padding: 20px; background: #14161a; min-height: 100vh; color: var(--fc-text); }
 
 /* 1. 指标卡片 */
 .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
@@ -145,12 +145,12 @@ onUnmounted(() => {
 }
 
 .metric-card .label { font-size: 14px; color: #909399; margin-bottom: 8px; }
-.metric-card .value { font-size: 28px; font-weight: bold; color: #fff; font-family: monospace; }
+.metric-card .value { font-size: 28px; font-weight: bold; color: var(--fc-text); font-family: monospace; }
 .metric-card .sub { font-size: 12px; color: #909399; margin-top: 8px; }
 .plus { color: #f56c6c; } .minus { color: #67c23a; }
 
 /* 健康分卡片样式 (渐变色) */
-.metric-card.health { display: flex; align-items: center; gap: 20px; color: #fff; border: none; }
+.metric-card.health { display: flex; align-items: center; gap: 20px; color: var(--fc-text); border: none; }
 .metric-card.bg-success { background: linear-gradient(135deg, #67c23a 0%, #409eff 100%); }
 .metric-card.bg-warning { background: linear-gradient(135deg, #e6a23c 0%, #f56c6c 100%); }
 .metric-card.bg-danger { background: linear-gradient(135deg, #f56c6c 0%, #909399 100%); }

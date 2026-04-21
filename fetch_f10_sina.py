@@ -7,7 +7,7 @@ import os
 from sqlalchemy import create_engine, text
 
 # ================= 配置区域 =================
-DB_URL = "mysql+pymysql://root:030314@localhost:3306/fincoach?charset=utf8mb4"
+DB_URL = "postgresql+psycopg2://postgres:030314@localhost:5432/fincoach"
 
 # ================= 强制禁用代理 (关键) =================
 # 确保 requests 不会走任何可能失效的代理
@@ -105,7 +105,7 @@ def main():
                 stock_code VARCHAR(20) PRIMARY KEY, 
                 description TEXT, 
                 industry VARCHAR(100),
-                update_time DATETIME DEFAULT CURRENT_TIMESTAMP
+                update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """))
 
@@ -135,7 +135,8 @@ def main():
                     conn.execute(text("""
                         INSERT INTO company_profile (stock_code, description, business_scope) 
                         VALUES (:code, :desc, :ind)
-                        ON DUPLICATE KEY UPDATE description=:desc, business_scope=:ind
+                        ON CONFLICT (stock_code) DO UPDATE SET
+                            description=EXCLUDED.description, business_scope=EXCLUDED.business_scope
                     """), {'code': code, 'desc': desc_val, 'ind': info['industry']})
                     
                     # 更新 market_security 的 sector 字段

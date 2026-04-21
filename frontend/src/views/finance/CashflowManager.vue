@@ -317,7 +317,7 @@ onMounted(() => loadList());
   padding: 20px;
   background: #14161a;
   min-height: 100vh;
-  color: #fff;
+  color: var(--fc-text);
 }
 .toolbar {
   display: flex;
@@ -353,7 +353,7 @@ h2 {
 }
 :deep(.chart-card) {
   background: #1d212b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--fc-border);
   margin-bottom: 20px;
 }
 .charts-row {
@@ -380,7 +380,7 @@ h2 {
   background: #1d212b;
 }
 :deep(.el-dialog__title) {
-  color: #fff;
+  color: var(--fc-text);
 }
 :deep(.el-form-item__label) {
   color: #dcdfe6;
@@ -392,7 +392,7 @@ h2 {
   box-shadow: 0 0 0 1px #4c4d4f inset;
 }
 :deep(.el-input__inner) {
-  color: #fff;
+  color: var(--fc-text);
 }
 .positive {
   color: #67c23a;

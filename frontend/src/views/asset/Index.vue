@@ -269,7 +269,7 @@ onMounted(() => loadList());
 
 <style scoped>
 /* 深色主题适配 */
-.asset-manage-container { padding: 20px; background: #14161a; min-height: 100vh; color: #fff; }
+.asset-manage-container { padding: 20px; background: #14161a; min-height: 100vh; color: var(--fc-text); }
 .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 h2 { margin: 0; font-size: 20px; }
 
@@ -281,8 +281,8 @@ h2 { margin: 0; font-size: 20px; }
 
 /* 弹窗适配 */
 :deep(.el-dialog) { background: #1d212b; }
-:deep(.el-dialog__title) { color: #fff; }
+:deep(.el-dialog__title) { color: var(--fc-text); }
 :deep(.el-form-item__label) { color: #dcdfe6; }
 :deep(.el-input__wrapper), :deep(.el-select__wrapper) { background-color: #2b303c; box-shadow: 0 0 0 1px #4c4d4f inset; }
-:deep(.el-input__inner) { color: #fff; }
+:deep(.el-input__inner) { color: var(--fc-text); }
 </style>

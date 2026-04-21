@@ -352,15 +352,15 @@ const getRiskEmoji = (level: string) => {
   :deep(.el-drawer__header) {
     margin-bottom: 0;
     padding: 20px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #ffffff;
+    border-bottom: 1px solid var(--fc-border-light);
+    background: transparent;
   }
   
   :deep(.el-drawer__body) {
     padding: 0;
     display: flex;
     flex-direction: column;
-    background: #f1f5f9;
+    background: transparent;
   }
 }
 
@@ -371,7 +371,7 @@ const getRiskEmoji = (level: string) => {
   h3 {
     margin: 0 0 20px 0;
     font-size: 18px;
-    color: #1e293b;
+    color: var(--fc-text-strong);
   }
 
   .scenarios {
@@ -381,43 +381,44 @@ const getRiskEmoji = (level: string) => {
   }
 
   .scenario-card {
-    background: #ffffff;
+    background: var(--fc-panel);
     border: 2px solid transparent;
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--fc-shadow);
 
     &:hover {
-      border-color: #cbd5e1;
+      border-color: var(--fc-border);
       transform: translateY(-2px);
     }
 
     &.active {
-      border-color: #3b82f6;
-      background: #eff6ff;
+      border-color: var(--fc-primary);
+      background: rgba(79, 70, 229, 0.1);
       
-      .label { color: #1e40af; }
+      .label { color: var(--fc-primary); }
     }
 
     .icon { font-size: 24px; margin-bottom: 8px; }
-    .label { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
-    .desc { font-size: 13px; color: #64748b; line-height: 1.4; }
+    .label { font-weight: 600; font-size: 16px; margin-bottom: 4px; color: var(--fc-text); }
+    .desc { font-size: 13px; color: var(--fc-text-disabled); line-height: 1.4; }
   }
 }
 
 .amount-input-area {
   margin-top: 24px;
   padding: 16px;
-  background: #ffffff;
+  background: var(--fc-panel);
   border-radius: 12px;
+  border: 1px solid var(--fc-border-light);
   
   label {
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: #475569;
+    color: var(--fc-text-muted);
     margin-bottom: 12px;
   }
   
@@ -428,7 +429,7 @@ const getRiskEmoji = (level: string) => {
   .hint {
     margin-top: 8px;
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--fc-text-muted);
   }
 }
 
@@ -440,10 +441,10 @@ const getRiskEmoji = (level: string) => {
     height: 48px;
     font-size: 16px;
     font-weight: 600;
-    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    background: linear-gradient(135deg, var(--fc-primary), #06b6d4);
     border: none;
     border-radius: 24px;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 12px var(--fc-primary-glow);
     
     &:hover {
       opacity: 0.9;
@@ -488,7 +489,7 @@ const getRiskEmoji = (level: string) => {
   }
   
   p {
-    color: #475569;
+    color: var(--fc-text-muted);
     font-size: 15px;
     font-weight: 500;
   }
@@ -513,8 +514,8 @@ const getRiskEmoji = (level: string) => {
 
 .plan-header {
   padding: 20px 24px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--fc-panel);
+  border-bottom: 1px solid var(--fc-border-light);
   
   .header-top {
     display: flex;
@@ -532,15 +533,15 @@ const getRiskEmoji = (level: string) => {
     .label {
       display: block;
       font-size: 12px;
-      color: #94a3b8;
+      color: var(--fc-text-muted);
       margin-bottom: 4px;
     }
     .value {
       font-size: 18px;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--fc-text-strong);
       
-      &.text-green { color: #10b981; }
+      &.text-green { color: var(--fc-success); }
     }
   }
 }
@@ -551,11 +552,11 @@ const getRiskEmoji = (level: string) => {
   font-size: 13px;
   font-weight: 600;
   
-  &.conservative { background: #d1fae5; color: #059669; }
-  &.steady { background: #cffafe; color: #0891b2; }
-  &.balanced { background: #dbeafe; color: #2563eb; }
-  &.growth { background: #fef3c7; color: #d97706; }
-  &.aggressive { background: #fee2e2; color: #dc2626; }
+  &.conservative { background: rgba(16, 185, 129, 0.15); color: var(--fc-success); }
+  &.steady { background: rgba(6, 182, 212, 0.15); color: #06b6d4; }
+  &.balanced { background: rgba(79, 70, 229, 0.15); color: var(--fc-primary); }
+  &.growth { background: rgba(230, 162, 60, 0.15); color: var(--fc-warning); }
+  &.aggressive { background: rgba(239, 68, 68, 0.15); color: var(--fc-danger); }
 }
 
 .plan-items {
@@ -565,15 +566,16 @@ const getRiskEmoji = (level: string) => {
 }
 
 .plan-item {
-  background: #ffffff;
+  background: var(--fc-panel);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: var(--fc-shadow);
+  border: 1px solid var(--fc-border-light);
   
-  &.buy { border-left: 5px solid #10b981; }
-  &.sell { border-left: 5px solid #ef4444; }
-  &.info { border-left: 5px solid #3b82f6; }
+  &.buy { border-left: 5px solid var(--fc-success); }
+  &.sell { border-left: 5px solid var(--fc-danger); }
+  &.info { border-left: 5px solid var(--fc-primary); }
 }
 
 .item-header {
@@ -589,21 +591,21 @@ const getRiskEmoji = (level: string) => {
   border-radius: 6px;
   font-weight: 600;
   
-  &.buy { background: #d1fae5; color: #059669; }
-  &.sell { background: #fee2e2; color: #dc2626; }
-  &.info { background: #dbeafe; color: #2563eb; }
+  &.buy { background: rgba(16, 185, 129, 0.15); color: var(--fc-success); }
+  &.sell { background: rgba(239, 68, 68, 0.15); color: var(--fc-danger); }
+  &.info { background: rgba(79, 70, 229, 0.15); color: var(--fc-primary); }
 }
 
 .category-name {
   font-weight: 700;
   font-size: 16px;
-  color: #1e293b;
+  color: var(--fc-text-strong);
 }
 
 .sub-type {
   font-size: 12px;
-  color: #64748b;
-  background: #f1f5f9;
+  color: var(--fc-text-disabled);
+  background: rgba(255, 255, 255, 0.06);
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -614,8 +616,8 @@ const getRiskEmoji = (level: string) => {
   margin: 12px 0;
   font-family: 'JetBrains Mono', monospace;
   
-  .text-green { color: #059669; }
-  .text-red { color: #dc2626; }
+  .text-green { color: var(--fc-success); }
+  .text-red { color: var(--fc-danger); }
 }
 
 .ratio-info {
@@ -623,31 +625,32 @@ const getRiskEmoji = (level: string) => {
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: #64748b;
+  color: var(--fc-text-disabled);
   margin-bottom: 12px;
   padding: 8px 12px;
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 8px;
   width: fit-content;
   
-  .arrow { color: #cbd5e1; font-weight: bold; }
-  .target { color: #3b82f6; font-weight: 600; }
+  .arrow { color: var(--fc-text-disabled); font-weight: bold; }
+  .target { color: var(--fc-primary); font-weight: 600; }
 }
 
 .item-reason {
   font-size: 13px;
-  color: #475569;
+  color: var(--fc-text-muted);
   line-height: 1.6;
   margin: 0;
-  background: #fffbeb;
+  background: rgba(230, 162, 60, 0.08);
   padding: 10px;
   border-radius: 8px;
+  border: 1px solid rgba(230, 162, 60, 0.15);
 }
 
 .plan-footer {
   padding: 24px;
-  background: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  background: var(--fc-panel);
+  border-top: 1px solid var(--fc-border-light);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -657,7 +660,7 @@ const getRiskEmoji = (level: string) => {
     font-size: 16px;
     font-weight: 700;
     border-radius: 12px;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--fc-success), #059669);
     border: none;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     

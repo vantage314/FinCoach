@@ -140,11 +140,9 @@ const handleLogout = async () => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .top-layout {
   min-height: 100vh;
-  background-color: $background-dark;
+  background-color: var(--fc-bg);
 }
 
 /* 固定顶部导航栏 - Glassmorphism 风格 */
@@ -183,13 +181,13 @@ const handleLogout = async () => {
 }
 
 .logo-icon {
-  color: $primary-color;
+  color: var(--fc-primary);
 }
 
 .brand-text {
   font-size: 20px;
   font-weight: 700;
-  background: linear-gradient(135deg, #06b6d4, $primary-color);
+  background: linear-gradient(135deg, #06b6d4, var(--fc-primary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -207,7 +205,7 @@ const handleLogout = async () => {
   :deep(.el-menu-item) {
     height: 64px;
     line-height: 64px;
-    color: $text-dim;
+    color: var(--fc-text-muted);
     border-bottom: 2px solid transparent;
     padding: 0 20px;
     font-size: 14px;
@@ -215,13 +213,13 @@ const handleLogout = async () => {
     background: transparent !important;
     
     &:hover {
-      color: $text-light;
+      color: var(--fc-text);
       background: rgba(255, 255, 255, 0.05) !important;
     }
     
     &.is-active {
-      color: $text-light;
-      border-bottom-color: $primary-color;
+      color: var(--fc-text);
+      border-bottom-color: var(--fc-primary);
       background: transparent !important;
     }
     
@@ -242,7 +240,7 @@ const handleLogout = async () => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: $text-light;
+  color: var(--fc-text);
   padding: 8px 12px;
   border-radius: 8px;
   transition: background-color 0.3s ease;
@@ -253,7 +251,7 @@ const handleLogout = async () => {
 }
 
 .user-avatar {
-  background: linear-gradient(135deg, $primary-color, #06b6d4);
+  background: linear-gradient(135deg, var(--fc-primary), #06b6d4);
   color: white;
   font-weight: 600;
 }
@@ -268,7 +266,7 @@ const handleLogout = async () => {
 
 .arrow-icon {
   font-size: 12px;
-  color: $text-dim;
+  color: var(--fc-text-muted);
 }
 
 /* 主内容区域 */
@@ -276,7 +274,7 @@ const handleLogout = async () => {
   margin-top: 64px;
   padding: 24px;
   min-height: calc(100vh - 64px);
-  background-color: $background-dark;
+  background-color: var(--fc-bg);
 }
 
 /* 页面切换动画 */

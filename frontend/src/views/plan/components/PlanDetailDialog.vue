@@ -131,13 +131,11 @@ const formatTime = (time: string | number) => dayjs(time).format('YYYY-MM-DD HH:
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .status-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   padding: 16px 24px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -149,11 +147,11 @@ const formatTime = (time: string | number) => dayjs(time).format('YYYY-MM-DD HH:
     
     label {
       font-size: 12px;
-      color: $text-secondary;
+      color: var(--fc-text-muted);
     }
     
     span {
-      color: $text-primary;
+      color: var(--fc-text);
       font-weight: 500;
       
       &.amount {
@@ -170,12 +168,12 @@ const formatTime = (time: string | number) => dayjs(time).format('YYYY-MM-DD HH:
   
   .main-name {
     font-weight: 600;
-    color: $text-primary;
+    color: var(--fc-text);
   }
   
   .sub-name {
     font-size: 12px;
-    color: $text-dim;
+    color: var(--fc-text-muted);
   }
 }
 
@@ -186,26 +184,26 @@ const formatTime = (time: string | number) => dayjs(time).format('YYYY-MM-DD HH:
 
 .reason {
   font-size: 13px;
-  color: $text-secondary;
+  color: var(--fc-text-muted);
   line-height: 1.5;
 }
 
 .executed-feedback {
   margin-top: 24px;
   padding: 12px;
-  background: rgba($success, 0.1);
-  border: 1px solid rgba($success, 0.2);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 8px;
-  color: $success;
+  color: var(--fc-success);
   font-size: 14px;
 }
 
 .execute-btn {
   padding: 0 32px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba($primary, 0.4);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
 }
 </style>

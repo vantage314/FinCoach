@@ -75,8 +75,8 @@ const handleLogout = async () => {
 .admin-page {
   min-height: 100vh;
   padding: 24px;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: #fff;
+  background: var(--fc-bg-gradient);
+  color: var(--fc-text);
 }
 
 .page-header {
@@ -95,13 +95,13 @@ const handleLogout = async () => {
 
 .sub {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   font-size: 13px;
 }
 
 .profile-card {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--fc-panel);
+  border: 1px solid var(--fc-border);
 }
 
 .profile-header {
@@ -112,7 +112,7 @@ const handleLogout = async () => {
 
 .profile-avatar {
   background: linear-gradient(135deg, #3b82f6, #06b6d4);
-  color: #fff;
+  color: var(--fc-text);
   font-weight: 700;
 }
 

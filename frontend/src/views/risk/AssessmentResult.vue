@@ -304,11 +304,9 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .assessment-result {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background: var(--fc-bg-gradient);
   padding: 40px 20px;
   display: flex;
   justify-content: center;
@@ -403,7 +401,7 @@ onMounted(() => {
   justify-content: space-between;
   height: 280px;
   font-size: 12px;
-  color: #64748b;
+  color: var(--fc-text-disabled);
   padding: 10px 0;
 }
 
@@ -413,10 +411,10 @@ onMounted(() => {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
@@ -466,7 +464,7 @@ onMounted(() => {
 }
 
 .profile-desc {
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   font-size: 15px;
   line-height: 1.6;
   margin-bottom: 24px;
@@ -474,7 +472,7 @@ onMounted(() => {
 
 /* 双轨对比条 */
 .comparison-box {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--fc-panel-hover);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 24px;
@@ -496,7 +494,7 @@ onMounted(() => {
 }
 
 .comp-label {
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   font-size: 13px;
 }
 
@@ -506,7 +504,7 @@ onMounted(() => {
   font-variant-numeric: tabular-nums;
   
   &.gray {
-    color: #64748b;
+    color: var(--fc-text-disabled);
   }
   
   &.highlight {
@@ -571,7 +569,7 @@ onMounted(() => {
 
 .loading-state {
   text-align: center;
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   
   .spinner {
     width: 50px;
@@ -604,7 +602,7 @@ onMounted(() => {
     font-size: 16px;
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
-    color: #94a3b8;
+    color: var(--fc-text-muted);
 }
 
 .retake-btn:hover {

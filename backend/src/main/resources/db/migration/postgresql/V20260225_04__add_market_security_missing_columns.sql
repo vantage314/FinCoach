@@ -1,0 +1,48 @@
+-- ============================================================
+-- 补全 market_security 表缺失列
+-- 实体 MarketSecurity.java 中定义了盘口、成交额等字段
+-- 但 PostgreSQL DDL 中未创建这些列
+-- ============================================================
+
+-- 今日开盘价/最高/最低
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS open_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS high_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS low_price DECIMAL(10,2) DEFAULT NULL;
+
+-- 成交额
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS turnover DECIMAL(20,2) DEFAULT NULL;
+
+-- 买一到买五 (价格 + 量)
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid1_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid1_vol INTEGER DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid2_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid2_vol INTEGER DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid3_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid3_vol INTEGER DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid4_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid4_vol INTEGER DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid5_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS bid5_vol INTEGER DEFAULT NULL;
+
+-- 卖一到卖五 (价格 + 量)
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask1_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask1_vol INTEGER DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask2_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask2_vol INTEGER DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask3_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask3_vol INTEGER DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask4_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask4_vol INTEGER DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask5_price DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS ask5_vol INTEGER DEFAULT NULL;
+
+-- 滚动市盈率
+ALTER TABLE market_security ADD COLUMN IF NOT EXISTS pe_ttm DECIMAL(10,2) DEFAULT NULL;
+
+-- 修复 volume 列类型: DDL 中是 VARCHAR(50)，实体中是 Long
+-- 必须先移除默认值，否则 PostgreSQL 无法自动转换 DEFAULT 到 BIGINT
+ALTER TABLE market_security ALTER COLUMN volume DROP DEFAULT;
+ALTER TABLE market_security ALTER COLUMN volume TYPE BIGINT USING (
+    CASE WHEN volume IS NOT NULL AND volume ~ '^\d+$' THEN volume::BIGINT ELSE NULL END
+);
+ALTER TABLE market_security ALTER COLUMN volume SET DEFAULT NULL;

@@ -195,12 +195,10 @@ const handleReset = () => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .profile-container {
   padding: 32px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  background: var(--fc-bg-gradient);
   color: white;
 }
 
@@ -213,9 +211,9 @@ const handleReset = () => {
 }
 
 .glass-panel {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   border-radius: 16px;
   padding: 24px;
 }
@@ -228,7 +226,7 @@ const handleReset = () => {
   .avatar {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, $primary-color, #06b6d4);
+    background: linear-gradient(135deg, var(--fc-primary), #06b6d4);
     border-radius: 50%;
     margin: 0 auto 16px;
     display: flex;
@@ -240,7 +238,7 @@ const handleReset = () => {
   }
   
   .username { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-  .role { color: #94a3b8; font-size: 14px; }
+  .role { color: var(--fc-text-muted); font-size: 14px; }
 }
 
 .info-list {
@@ -251,7 +249,7 @@ const handleReset = () => {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     font-size: 14px;
     
-    .label { color: #94a3b8; }
+    .label { color: var(--fc-text-muted); }
   }
 }
 
@@ -278,12 +276,12 @@ const handleReset = () => {
     
     .item-info {
       h4 { margin: 0 0 4px 0; font-weight: 600; }
-      p { color: #94a3b8; margin: 0; font-size: 13px; }
+      p { color: var(--fc-text-muted); margin: 0; font-size: 13px; }
     }
   }
 }
 
-:deep(.el-tabs__item) { color: #94a3b8; }
-:deep(.el-tabs__item.is-active) { color: $primary-color; }
+:deep(.el-tabs__item) { color: var(--fc-text-muted); }
+:deep(.el-tabs__item.is-active) { color: var(--fc-primary); }
 :deep(.el-tabs__nav-wrap::after) { background-color: rgba(255,255,255,0.1); }
 </style>

@@ -1,0 +1,142 @@
+/* ============================================================
+ * FinCoach Plus — 通用样式类（暗色玻璃拟态）
+ * ============================================================ */
+
+/* ---- 页面容器 ---- */
+.fc-page {
+    min-height: 100vh;
+    padding: 24px;
+    background: var(--fc-bg-gradient);
+    color: var(--fc-text);
+}
+
+.fc-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.fc-page-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fc-text-strong);
+}
+
+.fc-page-subtitle {
+    margin: 6px 0 0;
+    color: var(--fc-text-muted);
+    font-size: 13px;
+}
+
+/* ---- 卡片容器（玻璃拟态）---- */
+.fc-card {
+    background: var(--fc-panel);
+    backdrop-filter: blur(var(--fc-blur));
+    -webkit-backdrop-filter: blur(var(--fc-blur));
+    border: 1px solid var(--fc-border);
+    border-radius: var(--fc-radius);
+    box-shadow: var(--fc-shadow);
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fc-card:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.fc-card-strong {
+    background: var(--fc-panel-strong);
+}
+
+.fc-card-header {
+    color: var(--fc-text-strong);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fc-card-subtitle {
+    color: var(--fc-text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* ---- 指标展示 ---- */
+.fc-metric-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--fc-text-strong);
+    margin: 10px 0 4px;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+    line-height: 1.2;
+    word-break: break-all;
+}
+
+.fc-metric-label {
+    color: var(--fc-text-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.fc-metric-sub {
+    color: var(--fc-text-disabled);
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+/* ---- 筛选区 ---- */
+.fc-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.fc-filter-item {
+    min-width: 220px;
+}
+
+/* ---- 表格底部 ---- */
+.fc-table-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 12px;
+}
+
+/* ---- 错误信息 ---- */
+.fc-error-banner {
+    margin-bottom: 16px;
+}
+
+/* ---- 间距 ---- */
+.fc-mb-16 {
+    margin-bottom: 16px;
+}
+
+.fc-mb-20 {
+    margin-bottom: 20px;
+}
+
+/* ---- 全局暗色化修复 ---- */
+body {
+    background-color: var(--fc-bg) !important;
+    color: var(--fc-text);
+}
+
+/* 确保 el-card 内嵌使用 fc-card 样式时不冲突 */
+.el-card.fc-card {
+    padding: 0;
+}
+
+.el-card.fc-card>.el-card__body {
+    padding: 20px;
+}

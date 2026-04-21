@@ -3,7 +3,7 @@
     <el-header class="fixed-header">
       <div class="logo-area" @click="router.push('/app/diagnosis')">
         <el-icon :size="26" class="logo-icon"><Monitor /></el-icon>
-        <span class="brand-text">FinCoach</span>
+        <span class="brand-text">白领人士个人资产诊断与投资建议系统</span>
       </div>
 
       <el-menu
@@ -265,11 +265,9 @@ onMounted(() => loadNotifications());
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .top-layout {
   min-height: 100vh;
-  background-color: $background-dark;
+  background-color: var(--fc-bg);
 }
 
 .fixed-header {
@@ -282,8 +280,8 @@ onMounted(() => loadNotifications());
   align-items: center;
   justify-content: space-between;
   background: rgba(15, 23, 42, 0.6) !important;
-  backdrop-filter: blur(14px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(var(--fc-blur)) !important;
+  border-bottom: 1px solid var(--fc-border);
 }
 
 .logo-area {
@@ -295,13 +293,13 @@ onMounted(() => loadNotifications());
 }
 
 .logo-icon {
-  color: $primary-color;
+  color: var(--fc-primary);
 }
 
 .brand-text {
   font-size: 18px;
   font-weight: 700;
-  color: $text-light;
+  color: var(--fc-text);
 }
 
 .glass-menu {
@@ -316,15 +314,15 @@ onMounted(() => loadNotifications());
   :deep(.el-sub-menu__title) {
     height: 64px;
     line-height: 64px;
-    color: $text-dim;
+    color: var(--fc-text-muted);
     border-bottom: 2px solid transparent;
     padding: 0 16px;
     background: transparent !important;
   }
 
   :deep(.el-menu-item.is-active) {
-    color: $text-light;
-    border-bottom-color: $primary-color;
+    color: var(--fc-text);
+    border-bottom-color: var(--fc-primary);
   }
 }
 
@@ -342,17 +340,17 @@ onMounted(() => loadNotifications());
 }
 
 .notify-icon {
-  color: $text-light;
+  color: var(--fc-text);
   font-size: 18px;
 }
 
 .notify-dropdown {
   width: 320px;
   padding: 12px;
-  background: #1d212b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: $text-light;
+  background: var(--fc-panel-strong);
+  border: 1px solid var(--fc-border);
+  border-radius: 10px;
+  color: var(--fc-text);
 }
 
 .notify-header,
@@ -378,7 +376,7 @@ onMounted(() => loadNotifications());
 .notify-item {
   padding: 8px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--fc-panel-hover);
   cursor: pointer;
 }
 
@@ -399,23 +397,23 @@ onMounted(() => loadNotifications());
 }
 
 .notify-title .read {
-  color: $text-dim;
+  color: var(--fc-text-muted);
 }
 
 .notify-time {
   font-size: 11px;
-  color: $text-dim;
+  color: var(--fc-text-muted);
 }
 
 .notify-content {
   font-size: 12px;
-  color: #cbd5f5;
+  color: var(--fc-text);
 }
 
 .notify-empty {
   padding: 16px 0;
   text-align: center;
-  color: $text-dim;
+  color: var(--fc-text-muted);
   font-size: 12px;
 }
 
@@ -425,11 +423,11 @@ onMounted(() => loadNotifications());
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: $text-light;
+  color: var(--fc-text);
 }
 
 .user-avatar {
-  background: linear-gradient(135deg, $primary-color, #06b6d4);
+  background: linear-gradient(135deg, var(--fc-primary), #06b6d4);
   color: white;
   font-weight: 600;
 }
@@ -444,17 +442,17 @@ onMounted(() => loadNotifications());
 
 .arrow-icon {
   font-size: 12px;
-  color: $text-dim;
+  color: var(--fc-text-muted);
 }
 
 .main-content {
   padding: 20px 24px;
-  background-color: $background-dark;
+  background-color: var(--fc-bg);
   min-height: calc(100vh - 64px);
 }
 
 .route-loading {
-  color: $text-dim;
+  color: var(--fc-text-muted);
   padding: 32px 0;
   text-align: center;
   font-size: 14px;

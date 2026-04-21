@@ -118,8 +118,6 @@ const chartOption = computed(() => ({
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .metrics-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -132,7 +130,7 @@ const chartOption = computed(() => ({
 }
 
 .glass-panel {
-  background: rgba(30, 41, 59, 0.6);
+  background: var(--fc-panel);
   backdrop-filter: blur(12px);
   border-radius: 12px;
   padding: 20px;
@@ -142,27 +140,27 @@ const chartOption = computed(() => ({
 .metric-card {
     .label {
         font-size: 13px;
-        color: $text-secondary;
+        color: var(--fc-text-muted);
         margin-bottom: 8px;
     }
     .value {
         font-size: 24px;
         font-weight: 700;
-        color: $text-primary;
+        color: var(--fc-text);
         font-family: 'Roboto Mono';
         margin-bottom: 8px;
         
-        &.up { color: $finance-up; }
-        &.down { color: $finance-down; }
+        &.up { color: var(--fc-up); }
+        &.down { color: var(--fc-down); }
     }
     .trend {
         font-size: 12px;
         display: flex;
         align-items: center;
         gap: 4px;
-        color: $text-dim;
+        color: var(--fc-text-muted);
         
-        &.positive { color: $finance-up; }
+        &.positive { color: var(--fc-up); }
     }
 }
 
@@ -170,7 +168,7 @@ const chartOption = computed(() => ({
     h3 {
         margin: 0 0 16px;
         font-size: 16px;
-        color: $text-primary;
+        color: var(--fc-text);
         font-weight: 500;
     }
 }

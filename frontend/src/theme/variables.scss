@@ -1,35 +1,121 @@
-// FinCoach 语义化主题变量
+// ============================================================
+// FinCoach Plus — Design Tokens（暗色玻璃拟态体系）
+// ============================================================
 
-$primary-color: #4f46e5; // 靛蓝色
-$secondary-color: #10b981; // 翠绿色
-$background-dark: #0f172a; // 深蓝灰背景
-$text-light: #f8fafc;
+// ----- 品牌色 -----
+$primary-color: #4f46e5;
+$secondary-color: #10b981;
+
+// ----- 页面背景 -----
+$background-dark: #0b1120;
+
+// ----- 文字 -----
+$text-light: #f1f5f9;
 $text-dim: #94a3b8;
-$error-color: #ef4444;
+$text-disabled: #475569;
 
-// 金融色（红涨绿跌 - 中国市场惯例）
+// ----- 状态色 -----
+$error-color: #ef4444;
+$warning-color: #e6a23c;
+
+// ----- 金融色（红涨绿跌 - 中国市场惯例）-----
 $finance-up: #F56C6C;
 $finance-down: #67C23A;
 
-// Aliases for compatibility
+// ----- Aliases for compatibility -----
 $primary: $primary-color;
 $success: $secondary-color;
-$warning: #e6a23c;
+$warning: $warning-color;
 $danger: $error-color;
 $info: #909399;
 $text-primary: $text-light;
 $text-secondary: $text-dim;
-
 $accent-green: $secondary-color;
-$accent-red: $finance-up; // 红色代表重点/卖出/风险
+$accent-red: $finance-up;
 
+// ============================================================
+// CSS 自定义属性（Design Tokens）
+// ============================================================
 :root {
-  --fc-primary: #{$primary-color};
-  --fc-secondary: #{$secondary-color};
+  // ---- 背景 ----
   --fc-bg: #{$background-dark};
+  --fc-bg-gradient: linear-gradient(135deg, #0b1120, #162033);
+
+  // ---- 面板 / 卡片 ----
+  --fc-panel: rgba(30, 41, 59, 0.55);
+  --fc-panel-strong: rgba(30, 41, 59, 0.75);
+  --fc-panel-hover: rgba(255, 255, 255, 0.06);
+
+  // ---- 边框 ----
+  --fc-border: rgba(255, 255, 255, 0.10);
+  --fc-border-light: rgba(255, 255, 255, 0.06);
+
+  // ---- 文字 ----
   --fc-text: #{$text-light};
-  --fc-text-dim: #{$text-dim};
+  --fc-text-strong: #ffffff;
+  --fc-text-muted: #{$text-dim};
+  --fc-text-disabled: #{$text-disabled};
+
+  // ---- 品牌 / 状态 ----
+  --fc-primary: #{$primary-color};
+  --fc-primary-glow: rgba(79, 70, 229, 0.35);
+  --fc-secondary: #{$secondary-color};
+  --fc-danger: #{$error-color};
+  --fc-warning: #{$warning-color};
+  --fc-success: #{$secondary-color};
   --fc-error: #{$error-color};
+
+  // ---- 金融色 ----
   --fc-up: #{$finance-up};
   --fc-down: #{$finance-down};
+
+  // ---- 阴影 / 圆角 / 模糊 ----
+  --fc-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --fc-radius: 14px;
+  --fc-blur: 16px;
+
+  // ---- 输入框 ----
+  --fc-input-bg: rgba(255, 255, 255, 0.07);
+  --fc-input-border: rgba(255, 255, 255, 0.14);
+  --fc-input-focus-border: rgba(79, 70, 229, 0.6);
+
+  // ---- 表格 ----
+  --fc-table-header-bg: rgba(15, 23, 42, 0.6);
+  --fc-table-row-hover: rgba(255, 255, 255, 0.04);
+
+  // ============================================================
+  // Element Plus 内置变量桥接（确保无覆盖的组件也不白）
+  // ============================================================
+  --el-fill-color-blank: rgba(30, 41, 59, 0.75);
+  --el-fill-color: rgba(255, 255, 255, 0.05);
+  --el-fill-color-light: rgba(255, 255, 255, 0.04);
+  --el-fill-color-lighter: rgba(255, 255, 255, 0.03);
+  --el-fill-color-extra-light: rgba(255, 255, 255, 0.02);
+  --el-fill-color-dark: rgba(255, 255, 255, 0.08);
+
+  --el-bg-color: #{$background-dark};
+  --el-bg-color-overlay: rgba(30, 41, 59, 0.92);
+  --el-bg-color-page: #{$background-dark};
+
+  --el-text-color-primary: #{$text-light};
+  --el-text-color-regular: #{$text-light};
+  --el-text-color-secondary: #{$text-dim};
+  --el-text-color-placeholder: #{$text-disabled};
+  --el-text-color-disabled: #{$text-disabled};
+
+  --el-border-color: rgba(255, 255, 255, 0.10);
+  --el-border-color-light: rgba(255, 255, 255, 0.08);
+  --el-border-color-lighter: rgba(255, 255, 255, 0.06);
+  --el-border-color-extra-light: rgba(255, 255, 255, 0.04);
+  --el-border-color-dark: rgba(255, 255, 255, 0.14);
+  --el-border-color-darker: rgba(255, 255, 255, 0.18);
+
+  --el-color-white: #{$text-light};
+  --el-mask-color: rgba(0, 0, 0, 0.6);
+  --el-mask-color-extra-light: rgba(0, 0, 0, 0.3);
+
+  --el-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --el-box-shadow-light: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --el-box-shadow-lighter: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --el-box-shadow-dark: 0 12px 48px rgba(0, 0, 0, 0.5);
 }

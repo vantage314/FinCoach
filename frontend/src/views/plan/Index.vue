@@ -156,8 +156,6 @@ const getStatusLabel = (status: string) => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .plan-dashboard {
   padding: 24px;
   max-width: 1200px;
@@ -173,12 +171,12 @@ const getStatusLabel = (status: string) => {
   .title {
     font-size: 28px;
     font-weight: 600;
-    color: $text-primary;
+    color: var(--fc-text);
     margin: 0 0 8px 0;
   }
 
   .subtitle {
-    color: $text-secondary;
+    color: var(--fc-text-muted);
     margin: 0;
   }
 }
@@ -191,14 +189,14 @@ const getStatusLabel = (status: string) => {
   cursor: pointer;
   border-radius: 12px;
   transition: all 0.3s;
-  background: rgba(30, 41, 59, 0.6); // 深色半透明
+  background: var(--fc-panel); // 深色半透明
   border: 1px solid rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
 
   &:hover {
     transform: translateY(-2px);
     background: rgba(30, 41, 59, 0.8);
-    border-color: $primary;
+    border-color: var(--fc-primary);
   }
 }
 
@@ -217,7 +215,7 @@ const getStatusLabel = (status: string) => {
   .plan-name {
     font-size: 16px;
     font-weight: 500;
-    color: $text-primary;
+    color: var(--fc-text);
   }
 }
 
@@ -233,13 +231,13 @@ const getStatusLabel = (status: string) => {
 
     label {
       font-size: 12px;
-      color: $text-dim;
+      color: var(--fc-text-muted);
     }
 
     span {
       font-size: 18px;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--fc-text);
       font-family: 'Roboto Mono', monospace;
     }
   }
@@ -264,24 +262,24 @@ const getStatusLabel = (status: string) => {
         font-size: 12px;
         font-weight: 600;
         
-        &.buy { color: $accent-green; background: rgba($accent-green, 0.1); }
-        &.sell { color: $accent-red; background: rgba($accent-red, 0.1); }
+        &.buy { color: var(--fc-success); background: rgba(16, 185, 129, 0.1); }
+        &.sell { color: var(--fc-up); background: rgba(245, 108, 108, 0.1); }
       }
 
       .asset-name {
-        color: $text-secondary;
+        color: var(--fc-text-muted);
         flex: 1;
       }
 
       .amount {
-        color: $text-primary;
+        color: var(--fc-text);
         font-family: 'Roboto Mono', monospace;
       }
     }
 
     .more-hint {
       font-size: 12px;
-      color: $text-dim;
+      color: var(--fc-text-muted);
     }
   }
 }

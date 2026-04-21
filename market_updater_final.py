@@ -8,7 +8,7 @@ import random
 import sys
 
 # ================= 配置区域 =================
-DB_URL = "mysql+pymysql://root:030314@localhost:3306/fincoach?charset=utf8mb4"
+DB_URL = "postgresql+psycopg2://postgres:030314@localhost:5432/fincoach"
 
 # ================= 数据库连接 =================
 try:

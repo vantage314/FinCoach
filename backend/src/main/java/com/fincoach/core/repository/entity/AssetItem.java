@@ -1,8 +1,7 @@
 package com.fincoach.core.repository.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -20,6 +19,7 @@ public class AssetItem {
     private BigDecimal holdingCost;
     private String assetCode;
     private String subType;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
     
     // Phase 14: 持仓相关字段

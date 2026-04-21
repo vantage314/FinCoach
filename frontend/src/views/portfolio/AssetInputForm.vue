@@ -172,25 +172,23 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .asset-drawer {
   :deep(.el-drawer__header) {
-    background: linear-gradient(135deg, #1e293b, #0f172a);
+    background: var(--fc-bg-gradient);
     color: white;
     margin-bottom: 0;
     padding: 20px;
   }
   
   :deep(.el-drawer__body) {
-    background: linear-gradient(180deg, #1e293b, #0f172a);
+    background: var(--fc-bg-gradient);
     padding: 24px;
   }
 }
 
 .asset-form {
   :deep(.el-form-item__label) {
-    color: #94a3b8;
+    color: var(--fc-text-muted);
     font-size: 13px;
   }
   
@@ -198,7 +196,7 @@ onMounted(() => {
   :deep(.el-select__wrapper),
   :deep(.el-input-number) {
     background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--fc-border);
     border-radius: 12px;
     
     &.is-focus, &:focus-within {
@@ -222,7 +220,7 @@ onMounted(() => {
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
-  background: linear-gradient(135deg, #06b6d4, $primary-color);
+  background: linear-gradient(135deg, #06b6d4, var(--fc-primary));
   border: none;
   margin-top: 16px;
   

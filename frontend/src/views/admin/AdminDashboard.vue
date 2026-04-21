@@ -124,8 +124,8 @@ onMounted(() => {
 .admin-page {
   min-height: 100vh;
   padding: 24px;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: #fff;
+  background: var(--fc-bg-gradient);
+  color: var(--fc-text);
 }
 
 .page-header {
@@ -140,11 +140,12 @@ onMounted(() => {
 .page-header h2 {
   margin: 0;
   font-size: 22px;
+  color: var(--fc-text-strong);
 }
 
 .sub {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   font-size: 13px;
 }
 
@@ -157,28 +158,35 @@ onMounted(() => {
 }
 
 .metric-card {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--fc-panel);
+  border: 1px solid var(--fc-border);
+  backdrop-filter: blur(var(--fc-blur));
+  border-radius: var(--fc-radius);
 }
 
 .metric-label {
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   font-size: 13px;
+  font-weight: 500;
 }
 
 .metric-value {
   font-size: 26px;
   font-weight: 700;
   margin: 10px 0 4px;
+  color: var(--fc-text-strong);
+  font-variant-numeric: tabular-nums;
 }
 
 .metric-sub {
-  color: #64748b;
+  color: var(--fc-text-disabled);
   font-size: 12px;
 }
 
 .table-card {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--fc-panel);
+  border: 1px solid var(--fc-border);
+  backdrop-filter: blur(var(--fc-blur));
+  border-radius: var(--fc-radius);
 }
 </style>

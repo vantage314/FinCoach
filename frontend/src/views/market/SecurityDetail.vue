@@ -324,20 +324,18 @@ watch(kLineType, () => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .security-detail {
   min-height: calc(100vh - 112px);
   padding: 24px;
   padding-bottom: 100px;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  background: var(--fc-bg-gradient);
 }
 
 .back-bar {
   margin-bottom: 16px;
   
   .el-button {
-    color: #94a3b8;
+    color: var(--fc-text-muted);
     
     &:hover {
       color: #06b6d4;
@@ -352,9 +350,9 @@ watch(kLineType, () => {
   align-items: flex-start;
   margin-bottom: 24px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   border-radius: 16px;
 }
 
@@ -373,7 +371,7 @@ watch(kLineType, () => {
 
 .security-code {
   font-size: 14px;
-  color: #64748b;
+  color: var(--fc-text-disabled);
 }
 
 .risk-tag {
@@ -401,9 +399,9 @@ watch(kLineType, () => {
 .chart-section {
   margin-bottom: 24px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   border-radius: 16px;
 }
 
@@ -429,14 +427,14 @@ watch(kLineType, () => {
 .chart-tab {
   padding: 6px 12px;
   font-size: 13px;
-  color: #64748b;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--fc-text-disabled);
+  background: var(--fc-panel-hover);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    color: #94a3b8;
+    color: var(--fc-text-muted);
   }
   
   &.active {
@@ -453,9 +451,9 @@ watch(kLineType, () => {
 .info-section {
   margin-bottom: 24px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   border-radius: 16px;
 }
 
@@ -475,7 +473,7 @@ watch(kLineType, () => {
 
 .info-label {
   font-size: 13px;
-  color: #64748b;
+  color: var(--fc-text-disabled);
 }
 
 .info-value {
@@ -492,13 +490,13 @@ watch(kLineType, () => {
 .desc-title {
   font-size: 14px;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   margin: 0 0 8px 0;
 }
 
 .desc-text {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   line-height: 1.6;
   margin: 0;
 }
@@ -542,7 +540,7 @@ watch(kLineType, () => {
 }
 
 .buy-btn {
-  background: linear-gradient(135deg, #06b6d4, $primary-color);
+  background: linear-gradient(135deg, #06b6d4, var(--fc-primary));
   border: none;
   
   &:hover {

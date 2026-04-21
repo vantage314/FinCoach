@@ -127,8 +127,6 @@ const handleRegister = async () => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .register-page {
   color: white;
   
@@ -144,7 +142,7 @@ const handleRegister = async () => {
   
   .subtitle {
     font-size: 14px;
-    color: $text-dim;
+    color: var(--fc-text-muted);
     text-align: center;
     margin-bottom: 32px;
   }
@@ -152,7 +150,7 @@ const handleRegister = async () => {
 
 .custom-form {
   :deep(.el-form-item__label) {
-    color: $text-dim;
+    color: var(--fc-text-muted);
     font-size: 13px;
     padding-bottom: 4px;
   }
@@ -165,7 +163,7 @@ const handleRegister = async () => {
     padding: 8px 12px;
     
     &.is-focus {
-      border-color: $primary-color;
+      border-color: var(--fc-primary);
       background-color: rgba(255, 255, 255, 0.08);
     }
   }
@@ -185,7 +183,7 @@ const handleRegister = async () => {
   font-size: 16px;
   font-weight: 600;
   border: none;
-  background: linear-gradient(135deg, #06b6d4, $primary-color);
+  background: linear-gradient(135deg, #06b6d4, var(--fc-primary));
   transition: all 0.3s ease;
   margin-top: 16px;
   
@@ -200,10 +198,10 @@ const handleRegister = async () => {
   margin-top: 24px;
   text-align: center;
   font-size: 14px;
-  color: $text-dim;
+  color: var(--fc-text-muted);
   
   .link {
-    color: $primary-color;
+    color: var(--fc-primary);
     margin-left: 8px;
     text-decoration: none;
     font-weight: 500;

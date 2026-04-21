@@ -69,10 +69,8 @@ const colors = [
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .safety-panel {
-  background: rgba(30, 41, 59, 0.6);
+  background: var(--fc-panel);
   backdrop-filter: blur(12px);
   border-radius: 16px;
   padding: 24px;
@@ -96,11 +94,11 @@ const colors = [
   h3 {
     margin: 0 0 8px 0;
     font-size: 20px;
-    color: $text-primary;
+    color: var(--fc-text);
   }
   .tip {
     margin: 0;
-    color: $text-secondary;
+    color: var(--fc-text-muted);
     font-size: 13px;
   }
 }
@@ -113,12 +111,12 @@ const colors = [
   .percentage {
     font-size: 28px;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--fc-text);
   }
   
   .label {
     font-size: 12px;
-    color: $text-secondary;
+    color: var(--fc-text-muted);
   }
 }
 
@@ -131,21 +129,21 @@ const colors = [
   .amount {
     font-family: 'Roboto Mono', monospace;
     font-size: 18px;
-    color: $text-primary;
+    color: var(--fc-text);
     margin: 0;
     
-    .current { color: $primary; font-size: 24px; font-weight: 600; }
-    .separator { margin: 0 8px; color: $text-dim; }
-    .target { color: $text-secondary; }
+    .current { color: var(--fc-primary); font-size: 24px; font-weight: 600; }
+    .separator { margin: 0 8px; color: var(--fc-text-muted); }
+    .target { color: var(--fc-text-muted); }
   }
   
   .gap-info {
     font-size: 13px;
-    color: $text-secondary;
+    color: var(--fc-text-muted);
     
-    .gap { color: $warning; font-weight: 600; }
+    .gap { color: var(--fc-warning); font-weight: 600; }
     
-    &.success { color: $success; }
+    &.success { color: var(--fc-success); }
   }
   
   .deposit-btn {

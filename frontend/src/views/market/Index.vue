@@ -290,7 +290,7 @@ onUnmounted(() => {
 
 <style scoped>
 /* 样式与之前保持完全一致，直接复用即可 */
-.market-dashboard { background-color: #14161a; min-height: 100%; padding: 20px; color: #fff; }
+.market-dashboard { background-color: #14161a; min-height: 100%; padding: 20px; color: var(--fc-text); }
 .header-indices { margin-bottom: 24px; }
 .page-title { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
 .page-title h2 { margin: 0; font-size: 20px; font-weight: 600; }
@@ -317,13 +317,13 @@ onUnmounted(() => {
 .tab-item { cursor: pointer; color: #909399; padding-bottom: 10px; transition: color 0.3s; }
 .tab-item.active { color: #409eff; font-weight: 600; border-bottom: 2px solid #409eff; }
 :deep(.dark-input .el-input__wrapper) { background-color: #2b303c; box-shadow: none; border: 1px solid #4c4d4f; }
-:deep(.dark-input .el-input__inner) { color: #fff; }
+:deep(.dark-input .el-input__inner) { color: var(--fc-text); }
 .dark-table { --el-table-border-color: #363636; --el-table-bg-color: #1d212b; --el-table-tr-bg-color: #1d212b; --el-table-header-bg-color: #1d212b; }
 :deep(.el-table__inner-wrapper::before) { display: none; }
 :deep(.el-table td.el-table__cell), :deep(.el-table th.el-table__cell.is-leaf) { border-bottom: 1px solid #363636; }
 :deep(.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell) { background-color: #2b303c !important; }
 .name-cell { display: flex; flex-direction: column; }
-.stock-name { font-size: 14px; font-weight: bold; color: #fff; }
+.stock-name { font-size: 14px; font-weight: bold; color: var(--fc-text); }
 .stock-name.hover-link:hover { color: #409eff; text-decoration: underline; }
 .stock-code { font-size: 12px; color: #909399; }
 .text-red { color: #f56c6c; font-weight: 600; } .text-green { color: #67c23a; font-weight: 600; } .text-gray { color: #909399; }

@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2026-03-01T03:47:29.163Z",
+  "strict": true,
+  "allowedRgbaWhiteAlphaMax": 0.12,
+  "total": 11,
+  "findings": [
+    {
+      "file": "src\\theme\\element-overwrite.scss",
+      "ruleId": "bg-white-rgba",
+      "title": "背景使用 rgba(255,255,255,α)（α过大可能变白块）",
+      "severity": "medium",
+      "line": 1382,
+      "col": 4,
+      "match": "background-color: rgba(255, 255, 255, 0.15)",
+      "context": "========== .el-scrollbar__thumb { background-color: rgba(255, 255, 255, 0.15) !important; &:hover { background-color: rgba(255, 255, 255, 0.25) !important;"
+    },
+    {
+      "file": "src\\theme\\element-overwrite.scss",
+      "ruleId": "bg-white-rgba",
+      "title": "背景使用 rgba(255,255,255,α)（α过大可能变白块）",
+      "severity": "medium",
+      "line": 1385,
+      "col": 8,
+      "match": "background-color: rgba(255, 255, 255, 0.25)",
+      "context": ") !important; &:hover { background-color: rgba(255, 255, 255, 0.25) !important; } } // ======================== Empty ======================== .el-empty__"
+    },
+    {
+      "file": "src\\theme\\element-overwrite.scss",
+      "ruleId": "bg-white-rgba",
+      "title": "背景使用 rgba(255,255,255,α)（α过大可能变白块）",
+      "severity": "medium",
+      "line": 1477,
+      "col": 8,
+      "match": "background-color: rgba(255, 255, 255, 0.15)",
+      "context": "ar .el-scrollbar__thumb { background-color: rgba(255, 255, 255, 0.15) !important; &:hover { background-color: rgba(255, 255, 255, 0.25) !impor"
+    },
+    {
+      "file": "src\\theme\\element-overwrite.scss",
+      "ruleId": "bg-white-rgba",
+      "title": "背景使用 rgba(255,255,255,α)（α过大可能变白块）",
+      "severity": "medium",
+      "line": 1480,
+      "col": 12,
+      "match": "background-color: rgba(255, 255, 255, 0.25)",
+      "context": "tant; &:hover { background-color: rgba(255, 255, 255, 0.25) !important; } } } // ======================== Descriptions（全链路暗色）============="
+    },
+    {
+      "file": "src\\views\\asset\\Analysis.vue",
+      "ruleId": "bg-white-rgba",
+      "title": "背景使用 rgba(255,255,255,α)（α过大可能变白块）",
+      "severity": "medium",
+      "line": 158,
+      "col": 43,
+      "match": "background: rgba(255,255,255,0.2)",
+      "context": "ore-circle { width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column;"
+    },
+    {
+      "file": "src\\views\\dashboard\\Index.vue",
+      "ruleId": "shadow-white-glow",
+      "title": "box-shadow 使用纯白发光（可能显得廉价/刺眼）",
+      "severity": "low",
+      "line": 563,
+      "col": 6,
+      "match": "box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1)",
+      "context": "255, 255, 255, 0.05) !important; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset !important; border-radius: 12px; } :deep(.el-input__inner) {"
+    },
+    {
+      "file": "src\\views\\dashboard\\Index.vue",
+      "ruleId": "shadow-white-glow",
+      "title": "box-shadow 使用纯白发光（可能显得廉价/刺眼）",
+      "severity": "low",
+      "line": 591,
+      "col": 6,
+      "match": "box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1)",
+      "context": "255, 255, 255, 0.05) !important; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset !important; border-radius: 12px; } :deep(.el-select__placeholder"
+    },
+    {
+      "file": "src\\views\\market\\SecurityDetail.vue",
+      "ruleId": "bg-white-rgba",
+      "title": "背景使用 rgba(255,255,255,α)（α过大可能变白块）",
+      "severity": "medium",
+      "line": 532,
+      "col": 4,
+      "match": "background: rgba(255, 255, 255, 0.15)",
+      "context": "color: white; &:hover { background: rgba(255, 255, 255, 0.15); } .btn-icon { width: 18px; height: 18px; margin-right: 8px; } } .buy-"
+    },
+    {
+      "file": "src\\views\\risk\\AssessmentResult.vue",
+      "ruleId": "bg-white-rgba",
+      "title": "背景使用 rgba(255,255,255,α)（α过大可能变白块）",
+      "severity": "medium",
+      "line": 374,
+      "col": 4,
+      "match": "background: rgba(255, 255, 255, 0.2)",
+      "context": "x; span { height: 2px; background: rgba(255, 255, 255, 0.2); } } /* 温度计底座 */ .thermometer-bulb { width: 70px; height: 70px; border-radius: 50%;"
+    },
+    {
+      "file": "src\\views\\risk\\AssessmentWizard.vue",
+      "ruleId": "bg-white-rgba",
+      "title": "背景使用 rgba(255,255,255,α)（α过大可能变白块）",
+      "severity": "medium",
+      "line": 300,
+      "col": 4,
+      "match": "background: rgba(255, 255, 255, 0.15)",
+      "context": "der-radius: 12px; &:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3); } } /* 提交 Loading 遮罩 */ .submit-overlay { pos"
+    },
+    {
+      "file": "src\\views\\risk\\AssessmentWizard.vue",
+      "ruleId": "shadow-white-glow",
+      "title": "box-shadow 使用纯白发光（可能显得廉价/刺眼）",
+      "severity": "low",
+      "line": 193,
+      "col": 2,
+      "match": "box-shadow: \r\n    0 8px 32px rgba(0, 0, 0, 0.3),\r\n    inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+      "context": "border: 1px solid var(--fc-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1); } .question-card { width: 100%; bord"
+    }
+  ]
+}

@@ -116,9 +116,9 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .health-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   border-radius: 16px;
   padding: 20px;
   display: flex;
@@ -180,7 +180,7 @@ onMounted(() => {
 
 .score-label {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--fc-text-muted);
 }
 
 .suggestions-section {
@@ -196,7 +196,7 @@ onMounted(() => {
   line-height: 1.5;
   padding: 6px 10px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--fc-panel-hover);
   
   &.success {
     color: #34d399;
@@ -212,7 +212,7 @@ onMounted(() => {
 }
 
 .empty-hint {
-  color: #64748b;
+  color: var(--fc-text-disabled);
   font-size: 13px;
 }
 

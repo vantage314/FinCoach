@@ -545,7 +545,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.detail-container { padding: 20px; background: #14161a; min-height: 100vh; color: #fff; }
+.detail-container { padding: 20px; background: #14161a; min-height: 100vh; color: var(--fc-text); }
 
 /* 头部 */
 .header-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid #2c3038; }
@@ -582,8 +582,8 @@ onUnmounted(() => {
 .order-row .label { color: #909399; width: 30px; z-index: 1; }
 .order-row .price { font-weight: bold; width: 60px; text-align: right; z-index: 1; }
 .order-row.sell .price { color: #67c23a; } .order-row.buy .price { color: #f56c6c; }
-.order-row .vol { color: #fff; z-index: 1; }
-.order-row .bar { position: absolute; right: 0; top: 0; bottom: 0; background: rgba(255, 255, 255, 0.05); z-index: 0; }
+.order-row .vol { color: var(--fc-text); z-index: 1; }
+.order-row .bar { position: absolute; right: 0; top: 0; bottom: 0; background: var(--fc-panel-hover); z-index: 0; }
 .divider { height: 1px; background: #2c3038; margin: 10px 0; }
 
 /* F10 资料 */

@@ -439,18 +439,16 @@ const trendOption = computed(() => ({
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .diagnosis-container {
   min-height: 100vh;
   padding: 24px;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  background: var(--fc-bg-gradient);
   color: white;
   padding-bottom: 80px;
 }
 
 .glass-panel {
-  background: rgba(30, 41, 59, 0.6);
+  background: var(--fc-panel);
   backdrop-filter: blur(12px);
   border-radius: 16px;
   padding: 24px;
@@ -464,9 +462,9 @@ const trendOption = computed(() => ({
     padding: 40px 24px;
     background: radial-gradient(circle at center, rgba(79, 70, 229, 0.1), rgba(30, 41, 59, 0.6));
     
-    &.excellent { border-top: 2px solid $secondary-color; }
-    &.good { border-top: 2px solid $primary-color; }
-    &.risk { border-top: 2px solid $error-color; }
+    &.excellent { border-top: 2px solid var(--fc-success); }
+    &.good { border-top: 2px solid var(--fc-primary); }
+    &.risk { border-top: 2px solid var(--fc-danger); }
     
     .score-content {
         text-align: center;
@@ -481,7 +479,7 @@ const trendOption = computed(() => ({
         width: 140px;
         height: 140px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--fc-panel-hover);
         border: 4px solid rgba(255, 255, 255, 0.1);
         margin-bottom: 16px;
         box-shadow: 0 0 20px rgba(0,0,0,0.2);
@@ -497,13 +495,13 @@ const trendOption = computed(() => ({
         
         .score-label {
             font-size: 13px;
-            color: $text-secondary;
+            color: var(--fc-text-muted);
         }
     }
     
     .score-info {
         h2 { margin: 0 0 8px; font-size: 24px; }
-        p { margin: 0; color: $text-secondary; font-size: 14px; }
+        p { margin: 0; color: var(--fc-text-muted); font-size: 14px; }
     }
 }
 
@@ -525,7 +523,7 @@ const trendOption = computed(() => ({
     
     h3 {
         margin: 0 0 16px;
-        color: $text-primary;
+        color: var(--fc-text);
         font-size: 18px;
         font-weight: 600;
     }
@@ -541,7 +539,7 @@ const trendOption = computed(() => ({
     h3 {
         margin: 0 0 20px;
         font-size: 18px;
-        color: $text-primary;
+        color: var(--fc-text);
     }
 }
 
@@ -552,7 +550,7 @@ const trendOption = computed(() => ({
     --el-collapse-border-color: rgba(255,255,255,0.05);
     
     :deep(.el-collapse-item__header) {
-        color: $text-light;
+        color: var(--fc-text);
         font-size: 15px;
         padding: 12px 0;
         height: auto;
@@ -572,8 +570,8 @@ const trendOption = computed(() => ({
 }
 
 .diagnosis-item {
-    p { color: $text-secondary; margin-bottom: 12px; }
-    strong { color: $text-primary; }
+    p { color: var(--fc-text-muted); margin-bottom: 12px; }
+    strong { color: var(--fc-text); }
 }
 
 .action-footer {
@@ -584,7 +582,7 @@ const trendOption = computed(() => ({
     .action-btn {
         width: 200px;
         font-weight: 600;
-        box-shadow: 0 4px 15px rgba($primary-color, 0.4);
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
     }
 }
 
@@ -594,7 +592,7 @@ const trendOption = computed(() => ({
 
 .module-card {
   background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--fc-border);
   margin-bottom: 16px;
 }
 
@@ -613,7 +611,7 @@ const trendOption = computed(() => ({
 
 .score-item .label {
   font-size: 12px;
-  color: $text-secondary;
+  color: var(--fc-text-muted);
 }
 
 .score-item .value {
@@ -645,13 +643,13 @@ const trendOption = computed(() => ({
 
 .matrix-table th,
 .matrix-table td {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--fc-border);
   padding: 6px 8px;
   text-align: center;
 }
 
 .matrix-table th {
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   font-weight: 600;
 }
 

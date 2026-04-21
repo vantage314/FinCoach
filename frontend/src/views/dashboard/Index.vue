@@ -436,11 +436,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .dashboard {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  background: var(--fc-bg-gradient);
   padding: 32px;
   color: white;
 }
@@ -458,7 +456,7 @@ export default {
   }
   
   .subtitle {
-    color: #64748b;
+    color: var(--fc-text-disabled);
     font-size: 14px;
   }
 }
@@ -471,14 +469,14 @@ export default {
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   border-radius: 16px;
   padding: 24px;
   
   .stat-label {
-    color: #64748b;
+    color: var(--fc-text-disabled);
     font-size: 14px;
     margin-bottom: 8px;
   }
@@ -520,7 +518,7 @@ export default {
 
 .risk-info {
   .risk-label {
-    color: #94a3b8;
+    color: var(--fc-text-muted);
     font-size: 13px;
     margin-bottom: 4px;
   }
@@ -578,7 +576,7 @@ export default {
   .search-icon {
     width: 16px;
     height: 16px;
-    color: #64748b;
+    color: var(--fc-text-disabled);
   }
   
   .search-btn {
@@ -609,7 +607,7 @@ export default {
   padding: 0 24px;
   border-radius: 12px;
   font-weight: 600;
-  background: linear-gradient(135deg, #06b6d4, $primary-color);
+  background: linear-gradient(135deg, #06b6d4, var(--fc-primary));
   border: none;
   
   .icon {
@@ -642,9 +640,9 @@ export default {
   height: 44px;
   padding: 0 20px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
+  background: var(--fc-panel-hover);
+  border: 1px solid var(--fc-border);
+  color: var(--fc-text-muted);
   margin-right: 12px;
   font-weight: 600;
 
@@ -664,7 +662,7 @@ export default {
 .asset-table-wrapper {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   border-radius: 16px;
   padding: 20px;
 }
@@ -700,7 +698,7 @@ export default {
 
 .asset-code {
   margin-left: 8px;
-  color: #64748b;
+  color: var(--fc-text-disabled);
   font-size: 12px;
 }
 
@@ -716,7 +714,7 @@ export default {
   font-weight: 500;
   
   &.dim {
-    color: #64748b;
+    color: var(--fc-text-disabled);
   }
 }
 
@@ -740,17 +738,17 @@ export default {
   
   :deep(.el-pagination) {
     --el-pagination-bg-color: rgba(255, 255, 255, 0.05);
-    --el-pagination-text-color: #94a3b8;
-    --el-pagination-button-color: #94a3b8;
+    --el-pagination-text-color: var(--fc-text-muted);
+    --el-pagination-button-color: var(--fc-text-muted);
     --el-pagination-hover-color: #06b6d4;
   }
   
   :deep(.el-pagination.is-background .el-pager li) {
     background-color: rgba(255, 255, 255, 0.05);
-    color: #94a3b8;
+    color: var(--fc-text-muted);
     
     &.is-active {
-      background-color: $primary-color;
+      background-color: var(--fc-primary);
       color: white;
     }
   }

@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fincoach}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:030314}
+  flyway:
+    locations: classpath:db/migration/postgresql
+    clean-disabled: false
+    clean-on-validation-error: true
+
+app:
+  db: postgres

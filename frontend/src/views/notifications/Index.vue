@@ -127,7 +127,7 @@ onMounted(() => loadList());
   padding: 20px;
   background: #14161a;
   min-height: 100vh;
-  color: #fff;
+  color: var(--fc-text);
 }
 .toolbar {
   display: flex;

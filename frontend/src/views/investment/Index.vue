@@ -254,7 +254,7 @@ onMounted(() => {
   display: flex;
   height: calc(100vh - 80px);
   background: #14161a;
-  color: #fff;
+  color: var(--fc-text);
   gap: 20px;
   padding: 20px;
 }

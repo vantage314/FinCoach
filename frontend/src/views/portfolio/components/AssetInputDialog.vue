@@ -264,12 +264,11 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
 
 .asset-dialog {
   :deep(.el-dialog) {
-    background: linear-gradient(135deg, #1e293b, #0f172a) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--fc-bg-gradient) !important;
+    border: 1px solid var(--fc-border);
     border-radius: 16px;
   }
   
@@ -288,37 +287,25 @@ onMounted(() => {
   }
   
   :deep(.el-dialog__headerbtn .el-dialog__close) {
-    color: #94a3b8;
+    color: var(--fc-text-muted);
   }
 }
 
 .asset-form {
   :deep(.el-form-item__label) {
-    color: #94a3b8 !important;
+    color: var(--fc-text-muted) !important;
     font-size: 13px;
   }
   
-  /* 强制输入框背景为白色，文字为黑色 */
+  /* 输入框继承全局暗色样式 — 不再强制白底 */
   :deep(.el-input__wrapper),
   :deep(.el-textarea__inner) {
-    background-color: #ffffff !important;
-    box-shadow: 0 0 0 1px #dcdfe6 inset !important;
     border-radius: 12px;
   }
   
   :deep(.el-input__inner) {
-    color: #000000 !important;
     font-weight: 500;
     font-size: 15px;
-    
-    &::placeholder {
-      color: #a8abb2 !important;
-    }
-  }
-  
-  /* 聚焦时的边框颜色 */
-  :deep(.el-input__wrapper.is-focus) {
-    box-shadow: 0 0 0 1px var(--el-color-primary) inset !important;
   }
 }
 
@@ -333,7 +320,7 @@ onMounted(() => {
       width: 100%;
       background-color: rgba(255, 255, 255, 0.05);
       border-color: rgba(255, 255, 255, 0.15);
-      color: #94a3b8;
+      color: var(--fc-text-muted);
       font-weight: 500;
       
       &:hover {
@@ -342,7 +329,7 @@ onMounted(() => {
     }
     
     &.is-active .el-radio-button__inner {
-      background: linear-gradient(135deg, #06b6d4, $primary-color);
+      background: linear-gradient(135deg, #06b6d4, var(--fc-primary));
       border-color: transparent;
       color: white;
     }
@@ -354,7 +341,7 @@ onMounted(() => {
     .el-radio-button__inner {
       background-color: rgba(255, 255, 255, 0.05);
       border-color: rgba(255, 255, 255, 0.15);
-      color: #94a3b8;
+      color: var(--fc-text-muted);
       
       &:hover {
         color: white;
@@ -370,25 +357,20 @@ onMounted(() => {
 }
 
 .amount-input {
-  :deep(.el-input__wrapper) {
-    background-color: #ffffff !important;
-  }
-  
   :deep(.el-input__inner) {
     font-size: 20px !important;
     font-weight: 600;
-    color: #000000 !important;
   }
 }
 
 .currency-prefix {
-  color: #606266;
+  color: var(--fc-text-muted);
   font-weight: 500;
   font-size: 16px;
 }
 
 .currency-suffix {
-  color: #64748b;
+  color: var(--fc-text-disabled);
   font-size: 14px;
 }
 
@@ -402,7 +384,7 @@ onMounted(() => {
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
-  background: linear-gradient(135deg, #06b6d4, $primary-color);
+  background: linear-gradient(135deg, #06b6d4, var(--fc-primary));
   border: none;
   margin-top: 16px;
   transition: all 0.3s ease;

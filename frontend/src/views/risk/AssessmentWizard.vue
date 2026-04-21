@@ -146,11 +146,9 @@ const submitResult = async () => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .assessment-wizard {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background: var(--fc-bg-gradient);
   padding: 40px 20px;
   display: flex;
   flex-direction: column;
@@ -171,7 +169,7 @@ const submitResult = async () => {
     display: block;
     text-align: center;
     margin-top: 12px;
-    color: #94a3b8;
+    color: var(--fc-text-muted);
     font-size: 14px;
     font-variant-numeric: tabular-nums;
   }
@@ -188,10 +186,10 @@ const submitResult = async () => {
 
 /* Glassmorphism 毛玻璃效果 */
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--fc-border);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -322,7 +320,7 @@ const submitResult = async () => {
   p {
     margin-top: 24px;
     font-size: 18px;
-    color: #94a3b8;
+    color: var(--fc-text-muted);
   }
 }
 

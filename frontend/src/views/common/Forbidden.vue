@@ -24,7 +24,7 @@ const router = useRouter();
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: #fff;
+  background: var(--fc-bg-gradient);
+  color: var(--fc-text);
 }
 </style>

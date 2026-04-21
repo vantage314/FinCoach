@@ -1,5 +1,5 @@
-ALTER TABLE "user"
-  ADD COLUMN enabled BOOLEAN NOT NULL DEFAULT TRUE,
-  ADD COLUMN last_login_at TIMESTAMP NULL;
+-- 幂等添加：若列已存在则跳过
+ALTER TABLE "user" ADD COLUMN IF NOT EXISTS enabled BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE "user" ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMP NULL;
 
-CREATE INDEX idx_user_enabled ON "user"(enabled);
+CREATE INDEX IF NOT EXISTS idx_user_enabled ON "user"(enabled);

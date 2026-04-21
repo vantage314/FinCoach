@@ -376,8 +376,8 @@ onMounted(() => {
 .admin-page {
   min-height: 100vh;
   padding: 24px;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: #fff;
+  background: var(--fc-bg-gradient);
+  color: var(--fc-text);
 }
 
 .page-header {
@@ -396,7 +396,7 @@ onMounted(() => {
 
 .sub {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: var(--fc-text-muted);
   font-size: 13px;
 }
 
@@ -406,8 +406,8 @@ onMounted(() => {
 
 .summary-card {
   margin-bottom: 16px;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--fc-panel);
+  border: 1px solid var(--fc-border);
 }
 
 .action-row {

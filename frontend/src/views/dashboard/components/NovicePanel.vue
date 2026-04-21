@@ -60,12 +60,10 @@ const formatNumber = (num: number) => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .glass-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--fc-panel-hover);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--fc-border);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 24px;
@@ -85,7 +83,7 @@ const formatNumber = (num: number) => {
     }
 
     .subtitle {
-        color: #94a3b8;
+        color: var(--fc-text-muted);
         font-size: 14px;
     }
 }
@@ -118,7 +116,7 @@ const formatNumber = (num: number) => {
     text-align: right;
     
     .gap-text {
-        color: #94a3b8;
+        color: var(--fc-text-muted);
         font-size: 14px;
         
         .highlight {
@@ -150,7 +148,7 @@ const formatNumber = (num: number) => {
     }
     
     .tip {
-        color: #64748b;
+        color: var(--fc-text-disabled);
         font-size: 12px;
     }
 }

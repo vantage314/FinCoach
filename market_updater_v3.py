@@ -8,13 +8,13 @@ import random
 import sys
 
 # ================= 配置区域 =================
-DB_USER = 'root'
+DB_USER = 'postgres'
 DB_PASS = '030314'
 DB_HOST = 'localhost'
-DB_PORT = '3306'
+DB_PORT = '5432'
 DB_NAME = 'fincoach'
 
-DB_URL = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
+DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 # ================= 数据库连接 =================
 try:

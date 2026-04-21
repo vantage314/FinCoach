@@ -154,7 +154,7 @@ const sendMessage = async () => {
 </script>
 
 <style scoped>
-.chat-container { display: flex; height: calc(100vh - 80px); background: #14161a; color: #fff; overflow: hidden; }
+.chat-container { display: flex; height: calc(100vh - 80px); background: #14161a; color: var(--fc-text); overflow: hidden; }
 
 /* 侧边栏 */
 .chat-sidebar { width: 260px; background: #1d212b; border-right: 1px solid #2c3038; display: flex; flex-direction: column; padding: 15px; }
@@ -180,7 +180,7 @@ const sendMessage = async () => {
 .message-row .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2b303c; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid #4c4d4f; }
 .message-row.user .avatar { background: #409eff; border: none; }
 .message-row .bubble { background: #2b303c; padding: 12px 16px; border-radius: 12px; line-height: 1.6; position: relative; min-height: 40px; }
-.message-row.user .bubble { background: #409eff; color: #fff; border-radius: 12px 0 12px 12px; }
+.message-row.user .bubble { background: #409eff; color: var(--fc-text); border-radius: 12px 0 12px 12px; }
 .message-row.assistant .bubble { background: #1d212b; border: 1px solid #2c3038; border-radius: 0 12px 12px 12px; }
 
 /* 正在输入动画 */
@@ -192,7 +192,7 @@ const sendMessage = async () => {
 /* 输入区 */
 .input-area { padding: 20px; background: #1d212b; border-top: 1px solid #2c3038; display: flex; flex-direction: column; align-items: center; }
 .input-wrapper { width: 100%; max-width: 800px; position: relative; background: #2b303c; border-radius: 12px; border: 1px solid #4c4d4f; padding: 5px; display: flex; align-items: flex-end; }
-.chat-input :deep(.el-textarea__inner) { background: transparent; border: none; box-shadow: none; color: #fff; padding: 10px; max-height: 150px; }
+.chat-input :deep(.el-textarea__inner) { background: transparent; border: none; box-shadow: none; color: var(--fc-text); padding: 10px; max-height: 150px; }
 .send-btn { margin: 0 5px 5px 0; }
 .footer-tip { font-size: 12px; color: #606266; margin-top: 10px; }
 

@@ -1,8 +1,8 @@
 <template>
-  <div class="dashboard">
-    <h1 style="color: white; padding: 40px;">Dashboard Placeholder</h1>
-    <p style="color: #94a3b8; padding: 0 40px;">您已成功登录。</p>
-    <el-button @click="handleLogout" style="margin-left: 40px;">退出登录</el-button>
+  <div class="dashboard" style="padding: 40px;">
+    <h1 style="color: var(--fc-text-strong);">Dashboard Placeholder</h1>
+    <p style="color: var(--fc-text-muted);">您已成功登录。</p>
+    <el-button @click="handleLogout" style="margin-top: 16px;">退出登录</el-button>
   </div>
 </template>
 

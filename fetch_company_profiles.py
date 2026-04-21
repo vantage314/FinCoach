@@ -9,7 +9,7 @@ import time
 from sqlalchemy import create_engine, text
 
 # ===================== 配置 =====================
-DB_URL = "mysql+pymysql://root:030314@localhost:3306/fincoach?charset=utf8mb4"
+DB_URL = "postgresql+psycopg2://postgres:030314@localhost:5432/fincoach"
 
 try:
     engine = create_engine(DB_URL, pool_recycle=3600, pool_pre_ping=True)

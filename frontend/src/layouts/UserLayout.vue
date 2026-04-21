@@ -152,16 +152,14 @@ const handleLogout = async () => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .split-layout {
   min-height: 100vh;
-  background-color: $background-dark;
+  background-color: var(--fc-bg);
 }
 
 .sidebar {
   background: rgba(15, 23, 42, 0.85);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid var(--fc-border);
   display: flex;
   flex-direction: column;
 }
@@ -171,13 +169,13 @@ const handleLogout = async () => {
   align-items: center;
   gap: 10px;
   padding: 18px 20px;
-  color: $text-light;
+  color: var(--fc-text);
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--fc-border-light);
 }
 
 .brand-icon {
-  color: $primary-color;
+  color: var(--fc-primary);
 }
 
 .brand-text {
@@ -192,14 +190,14 @@ const handleLogout = async () => {
 
   :deep(.el-menu-item),
   :deep(.el-sub-menu__title) {
-    color: $text-dim;
+    color: var(--fc-text-muted);
     background: transparent !important;
   }
 
   :deep(.el-menu-item.is-active) {
-    color: $text-light;
-    background: rgba(59, 130, 246, 0.12) !important;
-    border-left: 3px solid $primary-color;
+    color: var(--fc-text);
+    background: rgba(79, 70, 229, 0.12) !important;
+    border-left: 3px solid var(--fc-primary);
   }
 }
 
@@ -215,11 +213,11 @@ const handleLogout = async () => {
   align-items: center;
   justify-content: space-between;
   background: rgba(15, 23, 42, 0.6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--fc-border);
 }
 
 .page-title {
-  color: $text-light;
+  color: var(--fc-text);
   font-size: 16px;
   font-weight: 600;
 }
@@ -234,11 +232,11 @@ const handleLogout = async () => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: $text-light;
+  color: var(--fc-text);
 }
 
 .user-avatar {
-  background: linear-gradient(135deg, $primary-color, #06b6d4);
+  background: linear-gradient(135deg, var(--fc-primary), #06b6d4);
   color: white;
   font-weight: 600;
 }
@@ -253,17 +251,17 @@ const handleLogout = async () => {
 
 .arrow-icon {
   font-size: 12px;
-  color: $text-dim;
+  color: var(--fc-text-muted);
 }
 
 .main-content {
   padding: 20px 24px;
-  background-color: $background-dark;
+  background-color: var(--fc-bg);
   min-height: calc(100vh - 56px);
 }
 
 .route-loading {
-  color: $text-dim;
+  color: var(--fc-text-muted);
   padding: 32px 0;
   text-align: center;
   font-size: 14px;

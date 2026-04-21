@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <h2 class="title">欢迎回来</h2>
-    <p class="subtitle">FinCoach 助您开启智慧投资之路</p>
+    <p class="subtitle">白领人士个人资产诊断与投资建议系统</p>
     
     <el-form
       ref="loginFormRef"
@@ -105,8 +105,6 @@ const handleLogin = async () => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .login-page {
   color: white;
   
@@ -122,7 +120,7 @@ const handleLogin = async () => {
   
   .subtitle {
     font-size: 14px;
-    color: $text-dim;
+    color: var(--fc-text-muted);
     text-align: center;
     margin-bottom: 32px;
   }
@@ -130,7 +128,7 @@ const handleLogin = async () => {
 
 .custom-form {
   :deep(.el-form-item__label) {
-    color: $text-dim;
+    color: var(--fc-text-muted);
     font-size: 13px;
     padding-bottom: 4px;
   }
@@ -143,7 +141,7 @@ const handleLogin = async () => {
     padding: 8px 12px;
     
     &.is-focus {
-      border-color: $primary-color;
+      border-color: var(--fc-primary);
       background-color: rgba(255, 255, 255, 0.08);
     }
   }
@@ -163,7 +161,7 @@ const handleLogin = async () => {
   font-size: 16px;
   font-weight: 600;
   border: none;
-  background: linear-gradient(135deg, #06b6d4, $primary-color);
+  background: linear-gradient(135deg, #06b6d4, var(--fc-primary));
   transition: all 0.3s ease;
   margin-top: 16px;
   
@@ -178,10 +176,10 @@ const handleLogin = async () => {
   margin-top: 24px;
   text-align: center;
   font-size: 14px;
-  color: $text-dim;
+  color: var(--fc-text-muted);
   
   .link {
-    color: $primary-color;
+    color: var(--fc-primary);
     margin-left: 8px;
     text-decoration: none;
     font-weight: 500;

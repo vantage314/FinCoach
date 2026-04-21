@@ -104,12 +104,10 @@ watch(() => props.personaTag, () => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .glass-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--fc-panel-hover);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--fc-border);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 24px;
@@ -128,7 +126,7 @@ watch(() => props.personaTag, () => {
         margin-bottom: 8px;
     }
     .subtitle {
-        color: #94a3b8;
+        color: var(--fc-text-muted);
         font-size: 14px;
     }
 }
@@ -153,7 +151,7 @@ watch(() => props.personaTag, () => {
         .label {
             display: block;
             font-size: 12px;
-            color: #64748b;
+            color: var(--fc-text-disabled);
             margin-bottom: 4px;
         }
         .value {

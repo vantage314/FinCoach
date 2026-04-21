@@ -371,8 +371,6 @@ const getRiskLevel = (item: any) => {
 </script>
 
 <style lang="scss" scoped>
-@use "@/theme/variables.scss" as *;
-
 .step-input {
   display: flex;
   flex-direction: column;
@@ -381,7 +379,7 @@ const getRiskLevel = (item: any) => {
 
 .step-title {
   font-size: 18px;
-  color: $text-primary;
+  color: var(--fc-text);
   margin: 0;
 }
 
@@ -396,7 +394,7 @@ const getRiskLevel = (item: any) => {
   border-radius: 12px;
   padding: 20px;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--fc-panel-hover);
   display: flex;
   gap: 16px;
   align-items: center;
@@ -407,10 +405,10 @@ const getRiskLevel = (item: any) => {
   }
 
   &.active {
-    border-color: $primary;
-    background: rgba($primary, 0.1);
+    border-color: var(--fc-primary);
+    background: rgba(79, 70, 229, 0.1);
 
-    h4 { color: $primary; }
+    h4 { color: var(--fc-primary); }
   }
 
   .icon {
@@ -420,12 +418,12 @@ const getRiskLevel = (item: any) => {
   .info {
     h4 {
       margin: 0 0 4px 0;
-      color: $text-primary;
+      color: var(--fc-text);
     }
     p {
       margin: 0;
       font-size: 12px;
-      color: $text-secondary;
+      color: var(--fc-text-muted);
     }
   }
 }
@@ -434,7 +432,7 @@ const getRiskLevel = (item: any) => {
   label {
     display: block;
     margin-bottom: 8px;
-    color: $text-secondary;
+    color: var(--fc-text-muted);
   }
 }
 
@@ -466,7 +464,7 @@ const getRiskLevel = (item: any) => {
 
 .reason-text {
   font-size: 12px;
-  color: $text-secondary;
+  color: var(--fc-text-muted);
   line-height: 1.4;
 }
 
@@ -478,7 +476,7 @@ const getRiskLevel = (item: any) => {
   label {
     display: block;
     margin-bottom: 8px;
-    color: $text-secondary;
+    color: var(--fc-text-muted);
   }
 }
 

@@ -3,7 +3,10 @@ server:
 
 spring:
   profiles:
-    active: dev-mysql
+    active: dev-pg
+    group:
+      dev-pg: dev
+      dev-mysql: dev
   datasource:
     hikari:
       maximum-pool-size: 10
