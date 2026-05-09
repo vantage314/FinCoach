@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: fincoach-api-vantagepan
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: codex/fincoach-render-api
+    autoDeploy: true
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /api/auth/test
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod-pg
+      - key: DB_HOST
+        fromDatabase:
+          name: fincoach-postgres
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: fincoach-postgres
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: fincoach-postgres
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: fincoach-postgres
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: fincoach-postgres
+          property: password
+      - key: DEEPSEEK_API_KEY
+        sync: false
+
+databases:
+  - name: fincoach-postgres
+    databaseName: fincoach
+    user: fincoach
+    plan: free
+    postgresMajorVersion: "16"
+    ipAllowList: []
