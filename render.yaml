@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: fincoach-api-vantagepan
+    name: fincoach-spring-api
     runtime: docker
     plan: free
     region: singapore
@@ -12,14 +12,10 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod-pg
-      - key: DB_HOST
+      - key: DATABASE_URL
         fromDatabase:
           name: fincoach-postgres
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: fincoach-postgres
-          property: port
+          property: connectionString
       - key: DB_NAME
         fromDatabase:
           name: fincoach-postgres
@@ -33,12 +29,4 @@ services:
           name: fincoach-postgres
           property: password
       - key: DEEPSEEK_API_KEY
-        sync: false
-
-databases:
-  - name: fincoach-postgres
-    databaseName: fincoach
-    user: fincoach
-    plan: free
-    postgresMajorVersion: "16"
-    ipAllowList: []
+        value: not-configured

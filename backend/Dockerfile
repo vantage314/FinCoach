@@ -9,8 +9,9 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 COPY --from=build /workspace/target/core-0.0.1-SNAPSHOT.jar app.jar
+COPY render-entrypoint.sh /app/render-entrypoint.sh
 
 ENV SPRING_PROFILES_ACTIVE=prod-pg
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["sh", "/app/render-entrypoint.sh"]
